@@ -1,0 +1,185 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-03-01 19:43:57.931646",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "action_name",
+  "cause",
+  "area",
+  "objectives",
+  "start_date",
+  "sector_affected",
+  "sub_sector_affected",
+  "national_strategy",
+  "attach_document_1",
+  "attach_document_2",
+  "attach_document_3",
+  "column_break_tdmdb",
+  "action_description",
+  "focus",
+  "action_status",
+  "duration",
+  "instrument_type",
+  "ghg_affected",
+  "national_implementing_entitys",
+  "estimated_investment"
+ ],
+ "fields": [
+  {
+   "fieldname": "action_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Name of Action",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "cause",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Cause",
+   "options": "\nClimate Change\nNot Defined",
+   "reqd": 1
+  },
+  {
+   "fieldname": "focus",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Focus",
+   "options": "\nAdaptation\nMitigation\nCross-Cutting\nEnablers\nTransparency\nOthers",
+   "reqd": 1
+  },
+  {
+   "fieldname": "area",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Area",
+   "options": "\nNational\nSub-national",
+   "reqd": 1
+  },
+  {
+   "fieldname": "action_description",
+   "fieldtype": "Small Text",
+   "label": "Action Description"
+  },
+  {
+   "fieldname": "objectives",
+   "fieldtype": "Data",
+   "label": "Objectives"
+  },
+  {
+   "fieldname": "instrument_type",
+   "fieldtype": "Table MultiSelect",
+   "label": "Type of Instrument(s)",
+   "options": "Project Action Instrument ChildTable"
+  },
+  {
+   "fieldname": "action_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Action Status",
+   "options": "\nProposed\nPlanned\nOngoing\nImplemented\nCompleted",
+   "reqd": 1
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Start Date"
+  },
+  {
+   "fieldname": "duration",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Duration"
+  },
+  {
+   "fieldname": "ghg_affected",
+   "fieldtype": "Table MultiSelect",
+   "label": "GHG(s) affected",
+   "options": "Mitigation Target GHGs in  ChildTable"
+  },
+  {
+   "fieldname": "sector_affected",
+   "fieldtype": "Table MultiSelect",
+   "label": "Sector Affected",
+   "options": "Project Actions Sector ChildTable"
+  },
+  {
+   "fieldname": "sub_sector_affected",
+   "fieldtype": "Table MultiSelect",
+   "label": "Sub-Sector(s) affected",
+   "options": "Project Actions Sub Sector ChildTable"
+  },
+  {
+   "fieldname": "national_implementing_entitys",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "National Implementing Entity(s)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "national_strategy",
+   "fieldtype": "Select",
+   "label": "Anchored in a national strategy",
+   "options": "\nYes\nNo\nNDC\nNAPA\nOthers"
+  },
+  {
+   "fieldname": "estimated_investment",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Estimated investment (USD)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_tdmdb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attach_document_1",
+   "fieldtype": "Attach",
+   "label": "Attach Document 1"
+  },
+  {
+   "fieldname": "attach_document_2",
+   "fieldtype": "Attach",
+   "label": "Attach Document 2"
+  },
+  {
+   "fieldname": "attach_document_3",
+   "fieldtype": "Attach",
+   "label": "Attach Document 3"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "make_attachments_public": 1,
+ "modified": "2024-09-18 13:02:59.611802",
+ "modified_by": "Administrator",
+ "module": "Mrvtools",
+ "name": "Project Actions",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "action_name",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

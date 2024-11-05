@@ -1,0 +1,86 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-08-05 13:59:28.487360",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "disbursement_category",
+  "q1",
+  "q2",
+  "q3",
+  "q4",
+  "total"
+ ],
+ "fields": [
+  {
+   "columns": 3,
+   "fieldname": "disbursement_category",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Disbursement Category",
+   "options": "Disbursement Category",
+   "precision": "2"
+  },
+  {
+   "columns": 1,
+   "default": "0",
+   "fieldname": "q1",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Q1",
+   "precision": "2"
+  },
+  {
+   "columns": 1,
+   "default": "0",
+   "fieldname": "q2",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Q2",
+   "precision": "2"
+  },
+  {
+   "columns": 1,
+   "default": "0",
+   "fieldname": "q3",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Q3",
+   "precision": "2"
+  },
+  {
+   "columns": 1,
+   "default": "0",
+   "fieldname": "q4",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Q4",
+   "precision": "2"
+  },
+  {
+   "columns": 2,
+   "default": "0",
+   "fieldname": "total",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Total",
+   "precision": "2"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "make_attachments_public": 1,
+ "modified": "2024-07-22 13:03:41.773102",
+ "modified_by": "Administrator",
+ "module": "Mrvtools",
+ "name": "Climate Monitoring Information Budget Expenditure ChildTable",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

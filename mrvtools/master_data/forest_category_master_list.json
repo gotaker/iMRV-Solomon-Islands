@@ -1,0 +1,386 @@
+[
+ {
+  "category": "4.B.2.a. Forest land converted to cropland . ",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.B. Cropland",
+  "modified": "2023-09-14 19:46:35.103860",
+  "name": "4.B.2.a. Forest land converted to cropland ."
+ },
+ {
+  "category": "4.F.2.c. Grassland converted  to other land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.F. Other land",
+  "modified": "2023-09-14 19:46:35.362016",
+  "name": "4.F.2.c. Grassland converted  to other land"
+ },
+ {
+  "category": "Cropland converted to Forest Land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.A. Forest land",
+  "modified": "2023-10-10 17:29:52.827050",
+  "name": "Cropland converted to Forest Land"
+ },
+ {
+  "category": "Forest land Remaining Forest land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.A. Forest land",
+  "modified": "2023-10-10 17:29:52.862160",
+  "name": "Forest land Remaining Forest land"
+ },
+ {
+  "category": "Grassland converted to Forest Land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.A. Forest land",
+  "modified": "2023-10-10 17:29:52.871434",
+  "name": "Grassland converted to Forest Land"
+ },
+ {
+  "category": "Other Land converted to Forest Land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.A. Forest land",
+  "modified": "2023-10-10 17:29:52.885325",
+  "name": "Other Land converted to Forest Land"
+ },
+ {
+  "category": "Settlements converted to Forest Land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.A. Forest land",
+  "modified": "2023-10-10 17:29:52.897770",
+  "name": "Settlements converted to Forest Land"
+ },
+ {
+  "category": "Wetlands converted to Forest Land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.A. Forest land",
+  "modified": "2023-10-10 17:29:52.908017",
+  "name": "Wetlands converted to Forest Land"
+ },
+ {
+  "category": "4.A.1. Forest land remaining forest land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.A. Forest land",
+  "modified": "2023-09-14 19:46:34.980215",
+  "name": "4.A.1. Forest land remaining forest land"
+ },
+ {
+  "category": "4.A.2. Land converted to forest land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.A. Forest land",
+  "modified": "2023-09-14 19:46:35.011982",
+  "name": "4.A.2. Land converted to forest land"
+ },
+ {
+  "category": "4.A.2.a. Cropland converted to forest land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.A. Forest land",
+  "modified": "2023-09-14 19:46:35.029031",
+  "name": "4.A.2.a. Cropland converted to forest land"
+ },
+ {
+  "category": "4.A.2.b. Grassland converted to forest land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.A. Forest land",
+  "modified": "2023-09-14 19:46:35.036657",
+  "name": "4.A.2.b. Grassland converted to forest land"
+ },
+ {
+  "category": "4.A.2.c. Wetlands converted to forest land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.A. Forest land",
+  "modified": "2023-09-14 19:46:35.045706",
+  "name": "4.A.2.c. Wetlands converted to forest land"
+ },
+ {
+  "category": "4.A.2.d. Settlements converted to forest land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.A. Forest land",
+  "modified": "2023-09-14 19:46:35.062448",
+  "name": "4.A.2.d. Settlements converted to forest land"
+ },
+ {
+  "category": "4.A.2.e. Other land converted to forest land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.A. Forest land",
+  "modified": "2023-09-14 19:46:35.078921",
+  "name": "4.A.2.e. Other land converted to forest land"
+ },
+ {
+  "category": "4.B.1. Cropland remaining cropland",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.B. Cropland",
+  "modified": "2023-09-14 19:46:35.087304",
+  "name": "4.B.1. Cropland remaining cropland"
+ },
+ {
+  "category": "4.B.2. Land converted to cropland",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.B. Cropland",
+  "modified": "2023-09-14 19:46:35.095630",
+  "name": "4.B.2. Land converted to cropland"
+ },
+ {
+  "category": "4.B.2.a. Forest land converted to cropland",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.B. Cropland",
+  "modified": "2023-11-06 17:39:54.540811",
+  "name": "4.B.2.a. Forest land converted to cropland"
+ },
+ {
+  "category": "4.B.2.b. Grassland converted to cropland",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.B. Cropland",
+  "modified": "2023-11-06 17:40:27.749402",
+  "name": "4.B.2.b. Grassland converted to cropland"
+ },
+ {
+  "category": "4.B.2.c. Wetlands converted to cropland",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.B. Cropland",
+  "modified": "2023-09-14 19:46:35.120309",
+  "name": "4.B.2.c. Wetlands converted to cropland"
+ },
+ {
+  "category": "4.B.2.d. Settlements converted to cropland",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.B. Cropland",
+  "modified": "2023-09-14 19:46:35.128753",
+  "name": "4.B.2.d. Settlements converted to cropland"
+ },
+ {
+  "category": "4.B.2.e. Other land converted to cropland",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.B. Cropland",
+  "modified": "2023-09-14 19:46:35.136715",
+  "name": "4.B.2.e. Other land converted to cropland"
+ },
+ {
+  "category": "4.C.1. Grassland remaining grassland",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.C. Grassland",
+  "modified": "2023-09-14 19:46:35.145442",
+  "name": "4.C.1. Grassland remaining grassland"
+ },
+ {
+  "category": "4.C.2. Land converted to grassland",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.C. Grassland",
+  "modified": "2023-09-14 19:46:35.153530",
+  "name": "4.C.2. Land converted to grassland"
+ },
+ {
+  "category": "4.C.2.a. Forest land converted to grassland",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.C. Grassland",
+  "modified": "2023-09-14 19:46:35.161912",
+  "name": "4.C.2.a. Forest land converted to grassland"
+ },
+ {
+  "category": "4.C.2.b. Cropland converted to grassland",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.C. Grassland",
+  "modified": "2023-09-14 19:46:35.170648",
+  "name": "4.C.2.b. Cropland converted to grassland"
+ },
+ {
+  "category": "4.C.2.c. Wetlands converted to grassland",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.C. Grassland",
+  "modified": "2023-09-14 19:46:35.178947",
+  "name": "4.C.2.c. Wetlands converted to grassland"
+ },
+ {
+  "category": "4.C.2.d. Settlements converted to grassland",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.C. Grassland",
+  "modified": "2023-09-14 19:46:35.187169",
+  "name": "4.C.2.d. Settlements converted to grassland"
+ },
+ {
+  "category": "4.C.2.e. Other land converted to grassland",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.C. Grassland",
+  "modified": "2023-09-14 19:46:35.195378",
+  "name": "4.C.2.e. Other land converted to grassland"
+ },
+ {
+  "category": "4.D.1. Wetlands remaining wetlands",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.D. Wetlands",
+  "modified": "2023-09-14 19:46:35.203774",
+  "name": "4.D.1. Wetlands remaining wetlands"
+ },
+ {
+  "category": "4.D.2. Land converted to wetlands",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.D. Wetlands",
+  "modified": "2023-09-14 19:46:35.212349",
+  "name": "4.D.2. Land converted to wetlands"
+ },
+ {
+  "category": "4.D.2.a.  Land converted to peat extraction",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.D. Wetlands",
+  "modified": "2023-09-14 19:46:35.229131",
+  "name": "4.D.2.a.  Land converted to peat extraction"
+ },
+ {
+  "category": "4.D.2.b. Land converted to flooded land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.D. Wetlands",
+  "modified": "2023-09-14 19:46:35.237491",
+  "name": "4.D.2.b. Land converted to flooded land"
+ },
+ {
+  "category": "4.D.2.c. Land converted to other wetlands",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.D. Wetlands",
+  "modified": "2023-09-14 19:46:35.248422",
+  "name": "4.D.2.c. Land converted to other wetlands"
+ },
+ {
+  "category": "4.E.1. Settlements remaining settlements",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.E. Settlements",
+  "modified": "2023-09-14 19:46:35.262080",
+  "name": "4.E.1. Settlements remaining settlements"
+ },
+ {
+  "category": "4.E.2. Land converted to settlements",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.E. Settlements",
+  "modified": "2023-09-14 19:46:35.270209",
+  "name": "4.E.2. Land converted to settlements"
+ },
+ {
+  "category": "4.E.2.a. Forest land converted to settlements",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.E. Settlements",
+  "modified": "2023-09-14 19:46:35.278522",
+  "name": "4.E.2.a. Forest land converted to settlements"
+ },
+ {
+  "category": "4.E.2.b. Cropland converted to settlements",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.E. Settlements",
+  "modified": "2023-09-14 19:46:35.287314",
+  "name": "4.E.2.b. Cropland converted to settlements"
+ },
+ {
+  "category": "4.E.2.c. Grassland converted to settlements",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.E. Settlements",
+  "modified": "2023-09-14 19:46:35.295731",
+  "name": "4.E.2.c. Grassland converted to settlements"
+ },
+ {
+  "category": "4.E.2.d. Wetlands converted to settlements",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.E. Settlements",
+  "modified": "2023-09-14 19:46:35.304026",
+  "name": "4.E.2.d. Wetlands converted to settlements"
+ },
+ {
+  "category": "4.E.2.e. Other Land converted to settlements",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.E. Settlements",
+  "modified": "2023-09-14 19:46:35.311815",
+  "name": "4.E.2.e. Other Land converted to settlements"
+ },
+ {
+  "category": "4.F.1. Other land remaining other land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.F. Other land",
+  "modified": "2023-09-14 19:46:35.320786",
+  "name": "4.F.1. Other land remaining other land"
+ },
+ {
+  "category": "4.F.2. Land converted to other land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.F. Other land",
+  "modified": "2023-09-14 19:46:35.337493",
+  "name": "4.F.2. Land converted to other land"
+ },
+ {
+  "category": "4.F.2.a. Forest land converted to other land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.F. Other land",
+  "modified": "2023-09-14 19:46:35.345823",
+  "name": "4.F.2.a. Forest land converted to other land"
+ },
+ {
+  "category": "4.F.2.b. Cropland converted to other land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.F. Other land",
+  "modified": "2023-09-14 19:46:35.353928",
+  "name": "4.F.2.b. Cropland converted to other land"
+ },
+ {
+  "category": "4.F.2.c. Grassland converted to other land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.F. Other land",
+  "modified": "2023-11-06 12:12:10.096296",
+  "name": "4.F.2.c. Grassland converted to other land"
+ },
+ {
+  "category": "4.F.2.d. Wetlands converted to other land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.F. Other land",
+  "modified": "2023-09-14 19:46:35.370751",
+  "name": "4.F.2.d. Wetlands converted to other land"
+ },
+ {
+  "category": "4.F.2.e. Settlements converted to other land",
+  "docstatus": 0,
+  "doctype": "Forest Category Master List",
+  "link_category": "4.F. Other land",
+  "modified": "2023-09-14 19:46:35.378946",
+  "name": "4.F.2.e. Settlements converted to other land"
+ }
+]

@@ -1,0 +1,226 @@
+[
+ {
+  "category": "1.A. Fuel combustion activities",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-07-28 12:31:09.915741",
+  "name": "1.A. Fuel combustion activities",
+  "sector": "1. Energy"
+ },
+ {
+  "category": "2.D. Non-Energy Products from Fuels and Solvent Use",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-11-08 19:46:30.013115",
+  "name": "2.D. Non-Energy Products from Fuels and Solvent Use",
+  "sector": "2. Industrial processes and product use"
+ },
+ {
+  "category": "2.F. Product uses as substitutes for ODS",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-07-28 12:32:34.600367",
+  "name": "2.F. Product uses as substitutes for ODS",
+  "sector": "2. Industrial processes and product use"
+ },
+ {
+  "category": "2.H. Other",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-07-28 12:32:54.666887",
+  "name": "2.H. Other",
+  "sector": "2. Industrial processes and product use"
+ },
+ {
+  "category": "3.A. Enteric fermentation",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:48:50.101058",
+  "name": "3.A. Enteric fermentation",
+  "sector": "3. Agriculture"
+ },
+ {
+  "category": "3.B.a. Manure management",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:49:27.724112",
+  "name": "3.B.a. Manure management",
+  "sector": "3. Agriculture"
+ },
+ {
+  "category": "3.B.b. Direct N2O emissions per MMS (kt N2O)",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:50:06.664585",
+  "name": "3.B.b. Direct N2O emissions per MMS (kt N2O)",
+  "sector": "3. Agriculture"
+ },
+ {
+  "category": "5.A. Solid waste disposal",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:59:47.309768",
+  "name": "5.A. Solid waste disposal",
+  "sector": "5. Waste"
+ },
+ {
+  "category": "5.D. Wastewater treatment and discharge",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 20:00:00.858044",
+  "name": "5.D. Wastewater treatment and discharge",
+  "sector": "5. Waste"
+ },
+ {
+  "category": "2.A. Mineral industry",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:16:25.322230",
+  "name": "2.A. Mineral industry",
+  "sector": "2. Industrial processes and product use"
+ },
+ {
+  "category": "2.B. Chemical industry ",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:17:36.402493",
+  "name": "2.B. Chemical industry",
+  "sector": "2. Industrial processes and product use"
+ },
+ {
+  "category": "2.G. Other product manufacture and use",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-11-08 18:33:03.587293",
+  "name": "2.G. Other product manufacture and use",
+  "sector": "2. Industrial processes and product use"
+ },
+ {
+  "category": "1.D. Memo Items",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:46:08.198409",
+  "name": "1.D. Memo Items",
+  "sector": "1. Energy"
+ },
+ {
+  "category": "3.D. Agricultural soils",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:50:28.148240",
+  "name": "3.D. Agricultural soils",
+  "sector": "3. Agriculture"
+ },
+ {
+  "category": "3.E. Prescribed burning of savannahs",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:50:42.634697",
+  "name": "3.E. Prescribed burning of savannahs",
+  "sector": "3. Agriculture"
+ },
+ {
+  "category": "3.F. Field burning of agricultural residues",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:51:02.877734",
+  "name": "3.F. Field burning of agricultural residues",
+  "sector": "3. Agriculture"
+ },
+ {
+  "category": "3.H. Urea application",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:51:19.976710",
+  "name": "3.H. Urea application",
+  "sector": "3. Agriculture"
+ },
+ {
+  "category": "4.A. Forest land",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:52:19.926523",
+  "name": "4.A. Forest land",
+  "sector": "4. LAND USE, LAND-USE CHANGE AND FORESTRY"
+ },
+ {
+  "category": "4.B. Cropland",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:52:33.123985",
+  "name": "4.B. Cropland",
+  "sector": "4. LAND USE, LAND-USE CHANGE AND FORESTRY"
+ },
+ {
+  "category": "4.C. Grassland",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:52:45.400930",
+  "name": "4.C. Grassland",
+  "sector": "4. LAND USE, LAND-USE CHANGE AND FORESTRY"
+ },
+ {
+  "category": "4.D. Wetlands",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:52:58.492145",
+  "name": "4.D. Wetlands",
+  "sector": "4. LAND USE, LAND-USE CHANGE AND FORESTRY"
+ },
+ {
+  "category": "4.E. Settlements",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:53:11.497842",
+  "name": "4.E. Settlements",
+  "sector": "4. LAND USE, LAND-USE CHANGE AND FORESTRY"
+ },
+ {
+  "category": "4.F. Other land",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:53:22.113985",
+  "name": "4.F. Other land",
+  "sector": "4. LAND USE, LAND-USE CHANGE AND FORESTRY"
+ },
+ {
+  "category": "4.G. Harvested wood products",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:53:31.133547",
+  "name": "4.G. Harvested wood products",
+  "sector": "4. LAND USE, LAND-USE CHANGE AND FORESTRY"
+ },
+ {
+  "category": "4.H. Biomass Burning",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 19:54:33.361149",
+  "name": "4.H. Biomass Burning",
+  "sector": "4. LAND USE, LAND-USE CHANGE AND FORESTRY"
+ },
+ {
+  "category": "5.B. Biological treatment of solid waste",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 20:00:19.134439",
+  "name": "5.B. Biological treatment of solid waste",
+  "sector": "5. Waste"
+ },
+ {
+  "category": "5.C. Incineration and open burning of waste",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 20:00:29.682254",
+  "name": "5.C. Incineration and open burning of waste",
+  "sector": "5. Waste"
+ },
+ {
+  "category": "5.E. Other",
+  "docstatus": 0,
+  "doctype": "GHG Category",
+  "modified": "2023-09-07 20:00:40.612735",
+  "name": "5.E. Other",
+  "sector": "5. Waste"
+ }
+]

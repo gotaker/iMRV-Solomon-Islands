@@ -1,0 +1,37 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Project Objective",
+  "modified": "2023-06-30 17:28:51.838374",
+  "name": "Mitigation",
+  "objective": "Mitigation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Objective",
+  "modified": "2023-06-30 17:29:30.502628",
+  "name": "Cross-Cutting",
+  "objective": "Cross-Cutting"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Objective",
+  "modified": "2023-06-30 17:29:44.569651",
+  "name": "Transparency",
+  "objective": "Transparency"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Objective",
+  "modified": "2023-06-30 17:30:08.641411",
+  "name": "Enablers",
+  "objective": "Enablers"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Objective",
+  "modified": "2023-06-30 17:29:02.643514",
+  "name": "Adaptation",
+  "objective": "Adaptation"
+ }
+]

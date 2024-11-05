@@ -1,0 +1,94 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-09-07 18:54:04.633421",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "urban_population",
+  "waste_per_capita_kgyear",
+  "fraction_of_population_burning_waste",
+  "dry_matter",
+  "fraction_carbon",
+  "fraction_of_fossil_carbon_in_total_carbon_fcf_fraction",
+  "oxidation_factor",
+  "reference"
+ ],
+ "fields": [
+  {
+   "fieldname": "urban_population",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Urban Population"
+  },
+  {
+   "default": "0",
+   "fieldname": "waste_per_capita_kgyear",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Waste Per Capita (kg/year)",
+   "precision": "2"
+  },
+  {
+   "default": "0",
+   "fieldname": "fraction_of_population_burning_waste",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Fraction of Population Burning Waste",
+   "precision": "2"
+  },
+  {
+   "default": "0",
+   "fieldname": "dry_matter",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Dry Matter Content -  dm  (fraction)",
+   "precision": "2"
+  },
+  {
+   "default": "0",
+   "fieldname": "fraction_of_fossil_carbon_in_total_carbon_fcf_fraction",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Fraction of Fossil Carbon in Total Carbon FCF (fraction)",
+   "precision": "2"
+  },
+  {
+   "default": "0",
+   "fieldname": "oxidation_factor",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Oxidation Factor- OF",
+   "precision": "2"
+  },
+  {
+   "fieldname": "reference",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Reference",
+   "precision": "2"
+  },
+  {
+   "default": "0",
+   "fieldname": "fraction_carbon",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Fraction of Carbon in Dry Matter CF (fraction)"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "make_attachments_public": 1,
+ "modified": "2024-07-22 13:04:27.152542",
+ "modified_by": "Administrator",
+ "module": "GHG Inventory",
+ "name": "Open Burning Waste ChildTable",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

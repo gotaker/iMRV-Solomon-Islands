@@ -1,0 +1,19 @@
+{
+ "content": null,
+ "creation": "2024-01-04 12:30:59.947036",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2024-01-04 12:30:59.947036",
+ "modified_by": "Administrator",
+ "module": "GHG Inventory",
+ "name": "finance-report",
+ "owner": "Administrator",
+ "page_name": "finance-report",
+ "roles": [],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "Finance Tracking Report"
+}

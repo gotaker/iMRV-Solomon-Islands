@@ -1,0 +1,362 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Energy",
+  "modified": "2023-06-30 18:01:46.072692",
+  "name": "Energy - Adaptation",
+  "objective": "Adaptation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Others",
+  "modified": "2023-07-11 20:33:35.901955",
+  "name": "Others - Enablers",
+  "objective": "Enablers"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Infrastructure",
+  "modified": "2023-07-11 20:33:35.966026",
+  "name": "Infrastructure - Enablers",
+  "objective": "Enablers"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Capacity Building",
+  "modified": "2023-07-11 20:33:36.007448",
+  "name": "Capacity Building - Enablers",
+  "objective": "Enablers"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Plans & Strategy",
+  "modified": "2023-07-11 20:33:36.024009",
+  "name": "Plans & Strategy - Enablers",
+  "objective": "Enablers"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Policy & Regulation",
+  "modified": "2023-07-11 20:33:36.032260",
+  "name": "Policy & Regulation - Enablers",
+  "objective": "Enablers"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Others",
+  "modified": "2023-07-11 20:33:36.049222",
+  "name": "Others - Transparency",
+  "objective": "Transparency"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Information Dissemination",
+  "modified": "2023-07-11 20:33:36.074180",
+  "name": "Information Dissemination - Transparency",
+  "objective": "Transparency"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Data & Information",
+  "modified": "2023-07-11 20:33:36.090783",
+  "name": "Data & Information - Transparency",
+  "objective": "Transparency"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Software & Tools",
+  "modified": "2023-07-11 20:33:36.115800",
+  "name": "Software & Tools - Transparency",
+  "objective": "Transparency"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Methodologies",
+  "modified": "2023-07-11 20:33:36.132563",
+  "name": "Methodologies - Transparency",
+  "objective": "Transparency"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Institutional Arrangements",
+  "modified": "2023-07-11 20:33:36.149022",
+  "name": "Institutional Arrangements - Transparency",
+  "objective": "Transparency"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Plans & Strategy",
+  "modified": "2023-07-11 20:33:36.165758",
+  "name": "Plans & Strategy - Transparency",
+  "objective": "Transparency"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Policy & Regulation",
+  "modified": "2023-07-11 20:33:36.182391",
+  "name": "Policy & Regulation - Transparency",
+  "objective": "Transparency"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Others",
+  "modified": "2023-07-11 20:33:36.199100",
+  "name": "Others - Cross-Cutting",
+  "objective": "Cross-Cutting"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "International Cooperation",
+  "modified": "2023-07-11 20:33:36.216100",
+  "name": "International Cooperation - Cross-Cutting",
+  "objective": "Cross-Cutting"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Information Dissemination",
+  "modified": "2023-07-11 20:33:36.232596",
+  "name": "Information Dissemination - Cross-Cutting",
+  "objective": "Cross-Cutting"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Institutional Arrangements",
+  "modified": "2023-07-11 20:33:36.249870",
+  "name": "Institutional Arrangements - Cross-Cutting",
+  "objective": "Cross-Cutting"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Plans & Strategy",
+  "modified": "2023-07-11 20:33:36.265811",
+  "name": "Plans & Strategy - Cross-Cutting",
+  "objective": "Cross-Cutting"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Policy & Regulation",
+  "modified": "2023-07-11 20:33:36.282410",
+  "name": "Policy & Regulation - Cross-Cutting",
+  "objective": "Cross-Cutting"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Indigenous Peoples",
+  "modified": "2023-07-11 20:33:36.290540",
+  "name": "Indigenous Peoples - Cross-Cutting",
+  "objective": "Cross-Cutting"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Gender & Youth",
+  "modified": "2023-07-11 20:33:36.307182",
+  "name": "Gender & Youth - Cross-Cutting",
+  "objective": "Cross-Cutting"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Others",
+  "modified": "2023-07-11 20:33:36.332366",
+  "name": "Others - Adaptation",
+  "objective": "Adaptation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Environment and Tourism",
+  "modified": "2023-07-11 20:33:36.366017",
+  "name": "Environment and Tourism - Adaptation",
+  "objective": "Adaptation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Waste",
+  "modified": "2023-07-11 20:33:36.390615",
+  "name": "Waste - Adaptation",
+  "objective": "Adaptation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Forestry",
+  "modified": "2023-07-11 20:33:36.415743",
+  "name": "Forestry - Adaptation",
+  "objective": "Adaptation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Infrastructure",
+  "modified": "2023-07-11 20:33:36.432713",
+  "name": "Infrastructure - Adaptation",
+  "objective": "Adaptation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Human Settlements",
+  "modified": "2023-07-11 20:33:36.449098",
+  "name": "Human Settlements - Adaptation",
+  "objective": "Adaptation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Fisheries and Marine Resources",
+  "modified": "2023-07-11 20:33:36.465755",
+  "name": "Fisheries and Marine Resources - Adaptation",
+  "objective": "Adaptation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Mining",
+  "modified": "2023-07-11 20:33:36.482435",
+  "name": "Mining - Adaptation",
+  "objective": "Adaptation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Human Health",
+  "modified": "2023-07-11 20:33:36.499258",
+  "name": "Human Health - Adaptation",
+  "objective": "Adaptation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Water Resources",
+  "modified": "2023-07-11 20:33:36.507175",
+  "name": "Water Resources - Adaptation",
+  "objective": "Adaptation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Agriculture",
+  "modified": "2023-07-11 20:33:36.523941",
+  "name": "Agriculture - Adaptation",
+  "objective": "Adaptation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Others",
+  "modified": "2023-07-11 20:33:36.540184",
+  "name": "Others - Mitigation",
+  "objective": "Mitigation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Industrial Processes and Product Use (IPPU)",
+  "modified": "2023-07-11 20:33:36.557788",
+  "name": "Industrial Processes and Product Use (IPPU) - Mitigation",
+  "objective": "Mitigation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Cross-Cutting",
+  "modified": "2023-07-11 20:33:36.586537",
+  "name": "Cross-Cutting - Mitigation",
+  "objective": "Mitigation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Transport",
+  "modified": "2023-07-11 20:33:36.602618",
+  "name": "Transport - Mitigation",
+  "objective": "Mitigation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Energy Utilisation",
+  "modified": "2023-07-11 20:33:36.624196",
+  "name": "Energy Utilisation - Mitigation",
+  "objective": "Mitigation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Energy Generation",
+  "modified": "2023-07-11 20:33:36.649118",
+  "name": "Energy Generation - Mitigation",
+  "objective": "Mitigation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Land Use and Land Use Change (LULUC)",
+  "modified": "2023-07-11 20:33:36.676048",
+  "name": "Land Use and Land Use Change (LULUC) - Mitigation",
+  "objective": "Mitigation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Forestry",
+  "modified": "2023-07-11 20:33:36.690752",
+  "name": "Forestry - Mitigation",
+  "objective": "Mitigation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Waste Management",
+  "modified": "2023-07-11 20:33:36.698844",
+  "name": "Waste Management - Mitigation",
+  "objective": "Mitigation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Agriculture",
+  "modified": "2023-07-11 20:33:36.715551",
+  "name": "Agriculture - Mitigation",
+  "objective": "Mitigation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Education",
+  "modified": "2023-07-11 20:33:36.382428",
+  "name": "Education - Adaptation",
+  "objective": "Adaptation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Project Key Sector",
+  "key_sector": "Cross-Cutting",
+  "modified": "2023-07-11 20:33:36.349071",
+  "name": "Cross-Cutting - Adaptation",
+  "objective": "Adaptation"
+ }
+]

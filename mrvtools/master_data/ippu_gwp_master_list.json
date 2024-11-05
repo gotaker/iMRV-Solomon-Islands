@@ -1,0 +1,776 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "Carbon dioxide",
+  "gwp": "1",
+  "modified": "2023-10-17 19:59:22.787542",
+  "name": "Carbon dioxide",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "Methane  ",
+  "gwp": "28",
+  "modified": "2023-11-18 17:24:45.547764",
+  "name": "Methane",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "Nitrous oxide",
+  "gwp": "265",
+  "modified": "2023-10-17 19:59:22.836173",
+  "name": "Nitrous oxide",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "CFC-11 ",
+  "gwp": "4660",
+  "modified": "2023-10-17 19:59:22.844581",
+  "name": "CFC-11",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "CFC-12 ",
+  "gwp": "10200",
+  "modified": "2023-10-17 19:59:22.853011",
+  "name": "CFC-12",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "CFC-13 ",
+  "gwp": "13900",
+  "modified": "2023-10-17 19:59:22.861155",
+  "name": "CFC-13",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "CFC-113 ",
+  "gwp": "5820",
+  "modified": "2023-10-17 19:59:22.869312",
+  "name": "CFC-113",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "CFC-114",
+  "gwp": "8590",
+  "modified": "2023-10-17 19:59:22.878561",
+  "name": "CFC-114",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "CFC-115 ",
+  "gwp": "7670",
+  "modified": "2023-10-17 19:59:22.894610",
+  "name": "CFC-115",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "Halon-1301 ",
+  "gwp": "6290",
+  "modified": "2023-10-17 19:59:22.903018",
+  "name": "Halon-1301",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "Halon-1211 ",
+  "gwp": "1750",
+  "modified": "2023-10-17 19:59:22.911177",
+  "name": "Halon-1211",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "Halon-2402 ",
+  "gwp": "1470",
+  "modified": "2023-10-17 19:59:22.919120",
+  "name": "Halon-2402",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "Carbon tetrachloride",
+  "gwp": "1730",
+  "modified": "2023-10-17 19:59:22.927932",
+  "name": "Carbon tetrachloride",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "Methyl bromide ",
+  "gwp": "2",
+  "modified": "2023-10-17 19:59:22.936507",
+  "name": "Methyl bromide",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "Methyl chloroform ",
+  "gwp": "160",
+  "modified": "2023-10-17 19:59:22.944904",
+  "name": "Methyl chloroform",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HCFC-21 ",
+  "gwp": "148",
+  "modified": "2023-10-17 19:59:22.953183",
+  "name": "HCFC-21",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HCFC-22 ",
+  "gwp": "1760",
+  "modified": "2023-10-17 19:59:22.970203",
+  "name": "HCFC-22",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HCFC-123 ",
+  "gwp": "79",
+  "modified": "2023-10-17 19:59:22.986378",
+  "name": "HCFC-123",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HCFC-124",
+  "gwp": "527",
+  "modified": "2023-10-17 19:59:22.994853",
+  "name": "HCFC-124",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HCFC-141b ",
+  "gwp": "782",
+  "modified": "2023-10-17 19:59:23.011717",
+  "name": "HCFC-141b",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HCFC-142b",
+  "gwp": "1980",
+  "modified": "2023-10-17 19:59:23.028220",
+  "name": "HCFC-142b",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HCFC-225ca ",
+  "gwp": "127",
+  "modified": "2023-10-17 19:59:23.035993",
+  "name": "HCFC-225ca",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HCFC-225cb",
+  "gwp": "525",
+  "modified": "2023-10-17 19:59:23.044559",
+  "name": "HCFC-225cb",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-23 ",
+  "gwp": "12400",
+  "modified": "2023-10-17 19:59:23.052941",
+  "name": "HFC-23",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-32 ",
+  "gwp": "677",
+  "modified": "2023-10-17 19:59:23.061191",
+  "name": "HFC-32",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-41 ",
+  "gwp": "116",
+  "modified": "2023-10-17 19:59:23.070076",
+  "name": "HFC-41",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-125 ",
+  "gwp": "3170",
+  "modified": "2023-10-17 19:59:23.086279",
+  "name": "HFC-125",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-134 ",
+  "gwp": "1120",
+  "modified": "2023-10-17 19:59:23.094909",
+  "name": "HFC-134",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-134a ",
+  "gwp": "1300",
+  "modified": "2023-10-17 19:59:23.111725",
+  "name": "HFC-134a",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-143 ",
+  "gwp": "328",
+  "modified": "2023-10-17 19:59:23.128004",
+  "name": "HFC-143",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-143a",
+  "gwp": "4800",
+  "modified": "2023-10-17 19:59:23.136130",
+  "name": "HFC-143a",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-152 ",
+  "gwp": "16",
+  "modified": "2023-10-17 19:59:23.144916",
+  "name": "HFC-152",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-152a ",
+  "gwp": "138",
+  "modified": "2023-10-17 19:59:23.161256",
+  "name": "HFC-152a",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-161",
+  "gwp": "4",
+  "modified": "2023-10-17 19:59:23.169921",
+  "name": "HFC-161",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-227ea ",
+  "gwp": "3350",
+  "modified": "2023-10-17 19:59:23.178383",
+  "name": "HFC-227ea",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-236cb",
+  "gwp": "1210",
+  "modified": "2023-10-17 19:59:23.195312",
+  "name": "HFC-236cb",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-236ea ",
+  "gwp": "1330",
+  "modified": "2023-10-17 19:59:23.211761",
+  "name": "HFC-236ea",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-236fa ",
+  "gwp": "8060",
+  "modified": "2023-10-17 19:59:23.227848",
+  "name": "HFC-236fa",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-245ca ",
+  "gwp": "716",
+  "modified": "2023-10-17 19:59:23.236284",
+  "name": "HFC-245ca",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-245fa",
+  "gwp": "858",
+  "modified": "2023-10-17 19:59:23.252985",
+  "name": "HFC-245fa",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-365mfc ",
+  "gwp": "804",
+  "modified": "2023-10-17 19:59:23.260951",
+  "name": "HFC-365mfc",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFC-43-10mee",
+  "gwp": "1650",
+  "modified": "2023-10-17 19:59:23.269610",
+  "name": "HFC-43-10mee",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "Sulfur hexafluoride ",
+  "gwp": "23500",
+  "modified": "2023-10-17 19:59:23.278062",
+  "name": "Sulfur hexafluoride",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "Nitrogen trifluoride ",
+  "gwp": "16100",
+  "modified": "2023-10-17 19:59:23.295296",
+  "name": "Nitrogen trifluoride",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "PFC-14 ",
+  "gwp": "6630",
+  "modified": "2023-10-17 19:59:23.311789",
+  "name": "PFC-14",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "PFC-116 ",
+  "gwp": "11100",
+  "modified": "2023-10-17 19:59:23.328113",
+  "name": "PFC-116",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "PFC-218",
+  "gwp": "8900",
+  "modified": "2023-10-17 19:59:23.336636",
+  "name": "PFC-218",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "PFC-318 ",
+  "gwp": "9540",
+  "modified": "2023-10-17 19:59:23.353372",
+  "name": "PFC-318",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "PFC-31-10",
+  "gwp": "9200",
+  "modified": "2023-10-17 19:59:23.361272",
+  "name": "PFC-31-10",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "PFC-41-12 ",
+  "gwp": "8550",
+  "modified": "2023-10-17 19:59:23.371263",
+  "name": "PFC-41-12",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "PFC-51-14",
+  "gwp": "7910",
+  "modified": "2023-10-17 19:59:23.386081",
+  "name": "PFC-51-14",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "PCF-91-18",
+  "gwp": "7190",
+  "modified": "2023-10-17 19:59:23.394573",
+  "name": "PCF-91-18",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "Trifluoromethyl sulfur pentafluoride",
+  "gwp": "17400",
+  "modified": "2023-10-17 19:59:23.403200",
+  "name": "Trifluoromethyl sulfur pentafluoride",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "Perfluorocyclopropane ",
+  "gwp": "9200",
+  "modified": "2023-10-17 19:59:23.420010",
+  "name": "Perfluorocyclopropane",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-125",
+  "gwp": "12400",
+  "modified": "2023-10-17 19:59:23.436268",
+  "name": "HFE-125",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-134",
+  "gwp": "5560",
+  "modified": "2023-10-17 19:59:23.444862",
+  "name": "HFE-134",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-143a",
+  "gwp": "523",
+  "modified": "2023-10-17 19:59:23.453214",
+  "name": "HFE-143a",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HCFE-235da2 ",
+  "gwp": "491",
+  "modified": "2023-10-17 19:59:23.461486",
+  "name": "HCFE-235da2",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-245cb2 ",
+  "gwp": "654",
+  "modified": "2023-10-17 19:59:23.478490",
+  "name": "HFE-245cb2",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-245fa2 ",
+  "gwp": "812",
+  "modified": "2023-10-17 19:59:23.495008",
+  "name": "HFE-245fa2",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-347mcc3 ",
+  "gwp": "530",
+  "modified": "2023-10-17 19:59:23.511727",
+  "name": "HFE-347mcc3",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-347pcf2",
+  "gwp": "889",
+  "modified": "2023-10-17 19:59:23.528583",
+  "name": "HFE-347pcf2",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-356pcc3 ",
+  "gwp": "413",
+  "modified": "2023-10-17 19:59:23.544824",
+  "name": "HFE-356pcc3",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-449sl (HFE-7100) ",
+  "gwp": "421",
+  "modified": "2023-10-17 19:59:23.561291",
+  "name": "HFE-449sl (HFE-7100)",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-569sf2 (HFE-7200)",
+  "gwp": "57",
+  "modified": "2023-10-17 19:59:23.570187",
+  "name": "HFE-569sf2 (HFE-7200)",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-43-10pccc124 (H-Galden 1040x)",
+  "gwp": "2820",
+  "modified": "2023-10-17 19:59:23.586845",
+  "name": "HFE-43-10pccc124 (H-Galden 1040x)",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-236ca12 (HG-10) ",
+  "gwp": "5350",
+  "modified": "2023-10-17 19:59:23.603407",
+  "name": "HFE-236ca12 (HG-10)",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-338pcc13 (HG-01)",
+  "gwp": "2910",
+  "modified": "2023-10-17 19:59:23.619712",
+  "name": "HFE-338pcc13 (HG-01)",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-227ea ",
+  "gwp": "6450",
+  "modified": "2023-10-17 19:59:23.628314",
+  "name": "HFE-227ea",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-236ea2 ",
+  "gwp": "1790",
+  "modified": "2023-10-17 19:59:23.636621",
+  "name": "HFE-236ea2",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-236fa ",
+  "gwp": "979",
+  "modified": "2023-10-17 19:59:23.644525",
+  "name": "HFE-236fa",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-245fa1 ",
+  "gwp": "828",
+  "modified": "2023-10-17 19:59:23.652950",
+  "name": "HFE-245fa1",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE 263fb2 ",
+  "gwp": "1",
+  "modified": "2023-10-17 19:59:23.661303",
+  "name": "HFE 263fb2",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-329mcc2",
+  "gwp": "3070",
+  "modified": "2023-10-17 19:59:23.678695",
+  "name": "HFE-329mcc2",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-338mcf2 ",
+  "gwp": "929",
+  "modified": "2023-10-17 19:59:23.695152",
+  "name": "HFE-338mcf2",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-347mcf2 ",
+  "gwp": "854",
+  "modified": "2023-10-17 19:59:23.711791",
+  "name": "HFE-347mcf2",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-356mec3 ",
+  "gwp": "387",
+  "modified": "2023-10-17 19:59:23.728044",
+  "name": "HFE-356mec3",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-356pcf2",
+  "gwp": "719",
+  "modified": "2023-10-17 19:59:23.737055",
+  "name": "HFE-356pcf2",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-356pcf3 ",
+  "gwp": "446",
+  "modified": "2023-10-17 19:59:23.752723",
+  "name": "HFE-356pcf3",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE 365mcf3 ",
+  "gwp": "1",
+  "modified": "2023-10-17 19:59:23.760985",
+  "name": "HFE 365mcf3",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "HFE-374pc2 ",
+  "gwp": "627",
+  "modified": "2023-10-17 19:59:23.777624",
+  "name": "HFE-374pc2",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "PFPMIE",
+  "gwp": "9710",
+  "modified": "2023-10-17 19:59:23.786076",
+  "name": "PFPMIE",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "Chloroform ",
+  "gwp": "16",
+  "modified": "2023-10-17 19:59:23.794228",
+  "name": "Chloroform",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "Methylene chloride ",
+  "gwp": "9",
+  "modified": "2023-10-17 19:59:23.802566",
+  "name": "Methylene chloride",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "Methyl chloride",
+  "gwp": "12",
+  "modified": "2023-10-17 19:59:23.810888",
+  "name": "Methyl chloride",
+  "reference": "GWP-AR5"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "IPPU GWP Master List",
+  "gas_name": "Halon-1201 ",
+  "gwp": "376",
+  "modified": "2023-10-17 19:59:23.819200",
+  "name": "Halon-1201",
+  "reference": "GWP-AR5"
+ }
+]

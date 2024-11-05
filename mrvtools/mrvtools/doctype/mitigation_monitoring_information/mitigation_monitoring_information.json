@@ -1,0 +1,409 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2023-07-07 12:50:12.674612",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "tab1",
+  "project_id",
+  "proj_id",
+  "column_break_adszg",
+  "project_name",
+  "monitoring_year",
+  "section_break_px1zu",
+  "project_description",
+  "section_break_bxjiw",
+  "objective",
+  "key_sub_sector",
+  "included_in",
+  "type_of_instrument",
+  "implementing_entity",
+  "contact_details",
+  "costusd",
+  "end_date",
+  "lifetime",
+  "non_ghg_mitigation_benefits",
+  "beneficiaries",
+  "market_based_mechanism",
+  "expected_project_output",
+  "expected_annual_ghg",
+  "actual_annual_ghg",
+  "ghg_estimation_methodology",
+  "ghg_estimation_methodology_file",
+  "column_break_pgchz",
+  "key_sector",
+  "location",
+  "other_agency",
+  "other_contact_details",
+  "source_of_funding",
+  "financial_closure_date",
+  "target_ghgs",
+  "status",
+  "gender_inclusiveness_assessment",
+  "project_impacts",
+  "weblink",
+  "start_date",
+  "select_approver",
+  "upload_calculation_sheet",
+  "section_break_pdgvc",
+  "performance_indicator",
+  "edit_button",
+  "upload_document",
+  "remarks",
+  "work_state",
+  "tab2",
+  "naming_series",
+  "edited_project_details",
+  "actual_performance_indicator",
+  "edited_performance_indicator"
+ ],
+ "fields": [
+  {
+   "fieldname": "project_name",
+   "fieldtype": "Data",
+   "label": "Project Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "project_name.project_description",
+   "fieldname": "project_description",
+   "fieldtype": "Small Text",
+   "label": "Brief Description",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_bxjiw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fetch_from": "project_name.type_of_instrument",
+   "fieldname": "type_of_instrument",
+   "fieldtype": "Data",
+   "label": "Type of Instrument",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "project_name.objective",
+   "fieldname": "objective",
+   "fieldtype": "Data",
+   "label": "Objective",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "project_name.key_sector",
+   "fieldname": "key_sector",
+   "fieldtype": "Data",
+   "label": "Mitigation Sector",
+   "read_only": 1
+  },
+  {
+   "fieldname": "included_in",
+   "fieldtype": "Data",
+   "label": "Included In",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "project_name.implementing_entity",
+   "fieldname": "implementing_entity",
+   "fieldtype": "Data",
+   "label": "Implementing Entity",
+   "read_only": 1
+  },
+  {
+   "fieldname": "contact_details",
+   "fieldtype": "Data",
+   "label": "Contact Details",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "project_name.costusd",
+   "fieldname": "costusd",
+   "fieldtype": "Data",
+   "label": "Cost(USD)",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "project_name.end_date",
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "non_ghg_mitigation_benefits",
+   "fieldtype": "Data",
+   "label": "Mitigation Non-GHG Benifits",
+   "read_only": 1
+  },
+  {
+   "fieldname": "beneficiaries",
+   "fieldtype": "Data",
+   "label": "Beneficiaries ",
+   "read_only": 1
+  },
+  {
+   "fieldname": "market_based_mechanism",
+   "fieldtype": "Data",
+   "label": "Registered With Market Based Mechanism",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ghg_estimation_methodology_file",
+   "fieldtype": "Attach"
+  },
+  {
+   "fieldname": "column_break_pgchz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "project_name.key_sub_sector",
+   "fieldname": "key_sub_sector",
+   "fieldtype": "Data",
+   "label": "Mitigation Sub- Sector",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "project_name.location",
+   "fieldname": "location",
+   "fieldtype": "Data",
+   "label": "Location",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "project_name.other_agency",
+   "fieldname": "other_agency",
+   "fieldtype": "Data",
+   "label": "Other Party",
+   "read_only": 1
+  },
+  {
+   "fieldname": "other_contact_details",
+   "fieldtype": "Data",
+   "label": "Contact Details",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "project_name.source_of_funding",
+   "fieldname": "source_of_funding",
+   "fieldtype": "Data",
+   "label": "Source of Funding",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "project_name.financial_closure_date",
+   "fieldname": "financial_closure_date",
+   "fieldtype": "Data",
+   "label": "Financial Closure Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "lifetime",
+   "fieldtype": "Data",
+   "label": "Project Lifetime(years)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "target_ghgs",
+   "fieldtype": "Data",
+   "label": "Target GHGs",
+   "read_only": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "gender_inclusiveness_assessment",
+   "fieldtype": "Data",
+   "label": "Gender Inclusiveness Assessment",
+   "read_only": 1
+  },
+  {
+   "fieldname": "project_impacts",
+   "fieldtype": "Data",
+   "label": "Project Impacts",
+   "read_only": 1
+  },
+  {
+   "fieldname": "weblink",
+   "fieldtype": "Data",
+   "label": "Provide Weblink",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "project_name.start_date",
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "upload_calculation_sheet",
+   "fieldtype": "Attach",
+   "label": "Upload Calculation Sheet"
+  },
+  {
+   "fieldname": "section_break_pdgvc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "performance_indicator",
+   "fieldtype": "Table",
+   "label": "Performance Indicator",
+   "options": "Mitigation Monitoring Information ChildTable"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "monitoring_year",
+   "fieldtype": "Select",
+   "label": "Monitoring Year",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_adszg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_px1zu",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "expected_project_output",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Expected Project Outputs",
+   "read_only": 1
+  },
+  {
+   "fieldname": "actual_annual_ghg",
+   "fieldtype": "Int",
+   "label": "Actual Annual GHG Emission Reductions (tCO2e/Year)"
+  },
+  {
+   "fieldname": "upload_document",
+   "fieldtype": "Attach",
+   "label": "Upload Document"
+  },
+  {
+   "fieldname": "select_approver",
+   "fieldtype": "Link",
+   "label": "Select Approver",
+   "options": "User"
+  },
+  {
+   "fetch_from": "project_name.expected_annual_ghg",
+   "fieldname": "expected_annual_ghg",
+   "fieldtype": "Int",
+   "label": "Expected Annual GHG",
+   "read_only": 1
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "options": "MIT-MONI-INFO-.###"
+  },
+  {
+   "fieldname": "tab2",
+   "fieldtype": "Tab Break",
+   "label": "Edited Details"
+  },
+  {
+   "fieldname": "edited_project_details",
+   "fieldtype": "Table",
+   "label": "Edited Mitigation Monitoring Details",
+   "options": "Edited Project Details",
+   "read_only": 1
+  },
+  {
+   "fieldname": "edited_performance_indicator",
+   "fieldtype": "Table",
+   "label": "Edited Performance Indicator",
+   "options": "Mitigation Monitoring Information ChildTable",
+   "read_only": 1
+  },
+  {
+   "fieldname": "work_state",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Work State",
+   "options": "\nPending\nApproved\nRejected"
+  },
+  {
+   "fieldname": "edit_button",
+   "fieldtype": "Button",
+   "label": "Edit Performance Indicator"
+  },
+  {
+   "fieldname": "tab1",
+   "fieldtype": "Tab Break",
+   "label": "Details"
+  },
+  {
+   "fieldname": "project_id",
+   "fieldtype": "Link",
+   "label": "Mitigation ID",
+   "options": "Mitigations",
+   "reqd": 1
+  },
+  {
+   "fieldname": "actual_performance_indicator",
+   "fieldtype": "Table",
+   "label": "Actual Performance Indicator",
+   "options": "Edited Performance Indicator ChildTable",
+   "read_only": 1
+  },
+  {
+   "fieldname": "proj_id",
+   "fieldtype": "Data",
+   "label": "Project ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ghg_estimation_methodology",
+   "fieldtype": "Data",
+   "label": "GHG Estimation Methodology",
+   "reqd": 1
+  }
+ ],
+ "force_re_route_to_default_view": 1,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "make_attachments_public": 1,
+ "modified": "2024-09-18 13:54:46.396158",
+ "modified_by": "Administrator",
+ "module": "Mrvtools",
+ "name": "Mitigation Monitoring Information",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "show_name_in_global_search": 1,
+ "sort_field": "project_name",
+ "sort_order": "ASC",
+ "states": [],
+ "title_field": "project_name",
+ "track_changes": 1
+}

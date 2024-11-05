@@ -1,0 +1,33 @@
+{
+ "content": null,
+ "creation": "2023-11-04 13:06:47.157631",
+ "docstatus": 0,
+ "doctype": "Page",
+ "icon": "fa fa-list",
+ "idx": 0,
+ "modified": "2024-07-01 13:19:22.169229",
+ "modified_by": "Administrator",
+ "module": "Mrvtools",
+ "name": "adaptation-report",
+ "owner": "Administrator",
+ "page_name": "adaptation-report",
+ "roles": [
+  {
+   "role": "Administrator"
+  },
+  {
+   "role": "Adaptation Report"
+  },
+  {
+   "role": "Observer Adaptation Report"
+  },
+  {
+   "role": "Approver Adaptation Report"
+  }
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "Adaptation Report"
+}

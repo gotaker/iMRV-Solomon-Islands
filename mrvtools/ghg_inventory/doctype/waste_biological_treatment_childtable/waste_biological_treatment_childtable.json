@@ -1,0 +1,57 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-09-07 15:02:02.434657",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "biological_treatment_system",
+  "total_annual_amount",
+  "emission_factor_kgco2",
+  "reference"
+ ],
+ "fields": [
+  {
+   "fieldname": "biological_treatment_system",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Biological Treatment System"
+  },
+  {
+   "default": "0",
+   "fieldname": "total_annual_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Total Annual amount treated by biological treatment facilities (tonnes)",
+   "precision": "2"
+  },
+  {
+   "default": "0",
+   "fieldname": "emission_factor_kgco2",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Emission Factor (kgCO2/ton of waste)",
+   "precision": "2"
+  },
+  {
+   "fieldname": "reference",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Reference"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "make_attachments_public": 1,
+ "modified": "2024-07-22 13:04:21.625867",
+ "modified_by": "Administrator",
+ "module": "GHG Inventory",
+ "name": "Waste Biological Treatment ChildTable",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

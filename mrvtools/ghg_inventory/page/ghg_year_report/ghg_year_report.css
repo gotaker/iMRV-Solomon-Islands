@@ -1,0 +1,137 @@
+.list-filters {
+	overflow-y: hidden;
+	padding: 5px
+}
+.datatable .dt-header .dt-cell--header .dt-cell__content{
+	font-weight: 600;
+}
+.dt-cell--header{
+	background-color: #c4ddd3 !important;
+    color: #016a42;
+	height: 35px !important;
+}
+.datatable{
+	margin: auto;
+}
+.list-filter-item {
+	min-width: 150px;
+	float: left;
+	margin: 5px;
+}
+.layout-main-section .report-wrapper {
+    padding: 0px !important; 
+    margin: 15px 30px 20px 30px;
+    
+}
+.report-wrapper {
+	border: 1px solid #dbdbdb;
+}
+.dt-scrollable{
+	width:100% !important;
+	height:62vh !important
+	/* overflow-x: hidden !important; */
+}
+.list-item_content {
+	flex: 1;
+	padding-right: 15px;
+	align-items: center;
+}
+
+.select-time, .select-doctype, .select-filter, .select-sort {
+	background: #f0f4f7;
+}
+
+.from-date-field .clearfix{
+	display: none;
+}
+
+.from-date-field {
+	margin-left: 10px;
+}
+
+.select-time:focus, .select-doctype:focus, .select-filter:focus, .select-sort:focus {
+	background: #f0f4f7;
+}
+
+.header-btn-base {
+	border: none;
+	outline: 0;
+	vertical-align: middle;
+	overflow: hidden;
+	text-decoration: none;
+	color: inherit;
+	background-color: inherit;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.header-btn-round {
+	border-radius: 4px;
+}
+
+.item-title-bold {
+	font-weight: bold;
+}
+
+.rank {
+	max-width: 100px;
+}
+
+.ghg_year_report .result {
+	border-top: 1px solid var(--border-color);
+}
+
+.ghg_year_report .list-item {
+	padding-left: 45px;
+}
+
+.ghg_year_report .list-item_content {
+	padding-right: 60px;
+}
+
+.ghg_year_report-sidebar {
+	padding-left: 0;
+	position: fixed;
+}
+
+.ghg_year_report-list {
+	padding: var(-padding-sm) 0;
+	min-height: 70vh;
+}
+
+.ghg_year_report-empty-state {
+	align-items: center;
+	height: 70vh;
+	justify-content: center;
+	display: flex;
+}
+
+
+.totalghg_year_report-graph, .totalorder_analytics-graph, .avgorder_analytics-graph {
+    margin-bottom: 15px;
+}
+.ghg_year_report.page-main-content {
+    padding: 15px;
+}
+
+.title{
+	size: 40px;
+}
+
+
+.number-widget-box {
+    width: 100%;
+}
+
+.total_card{
+	flex:calc(33.3% - 5px); 
+	border:1px; 
+	padding: 15px;
+	border-radius: 1px;
+	background-color:rgb(255, 255, 255);
+}
+
+.total_card_div{
+	display:flex; 
+	gap: 5px;
+}

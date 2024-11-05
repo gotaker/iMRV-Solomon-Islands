@@ -1,0 +1,792 @@
+[
+ {
+  "ch4": "quantity * ncv * ch4",
+  "co2": "quantity * ncv * co2",
+  "co2_2": null,
+  "cumulative_ch4": "sum_ch4/10**9",
+  "cumulative_co2": "sum_co2/10**9",
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": "sum_n2o/10**9",
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-08 18:41:44.711929",
+  "n2o": "quantity * ncv * n2o",
+  "name": "Energy",
+  "net_consumption": "Production + Imports - Exports - Bunker - Stock_change - Excluded",
+  "sector": "1. Energy",
+  "table_name": [
+   {
+    "label": "electricity_generation",
+    "parent": "Energy",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "manufacturing_industries",
+    "parent": "Energy",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "transport",
+    "parent": "Energy",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "other_energy",
+    "parent": "Energy",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "other_sectors",
+    "parent": "Energy",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "reference_approach",
+    "parent": "Energy",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "international_bunkers",
+    "parent": "Energy",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2 +(cumulative_ch4 * gwp_methane )+(cumulative_n2o * gwp_n2o)",
+  "total_cumulative": null
+ },
+ {
+  "ch4": null,
+  "co2": "",
+  "co2_2": null,
+  "cumulative_ch4": null,
+  "cumulative_co2": "(sum(amount) * lime) /1000",
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": null,
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-02 15:18:00.780455",
+  "n2o": null,
+  "name": "Lime",
+  "net_consumption": null,
+  "sector": "2. Industrial processes and product use",
+  "table_name": [
+   {
+    "label": "lime_production",
+    "parent": "Lime",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2",
+  "total_cumulative": null
+ },
+ {
+  "ch4": null,
+  "co2": "amount*clinker_fraction",
+  "co2_2": null,
+  "cumulative_ch4": "",
+  "cumulative_co2": "(sum_co2 + ( clinker_import - clinker_export)) * cement /1000",
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": null,
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-02 17:54:12.423237",
+  "n2o": null,
+  "name": "Cement",
+  "net_consumption": null,
+  "sector": "2. Industrial processes and product use",
+  "table_name": [
+   {
+    "label": "cement_production",
+    "parent": "Cement",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "clinker_data",
+    "parent": "Cement",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2",
+  "total_cumulative": null
+ },
+ {
+  "ch4": "",
+  "co2": "",
+  "co2_2": null,
+  "cumulative_ch4": "(quantity * ch4)/10**3",
+  "cumulative_co2": "(quantity * co2)/10**3",
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": "(quantity * n2o)/10**3",
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-06 16:02:43.250159",
+  "n2o": "",
+  "name": "Chemical Industry",
+  "net_consumption": null,
+  "sector": "2. Industrial processes and product use",
+  "table_name": [
+   {
+    "label": "chemical_industry",
+    "parent": "Chemical Industry",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2 +(cumulative_ch4 * gwp_methane )+(cumulative_n2o * gwp_n2o)",
+  "total_cumulative": null
+ },
+ {
+  "ch4": "Area * Mass_of_fuel * Combustion * ch4",
+  "co2": "Area * Mass_of_fuel * Combustion * co2",
+  "co2_2": null,
+  "cumulative_ch4": "sum_ch4/10**3",
+  "cumulative_co2": "sum_co2/10**3",
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": "sum_n2o/10**3",
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-06 15:39:04.557882",
+  "n2o": "Area * Mass_of_fuel * Combustion * n2o",
+  "name": "Bio_mass Burning",
+  "net_consumption": null,
+  "sector": "4. LAND USE, LAND-USE CHANGE AND FORESTRY",
+  "table_name": [
+   {
+    "label": "biomass_burning",
+    "parent": "Bio_mass Burning",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2 +(cumulative_ch4 * gwp_methane )+(cumulative_n2o * gwp_n2o)",
+  "total_cumulative": null
+ },
+ {
+  "ch4": "amount* ch4",
+  "co2": "amount* co2",
+  "co2_2": null,
+  "cumulative_ch4": "(sum_ch4)/10**3",
+  "cumulative_co2": "(sum_co2)/10**3",
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": "(sum_n2o)/10**3",
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-08 15:07:51.053279",
+  "n2o": "amount* n2o",
+  "name": "Other Use",
+  "net_consumption": null,
+  "sector": "2. Industrial processes and product use",
+  "table_name": [
+   {
+    "label": "other_ippu",
+    "parent": "Other Use",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "activity_data",
+    "parent": "Other Use",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "other_sector",
+    "parent": "Other Use",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2 +(cumulative_ch4 * gwp_methane )+(cumulative_n2o * gwp_n2o)",
+  "total_cumulative": null
+ },
+ {
+  "ch4": "",
+  "co2": "amount_consumed * carbon_content * fraction_oxidized",
+  "co2_2": null,
+  "cumulative_ch4": "",
+  "cumulative_co2": "(sum_co2) * 44/12/1000",
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": "",
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-06 17:40:21.230047",
+  "n2o": "",
+  "name": "Lubricant Use",
+  "net_consumption": null,
+  "sector": "2. Industrial processes and product use",
+  "table_name": [
+   {
+    "label": "lubricant_use",
+    "parent": "Lubricant Use",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "lubricant_cumulative_co2",
+  "total_cumulative": null
+ },
+ {
+  "ch4": null,
+  "co2": "amount * gwp_value",
+  "co2_2": null,
+  "cumulative_ch4": null,
+  "cumulative_co2": "sum_co2 /1000",
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": null,
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-06 20:02:11.611673",
+  "n2o": null,
+  "name": "ODS",
+  "net_consumption": null,
+  "sector": "2. Industrial processes and product use",
+  "table_name": [
+   {
+    "label": "refrigeration",
+    "parent": "ODS",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "foam_blowing_agents",
+    "parent": "ODS",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "fire_protection",
+    "parent": "ODS",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "aerosols",
+    "parent": "ODS",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "solvents",
+    "parent": "ODS",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "other_applications",
+    "parent": "ODS",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2",
+  "total_cumulative": null
+ },
+ {
+  "ch4": null,
+  "co2": null,
+  "co2_2": null,
+  "cumulative_ch4": "(Urban * Waste * (Fraction_managed * ch4_managed + Fraction_unmanaged * ch4_unmanaged)) /10**9",
+  "cumulative_co2": "",
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": null,
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-07 11:57:13.316491",
+  "n2o": null,
+  "name": "Solid Waste",
+  "net_consumption": null,
+  "sector": "5. Waste",
+  "table_name": [
+   {
+    "label": "solid_waste",
+    "parent": "Solid Waste",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2 +(cumulative_ch4 * gwp_methane )+(cumulative_n2o * gwp_n2o)",
+  "total_cumulative": null
+ },
+ {
+  "ch4": null,
+  "co2": "Amount * co2",
+  "co2_2": null,
+  "cumulative_ch4": null,
+  "cumulative_co2": "sum_co2/10**3",
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": null,
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-07 13:36:42.296457",
+  "n2o": null,
+  "name": "Biological Treatment",
+  "net_consumption": null,
+  "sector": "5. Waste",
+  "table_name": [
+   {
+    "label": "biological_treatment",
+    "parent": "Biological Treatment",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2 +(cumulative_ch4 * gwp_methane )+(cumulative_n2o * gwp_n2o)",
+  "total_cumulative": null
+ },
+ {
+  "ch4": null,
+  "co2": "amount * gwp_value",
+  "co2_2": null,
+  "cumulative_ch4": null,
+  "cumulative_co2": "sum_co2 /1000",
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": null,
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-06 21:27:46.187574",
+  "n2o": null,
+  "name": "2G - 2.G1, 2.G.2, 2.G.4",
+  "net_consumption": null,
+  "sector": "2. Industrial processes and product use",
+  "table_name": [
+   {
+    "label": "electrical_equipment",
+    "parent": "2G - 2.G1, 2.G.2, 2.G.4",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "sf6_and_pfcs_from_other_product_use",
+    "parent": "2G - 2.G1, 2.G.2, 2.G.4",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "other_use",
+    "parent": "2G - 2.G1, 2.G.2, 2.G.4",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2",
+  "total_cumulative": null
+ },
+ {
+  "ch4": null,
+  "co2": "amount * gwp_value",
+  "co2_2": null,
+  "cumulative_ch4": null,
+  "cumulative_co2": "sum_co2 /10**3",
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": null,
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-07 12:56:45.832849",
+  "n2o": null,
+  "name": "2G -2.G3",
+  "net_consumption": null,
+  "sector": "2. Industrial processes and product use",
+  "table_name": [
+   {
+    "label": "n2o_from_product_uses",
+    "parent": "2G -2.G3",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2",
+  "total_cumulative": null
+ },
+ {
+  "ch4": "",
+  "co2": null,
+  "co2_2": null,
+  "cumulative_ch4": "Population * Degradable * Correction_industrial  * Methane_capacity / 10**6",
+  "cumulative_co2": null,
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": "Population * Protein  * Nitrogen_fraction *Emission_factor / 10**6",
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-07 16:19:05.466221",
+  "n2o": null,
+  "name": "Domestic Wastewater",
+  "net_consumption": null,
+  "sector": "5. Waste",
+  "table_name": [
+   {
+    "label": "ch4_wastewater_treatment",
+    "parent": "Domestic Wastewater",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "n2o_wastewater_treatment",
+    "parent": "Domestic Wastewater",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2 +(cumulative_ch4 * gwp_methane )+(cumulative_n2o * gwp_n2o)",
+  "total_cumulative": null
+ },
+ {
+  "ch4": "",
+  "co2": null,
+  "co2_2": null,
+  "cumulative_ch4": null,
+  "cumulative_co2": null,
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": "sum_n2o * 365 * 44/100000000 /28/10**3",
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-07 19:29:28.367375",
+  "n2o": "head * nitrogen_excretion_rate * animal_mass * nitrogen_excretion_managed * emission_factor_n2o * managed_livestock_manure_n2o",
+  "name": "Indirect N2O Emissions",
+  "net_consumption": null,
+  "sector": "3. Agriculture",
+  "table_name": [
+   {
+    "label": "indirect_manure_management",
+    "parent": "Indirect N2O Emissions",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2 +(cumulative_ch4 * gwp_methane )+(cumulative_n2o * gwp_n2o)",
+  "total_cumulative": null
+ },
+ {
+  "ch4": "((Production * Wastewater_generated * COD  - Wastewater_sludge) * Methane_produced * Correction_factor - Methane_recovered)",
+  "co2": null,
+  "co2_2": null,
+  "cumulative_ch4": " sum_ch4/ 10**6",
+  "cumulative_co2": null,
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": null,
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-07 17:25:40.189574",
+  "n2o": null,
+  "name": "Industrial Wastewater",
+  "net_consumption": null,
+  "sector": "5. Waste",
+  "table_name": [
+   {
+    "label": "industrial_wastewater_treatment",
+    "parent": "Industrial Wastewater",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2 +(cumulative_ch4 * gwp_methane )+(cumulative_n2o * gwp_n2o)",
+  "total_cumulative": null
+ },
+ {
+  "ch4": "head * enteric_fermentation",
+  "co2": null,
+  "co2_2": null,
+  "cumulative_ch4": "sum_ch4 / 10**6",
+  "cumulative_co2": null,
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": "",
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-07 17:10:23.751065",
+  "n2o": "",
+  "name": "Enteric Fermentation",
+  "net_consumption": null,
+  "sector": "3. Agriculture",
+  "table_name": [
+   {
+    "label": "enteric_fermentation",
+    "parent": "Enteric Fermentation",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2 +(cumulative_ch4 * gwp_methane )+(cumulative_n2o * gwp_n2o)",
+  "total_cumulative": null
+ },
+ {
+  "ch4": "Production *  ch4",
+  "co2": null,
+  "co2_2": null,
+  "cumulative_ch4": "sum_ch4/ 10**3",
+  "cumulative_co2": null,
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": "sum_n2o/ 10**3",
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-07 18:41:29.336852",
+  "n2o": "Production *n2o",
+  "name": "Other Wastewater",
+  "net_consumption": null,
+  "sector": "5. Waste",
+  "table_name": [
+   {
+    "label": "other_wastewater_treatement",
+    "parent": "Other Wastewater",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2 +(cumulative_ch4 * gwp_methane )+(cumulative_n2o * gwp_n2o)",
+  "total_cumulative": null
+ },
+ {
+  "ch4": "Amount * ch4",
+  "co2": "Amount * co2",
+  "co2_2": null,
+  "cumulative_ch4": "sum_ch4/ 10**3",
+  "cumulative_co2": "sum_co2/ 10**3",
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": "sum_n2o/ 10**3",
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-07 19:12:07.625497",
+  "n2o": "Amount * n2o",
+  "name": "Other Waste",
+  "net_consumption": null,
+  "sector": "5. Waste",
+  "table_name": [
+   {
+    "label": "other_waste",
+    "parent": "Other Waste",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2 +(cumulative_ch4 * gwp_methane )+(cumulative_n2o * gwp_n2o)",
+  "total_cumulative": null
+ },
+ {
+  "ch4": null,
+  "co2": null,
+  "co2_2": null,
+  "cumulative_ch4": null,
+  "cumulative_co2": null,
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": "total_amount * emission_factor * 44/28",
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-07 20:10:14.817047",
+  "n2o": "",
+  "name": "Managed Soils 3D.1",
+  "net_consumption": null,
+  "sector": "3. Agriculture",
+  "table_name": [
+   {
+    "label": "direct_managed_soils",
+    "parent": "Managed Soils 3D.1",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2 +(cumulative_ch4 * gwp_methane )+(cumulative_n2o * gwp_n2o)",
+  "total_cumulative": null
+ },
+ {
+  "ch4": null,
+  "co2": "Waste_amount * dry_fraction1 * carbon_fraction1 * fossil_fraction * oxidation_factor1",
+  "co2_2": "Population * waste * Population_fraction * dry_fraction2 * carbon_fraction2 * oxidation_factor2",
+  "cumulative_ch4": null,
+  "cumulative_co2": "sum_co2  *  44/12/1000",
+  "cumulative_co2_additional": "sum_co2_additional * 44/12/10**6",
+  "cumulative_n2o": null,
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-08 12:06:05.676054",
+  "n2o": null,
+  "name": "Incineration",
+  "net_consumption": null,
+  "sector": "5. Waste",
+  "table_name": [
+   {
+    "label": "waste_incineration",
+    "parent": "Incineration",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "open_burning_of_waste",
+    "parent": "Incineration",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "total_cumulative +(cumulative_ch4 * gwp_methane )+(cumulative_n2o * gwp_n2o)",
+  "total_cumulative": "cumulative_co2 + cumulative_co2_additional"
+ },
+ {
+  "ch4": null,
+  "co2": null,
+  "co2_2": null,
+  "cumulative_ch4": "",
+  "cumulative_co2": "",
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": "((amount_of_synthetic_n_fertilizers * fraction_of_synthetic_n_fertilizers) + (annual_amount_of_animal_manure + annual_amount_of_urine) * fraction_of_applied_organic_n_fertilizer * emission_factor_n2o)  * (44/28)",
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-07 20:58:42.061366",
+  "n2o": "",
+  "name": "Managed Soils 3D.2.a",
+  "net_consumption": null,
+  "sector": "3. Agriculture",
+  "table_name": [
+   {
+    "label": "atmospheric_deposit",
+    "parent": "Managed Soils 3D.2.a",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2 +(cumulative_ch4 * gwp_methane )+(cumulative_n2o * gwp_n2o)",
+  "total_cumulative": null
+ },
+ {
+  "ch4": null,
+  "co2": null,
+  "co2_2": null,
+  "cumulative_ch4": "",
+  "cumulative_co2": "",
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": "((annual_amount_of_synthetic_fertilizer + annual_amoun_of_animal_manure + annual_amount_of_urine + amount_of_n_in_crop + annual_amount_of_n_mineralized) * fraction_of_all_n_additions * emission_factor_for_n20) * (44/28)",
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-07 21:38:19.398248",
+  "n2o": "",
+  "name": "Managed Soils 3D.2.b",
+  "net_consumption": null,
+  "sector": "3. Agriculture",
+  "table_name": [
+   {
+    "label": "n2o_from_n_leaching",
+    "parent": "Managed Soils 3D.2.b",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2 +(cumulative_ch4 * gwp_methane )+(n_leaching_cumulative_n2o* gwp_n2o)",
+  "total_cumulative": null
+ },
+ {
+  "ch4": "amount* ch4",
+  "co2": "amount* co2",
+  "co2_2": null,
+  "cumulative_ch4": "(sum_ch4)/10**3",
+  "cumulative_co2": "(sum_co2)/10**3",
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": "(sum_n2o)/10**3",
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-08 12:09:11.465614",
+  "n2o": "amount* n2o",
+  "name": "Burning of Savannah and Agriculture Residue",
+  "net_consumption": null,
+  "sector": "3. Agriculture",
+  "table_name": [
+   {
+    "label": "activity_data_burning",
+    "parent": "Burning of Savannah and Agriculture Residue",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   },
+   {
+    "label": "activity_data_agriculture",
+    "parent": "Burning of Savannah and Agriculture Residue",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2 +(cumulative_ch4 * gwp_methane )+(cumulative_n2o * gwp_n2o)",
+  "total_cumulative": null
+ },
+ {
+  "ch4": null,
+  "co2": "amount_of_urea * emission_factor_co2",
+  "co2_2": null,
+  "cumulative_ch4": null,
+  "cumulative_co2": "sum_co2 * 44/12/10**3",
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": null,
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-08 14:12:10.128141",
+  "n2o": "",
+  "name": "Urea Application",
+  "net_consumption": null,
+  "sector": "3. Agriculture",
+  "table_name": [
+   {
+    "label": "urea_application",
+    "parent": "Urea Application",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2",
+  "total_cumulative": null
+ },
+ {
+  "ch4": "",
+  "co2": null,
+  "co2_2": null,
+  "cumulative_ch4": null,
+  "cumulative_co2": null,
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": "sum_n2o * 365 * 44/100000000 /28/10**3",
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-08 16:01:57.930720",
+  "n2o": "head * nitrogen_excretion_rate * animal_mass * nitrogen_excretion_managed * direct_n2o_n_emissions",
+  "name": "Direct N2O Emissions",
+  "net_consumption": null,
+  "sector": "3. Agriculture",
+  "table_name": [
+   {
+    "label": "direct_emissions_mms",
+    "parent": "Direct N2O Emissions",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": "cumulative_co2 +(cumulative_ch4 * gwp_methane )+(cumulative_n2o * gwp_n2o)",
+  "total_cumulative": null
+ },
+ {
+  "ch4": null,
+  "co2": "Amount * co2",
+  "co2_2": null,
+  "cumulative_ch4": null,
+  "cumulative_co2": "sum_co2/10**3",
+  "cumulative_co2_additional": null,
+  "cumulative_n2o": null,
+  "docstatus": 0,
+  "doctype": "GHG Inventory Report Formulas",
+  "modified": "2023-11-08 19:07:32.241421",
+  "n2o": null,
+  "name": "Energy Biomass",
+  "net_consumption": null,
+  "sector": "1. Energy",
+  "table_name": [
+   {
+    "label": "co2_emissions_from_biomass",
+    "parent": "Energy Biomass",
+    "parentfield": "table_name",
+    "parenttype": "GHG Inventory Report Formulas"
+   }
+  ],
+  "total_co2": null,
+  "total_cumulative": null
+ }
+]

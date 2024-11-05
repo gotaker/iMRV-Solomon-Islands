@@ -1,0 +1,37 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "NDP Objective Coverage",
+  "modified": "2024-07-19 17:15:07.057861",
+  "name": "NDS-OBJECTIVE-01",
+  "ndp_objective": "Sustained and inclusive economic growth"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "NDP Objective Coverage",
+  "modified": "2024-07-19 17:15:07.087576",
+  "name": "NDS-OBJECTIVE-02",
+  "ndp_objective": "Poverty alleviated across the whole of the Solomon Islands, basic needs addressed and food security improved; benefits of development more equitably distributed."
+ },
+ {
+  "docstatus": 0,
+  "doctype": "NDP Objective Coverage",
+  "modified": "2024-07-19 17:15:07.104328",
+  "name": "NDS-OBJECTIVE-03",
+  "ndp_objective": "All Solomon Islanders have access to quality social services including education and health"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "NDP Objective Coverage",
+  "modified": "2024-07-19 17:15:07.121019",
+  "name": "NDS-OBJECTIVE-04",
+  "ndp_objective": "Resilient and environmentally sustainable development with effective disaster risk management, response and recovery"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "NDP Objective Coverage",
+  "modified": "2024-07-19 17:15:07.137635",
+  "name": "NDS-OBJECTIVE-05",
+  "ndp_objective": "Unified Nation with stable and effective governance and public order"
+ }
+]

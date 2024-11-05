@@ -1,0 +1,21 @@
+[
+ {
+  "application_logo": "/files/Flag_of_the_Solomon_Islands.png",
+  "docstatus": 0,
+  "doctype": "Side Menu Settings",
+  "logo_background_color": null,
+  "logo_bottom_border_color": "#c0c6cc",
+  "name": "Side Menu Settings",
+  "route_logo": "main-dashboard",
+  "select_side_menu_type": "Side Menu",
+  "set_width": 280,
+  "side_bar_background_color": "#ffffff",
+  "side_bar_hover_color": "#016a42",
+  "side_bar_text_color": "#000000",
+  "side_bar_text_hover_color": "#ffffff",
+  "sub_menu_background_color": "#f9fafa",
+  "sub_menu_background_hover_color": "#ff843d",
+  "sub_menu_text_color": "#000000",
+  "sub_menu_text_hover_color": "#ffffff"
+ }
+]

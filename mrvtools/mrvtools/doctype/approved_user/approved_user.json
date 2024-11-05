@@ -1,0 +1,207 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "creation": "2024-07-30 11:44:13.649293",
+ "default_view": "List",
+ "description": "Represents a User in the system.",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "section_break_3",
+  "email",
+  "role",
+  "column_break0",
+  "first_name",
+  "column_break_11",
+  "mobile_no",
+  "section_break_qoyx9",
+  "ghg",
+  "column_break_2kf4t",
+  "project_tracking",
+  "column_break_8unal",
+  "reports",
+  "user_image",
+  "change_password",
+  "password",
+  "reset_password_key",
+  "last_reset_password_key_generated_on",
+  "last_password_reset_date",
+  "redirect_url"
+ ],
+ "fields": [
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "oldfieldname": "enabled",
+   "oldfieldtype": "Check",
+   "read_only": 1
+  },
+  {
+   "depends_on": "enabled",
+   "fieldname": "section_break_3",
+   "fieldtype": "Section Break",
+   "label": "Basic Info"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Email",
+   "no_copy": 1,
+   "oldfieldname": "email",
+   "oldfieldtype": "Data",
+   "options": "Email",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break0",
+   "fieldtype": "Column Break",
+   "oldfieldtype": "Column Break",
+   "print_width": "50%",
+   "width": "50%"
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "mobile_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Mobile No",
+   "options": "Phone",
+   "read_only": 1
+  },
+  {
+   "description": "Get your globally recognized avatar from Gravatar.com",
+   "fieldname": "user_image",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "User Image",
+   "no_copy": 1,
+   "print_hide": 1
+  },
+  {
+   "collapsible": 1,
+   "depends_on": "eval:doc.enabled && (!doc.__islocal || !cint(doc.send_welcome_email))",
+   "fieldname": "change_password",
+   "fieldtype": "Section Break",
+   "label": "Change Password"
+  },
+  {
+   "fieldname": "reset_password_key",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Reset Password Key",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "description": "Stores the datetime when the last reset password key was generated.",
+   "fieldname": "last_reset_password_key_generated_on",
+   "fieldtype": "Datetime",
+   "hidden": 1,
+   "label": "Last Reset Password Key Generated On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_password_reset_date",
+   "fieldtype": "Date",
+   "hidden": 1,
+   "label": "Last Password Reset Date",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "redirect_url",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Redirect URL"
+  },
+  {
+   "fieldname": "ghg",
+   "fieldtype": "Table MultiSelect",
+   "label": "GHG",
+   "options": "Project Tracking ChildTable",
+   "read_only": 1
+  },
+  {
+   "fieldname": "project_tracking",
+   "fieldtype": "Table MultiSelect",
+   "label": "Project Tracking",
+   "options": "Project Tracking ChildTable",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reports",
+   "fieldtype": "Table MultiSelect",
+   "label": "Reports",
+   "options": "Project Tracking ChildTable",
+   "read_only": 1
+  },
+  {
+   "fieldname": "role",
+   "fieldtype": "Select",
+   "label": "Role",
+   "options": "\nUser\nApprover\nObserver\nExternal Observer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_qoyx9",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_2kf4t",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_8unal",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "first_name",
+   "fieldtype": "Data",
+   "in_global_search": 1,
+   "in_standard_filter": 1,
+   "label": "Full Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "password",
+   "fieldtype": "Password",
+   "label": "Set New Password",
+   "no_copy": 1
+  }
+ ],
+ "icon": "fa fa-user",
+ "image_field": "user_image",
+ "links": [],
+ "modified": "2024-08-02 16:10:47.885967",
+ "modified_by": "Administrator",
+ "module": "Mrvtools",
+ "name": "Approved User",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "read": 1,
+   "role": "All",
+   "select": 1,
+   "write": 1
+  }
+ ],
+ "route": "user",
+ "search_fields": "first_name",
+ "show_name_in_global_search": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "first_name",
+ "track_changes": 1
+}

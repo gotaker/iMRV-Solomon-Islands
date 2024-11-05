@@ -1,0 +1,34 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-07-01 16:01:33.344850",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "target_ghgs"
+ ],
+ "fields": [
+  {
+   "fieldname": "target_ghgs",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Target GHGs",
+   "options": "Mitigation Target GHGs",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "make_attachments_public": 1,
+ "modified": "2024-07-22 13:03:54.297862",
+ "modified_by": "Administrator",
+ "module": "Mrvtools",
+ "name": "Mitigation Target GHGs in  ChildTable",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

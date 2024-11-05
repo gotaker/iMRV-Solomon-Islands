@@ -1,0 +1,25 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Include JS Example</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+
+{% extends 'templates/web.html' %}
+{% block page_content %}
+  
+<script>
+    $(document).ready(function() {
+        var scriptElement = document.createElement('script');
+        scriptElement.src = 'adaptationreport.js'; 
+        document.head.appendChild(scriptElement);
+    });
+</script>
+{% endblock %}
+
+</body>
+</html>

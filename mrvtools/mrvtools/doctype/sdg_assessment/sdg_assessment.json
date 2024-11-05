@@ -1,0 +1,282 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2023-07-03 13:44:21.526974",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "tab1",
+  "project_id",
+  "column_break_xb4rr",
+  "project_name",
+  "start_date",
+  "select_approver",
+  "included_in",
+  "category_section",
+  "json",
+  "categories_json",
+  "categories_html",
+  "section_break_j9xm0",
+  "load_categories",
+  "qualitative_impact",
+  "quantitative_impact",
+  "naming_series",
+  "attach_document",
+  "remarks",
+  "tab2",
+  "html_table",
+  "html_json",
+  "edited_project_details",
+  "work_state"
+ ],
+ "fields": [
+  {
+   "fieldname": "qualitative_impact",
+   "fieldtype": "Table",
+   "label": "Qualitative Impact",
+   "options": "SDG Qualitative ChildTable"
+  },
+  {
+   "fieldname": "quantitative_impact",
+   "fieldtype": "Table",
+   "label": "Quantitative Impact",
+   "options": "SDG Quantitative ChildTable"
+  },
+  {
+   "fieldname": "category_section",
+   "fieldtype": "Section Break",
+   "label": "Select Categories and Click Load Categories Button"
+  },
+  {
+   "fieldname": "column_break_xb4rr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "load_categories",
+   "fieldtype": "Button",
+   "label": "Load Categories"
+  },
+  {
+   "fieldname": "select_approver",
+   "fieldtype": "Link",
+   "label": "Select Approver",
+   "options": "User"
+  },
+  {
+   "fieldname": "json",
+   "fieldtype": "JSON",
+   "hidden": 1,
+   "label": "JSON"
+  },
+  {
+   "fieldname": "section_break_j9xm0",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "options": "SDG-PRO-INFO-.###"
+  },
+  {
+   "fieldname": "included_in",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Included In",
+   "read_only": 1
+  },
+  {
+   "fieldname": "edited_project_details",
+   "fieldtype": "Table",
+   "label": "Edited Project Details",
+   "options": "Edited Project Details",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tab1",
+   "fieldtype": "Tab Break",
+   "label": "Details"
+  },
+  {
+   "fieldname": "tab2",
+   "fieldtype": "Tab Break",
+   "label": "Edited Details"
+  },
+  {
+   "fieldname": "html_json",
+   "fieldtype": "JSON",
+   "hidden": 1,
+   "label": "Html Json"
+  },
+  {
+   "fieldname": "work_state",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Work State",
+   "options": "\nPending\nApproved\nRejected"
+  },
+  {
+   "fieldname": "html_table",
+   "fieldtype": "HTML",
+   "label": "Edited Table Details"
+  },
+  {
+   "fieldname": "project_id",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Project ID",
+   "options": "Project",
+   "reqd": 1
+  },
+  {
+   "fieldname": "project_name",
+   "fieldtype": "Data",
+   "label": "Project Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "hidden": 1,
+   "label": "Start Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "categories_html",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "categories_json",
+   "fieldtype": "JSON",
+   "hidden": 1,
+   "label": "Categories Json"
+  },
+  {
+   "fieldname": "attach_document",
+   "fieldtype": "Attach",
+   "label": "Upload Document"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "make_attachments_public": 1,
+ "modified": "2024-09-18 13:50:42.634623",
+ "modified_by": "Administrator",
+ "module": "Mrvtools",
+ "name": "SDG Assessment",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  },
+  {
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "permlevel": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Approver SDG Tracking",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "permlevel": 2,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Approver SDG Tracking",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "SDG Tracking",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "permlevel": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "SDG Tracking",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Projects",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "permlevel": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Projects",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "project_id",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "project_name",
+ "track_changes": 1
+}

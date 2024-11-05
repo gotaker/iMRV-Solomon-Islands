@@ -1,0 +1,186 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-09-07 21:00:02.140770",
+  "name": "1.A.4.a.i.  Stationary combustion",
+  "sub_category": "1.A.4.a.i.  Stationary combustion",
+  "sub_sector": "1.A.4. Other sectors"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-09-07 21:00:47.458849",
+  "name": "1.A.4.b.i.  Stationary combustion",
+  "sub_category": "1.A.4.b.i.  Stationary combustion",
+  "sub_sector": "1.A.4. Other sectors"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-07-28 16:12:12.885069",
+  "name": "1.A.1.a.i. Electricity generation",
+  "sub_category": "1.A.1.a.i. Electricity generation",
+  "sub_sector": "1.A.1. Energy industries"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-07-28 16:12:28.339642",
+  "name": "1.A.3.a. Domestic aviation",
+  "sub_category": "1.A.3.a. Domestic aviation",
+  "sub_sector": "1.A.3. Transport"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-07-28 16:12:40.981894",
+  "name": "1.A.3.b. Road transportation",
+  "sub_category": "1.A.3.b. Road transportation",
+  "sub_sector": "1.A.3. Transport"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-07-28 16:13:50.717492",
+  "name": "1.A.3.d. Domestic navigation",
+  "sub_category": "1.A.3.d. Domestic navigation",
+  "sub_sector": "1.A.3. Transport"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-07-28 16:14:12.863855",
+  "name": "1.D.1.a. International aviation (aviation bunkers)",
+  "sub_category": "1.D.1.a. International aviation (aviation bunkers)",
+  "sub_sector": "1.D.1. International bunkers"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-07-28 16:14:23.865312",
+  "name": "1.D.1.b. International navigation (marine bunkers)",
+  "sub_category": "1.D.1.b. International navigation (marine bunkers)",
+  "sub_sector": "1.D.1. International bunkers"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-07-28 16:14:43.194433",
+  "name": "1.A.4.a. Commercial/institutional",
+  "sub_category": "1.A.4.a. Commercial/institutional",
+  "sub_sector": "1.A.4. Other sectors"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-07-28 16:14:58.835560",
+  "name": "1.A.4.b. Residential",
+  "sub_category": "1.A.4.b. Residential",
+  "sub_sector": "1.A.4. Other sectors"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-09-07 20:56:38.740301",
+  "name": "1.A.2.a. Iron and steel",
+  "sub_category": "1.A.2.a. Iron and steel",
+  "sub_sector": "1.A.2 Manufacturing industries and construction"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-09-07 20:56:49.130869",
+  "name": "1.A.2.b. Non-ferrous metals",
+  "sub_category": "1.A.2.b. Non-ferrous metals",
+  "sub_sector": "1.A.2 Manufacturing industries and construction"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-09-07 20:57:01.648405",
+  "name": "1.A.2.c. Chemicals",
+  "sub_category": "1.A.2.c. Chemicals",
+  "sub_sector": "1.A.2 Manufacturing industries and construction"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-09-07 20:57:14.183616",
+  "name": "1.A.2.d. Pulp, paper and print",
+  "sub_category": "1.A.2.d. Pulp, paper and print",
+  "sub_sector": "1.A.2 Manufacturing industries and construction"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-09-07 20:57:28.532633",
+  "name": "1.A.2.e. Food processing, beverages and tobacco",
+  "sub_category": "1.A.2.e. Food processing, beverages and tobacco",
+  "sub_sector": "1.A.2 Manufacturing industries and construction"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-09-07 20:57:39.746952",
+  "name": "1.A.2.f. Non-metallic minerals",
+  "sub_category": "1.A.2.f. Non-metallic minerals",
+  "sub_sector": "1.A.2 Manufacturing industries and construction"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-09-07 20:57:53.009106",
+  "name": "1.A.2.g. Other",
+  "sub_category": "1.A.2.g. Other",
+  "sub_sector": "1.A.2 Manufacturing industries and construction"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-09-07 20:58:04.949884",
+  "name": "All",
+  "sub_category": "All",
+  "sub_sector": "1.A.2 Manufacturing industries and construction"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-11-03 12:41:20.566367",
+  "name": "1.A.4.a.i. Stationary combustion",
+  "sub_category": "1.A.4.a.i. Stationary combustion",
+  "sub_sector": "1.A.4. Other sectors"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-09-07 21:00:34.328371",
+  "name": "1.A.4.a.ii.   Off-road vehicles and other machinery",
+  "sub_category": "1.A.4.a.ii.   Off-road vehicles and other machinery",
+  "sub_sector": "1.A.4. Other sectors"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-11-03 20:39:02.463374",
+  "name": "1.A.4.b.i. Stationary combustion",
+  "sub_category": "1.A.4.b.i. Stationary combustion",
+  "sub_sector": "1.A.4. Other sectors"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-09-07 21:01:08.212581",
+  "name": "1.A.4.b.ii.  Off-road vehicles and other machinery",
+  "sub_category": "1.A.4.b.ii.  Off-road vehicles and other machinery",
+  "sub_sector": "1.A.4. Other sectors"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sub Category",
+  "modified": "2023-09-07 21:01:22.027951",
+  "name": "1.A.4.c. Agriculture/forestry/fishing",
+  "sub_category": "1.A.4.c. Agriculture/forestry/fishing",
+  "sub_sector": "1.A.4. Other sectors"
+ }
+]

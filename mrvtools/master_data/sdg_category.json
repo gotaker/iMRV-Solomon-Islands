@@ -1,0 +1,138 @@
+[
+ {
+  "category": "SDG-1",
+  "docstatus": 0,
+  "doctype": "SDG Category",
+  "modified": "2024-07-15 10:51:58.982159",
+  "name": "SDG-1",
+  "sdg_logo": "/files/SDG-1.jpg"
+ },
+ {
+  "category": "SDG-2",
+  "docstatus": 0,
+  "doctype": "SDG Category",
+  "modified": "2024-07-15 10:52:18.923270",
+  "name": "SDG-2",
+  "sdg_logo": "/files/SDG-2.jpg"
+ },
+ {
+  "category": "SDG-3",
+  "docstatus": 0,
+  "doctype": "SDG Category",
+  "modified": "2024-07-15 10:52:32.405153",
+  "name": "SDG-3",
+  "sdg_logo": "/files/SDG-3.jpg"
+ },
+ {
+  "category": "SDG-4",
+  "docstatus": 0,
+  "doctype": "SDG Category",
+  "modified": "2024-07-15 10:52:46.045775",
+  "name": "SDG-4",
+  "sdg_logo": "/files/SDG-4.jpg"
+ },
+ {
+  "category": "SDG-5",
+  "docstatus": 0,
+  "doctype": "SDG Category",
+  "modified": "2024-07-15 10:52:58.515351",
+  "name": "SDG-5",
+  "sdg_logo": "/files/SDG-5.jpg"
+ },
+ {
+  "category": "SDG-6",
+  "docstatus": 0,
+  "doctype": "SDG Category",
+  "modified": "2024-07-15 10:53:11.376346",
+  "name": "SDG-6",
+  "sdg_logo": "/files/SDG-6.jpg"
+ },
+ {
+  "category": "SDG-7",
+  "docstatus": 0,
+  "doctype": "SDG Category",
+  "modified": "2024-07-15 10:53:36.321223",
+  "name": "SDG-7",
+  "sdg_logo": "/files/SDG-7.jpg"
+ },
+ {
+  "category": "SDG-8",
+  "docstatus": 0,
+  "doctype": "SDG Category",
+  "modified": "2024-07-15 10:53:51.069931",
+  "name": "SDG-8",
+  "sdg_logo": "/files/SDG-8.jpg"
+ },
+ {
+  "category": "SDG-9",
+  "docstatus": 0,
+  "doctype": "SDG Category",
+  "modified": "2024-07-15 10:54:06.815982",
+  "name": "SDG-9",
+  "sdg_logo": "/files/SDG-9.jpg"
+ },
+ {
+  "category": "SDG-10",
+  "docstatus": 0,
+  "doctype": "SDG Category",
+  "modified": "2024-07-15 10:54:27.941948",
+  "name": "SDG-10",
+  "sdg_logo": "/files/SDG-10.jpg"
+ },
+ {
+  "category": "SDG-11",
+  "docstatus": 0,
+  "doctype": "SDG Category",
+  "modified": "2024-07-15 10:54:38.578136",
+  "name": "SDG-11",
+  "sdg_logo": "/files/SDG-11.jpg"
+ },
+ {
+  "category": "SDG-12",
+  "docstatus": 0,
+  "doctype": "SDG Category",
+  "modified": "2024-07-15 10:54:54.469429",
+  "name": "SDG-12",
+  "sdg_logo": "/files/SDG-12.jpg"
+ },
+ {
+  "category": "SDG-13",
+  "docstatus": 0,
+  "doctype": "SDG Category",
+  "modified": "2024-07-15 10:55:14.845054",
+  "name": "SDG-13",
+  "sdg_logo": "/files/SDG-13.jpg"
+ },
+ {
+  "category": "SDG-14",
+  "docstatus": 0,
+  "doctype": "SDG Category",
+  "modified": "2024-07-15 10:55:49.469251",
+  "name": "SDG-14",
+  "sdg_logo": "/files/SDG-14.jpg"
+ },
+ {
+  "category": "SDG-15",
+  "docstatus": 0,
+  "doctype": "SDG Category",
+  "modified": "2024-07-15 10:56:04.875920",
+  "name": "SDG-15",
+  "sdg_logo": "/files/SDG-15.jpg"
+ },
+ {
+  "category": "SDG-16",
+  "docstatus": 0,
+  "doctype": "SDG Category",
+  "modified": "2024-07-15 10:56:38.735902",
+  "name": "SDG-16",
+  "sdg_logo": "/files/SDG-16.jpg"
+ },
+ {
+  "category": "SDG-17",
+  "docstatus": 0,
+  "doctype": "SDG Category",
+  "modified": "2024-07-15 10:56:52.727677",
+  "name": "SDG-17",
+  "sdg_logo": "/files/SDG-17.jpg"
+ }
+]

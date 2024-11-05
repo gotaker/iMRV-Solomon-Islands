@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include mrvtools *.css
+recursive-include mrvtools *.csv
+recursive-include mrvtools *.html
+recursive-include mrvtools *.ico
+recursive-include mrvtools *.js
+recursive-include mrvtools *.json
+recursive-include mrvtools *.md
+recursive-include mrvtools *.png
+recursive-include mrvtools *.py
+recursive-include mrvtools *.svg
+recursive-include mrvtools *.txt
+recursive-exclude mrvtools *.pyc

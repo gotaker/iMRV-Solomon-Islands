@@ -1,0 +1,202 @@
+[
+ {
+  "category": "1.A. Fuel combustion activities",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:39:28.524858",
+  "name": "1.A.1. Energy industries",
+  "sub_sector": "1.A.1. Energy industries"
+ },
+ {
+  "category": "1.A. Fuel combustion activities",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-07-28 15:43:31.175792",
+  "name": "1.A.3. Transport",
+  "sub_sector": "1.A.3. Transport"
+ },
+ {
+  "category": "1.A. Fuel combustion activities",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-07-28 15:43:51.013030",
+  "name": "1.A.4. Other sectors",
+  "sub_sector": "1.A.4. Other sectors"
+ },
+ {
+  "category": "2.H. Other",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-07-28 15:39:02.454036",
+  "name": "2.H.2. Food and beverages industry",
+  "sub_sector": "2.H.2. Food and beverages industry"
+ },
+ {
+  "category": "1.D. Memo Items",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:41:23.949888",
+  "name": "1.D.1. International bunkers",
+  "sub_sector": "1.D.1. International bunkers"
+ },
+ {
+  "category": "1.A. Fuel combustion activities",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:40:33.575984",
+  "name": "1.A.2 Manufacturing industries and construction",
+  "sub_sector": "1.A.2 Manufacturing industries and construction"
+ },
+ {
+  "category": "1.A. Fuel combustion activities",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:41:01.156662",
+  "name": "1.A.5. Other",
+  "sub_sector": "1.A.5. Other"
+ },
+ {
+  "category": "1.D. Memo Items",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:41:54.802436",
+  "name": "1.D.3. CO2 emissions from biomass",
+  "sub_sector": "1.D.3. CO2 emissions from biomass"
+ },
+ {
+  "category": "2.A. Mineral industry",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:42:18.249910",
+  "name": "2.A.1. Cement production",
+  "sub_sector": "2.A.1. Cement production "
+ },
+ {
+  "category": "2.A. Mineral industry",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:42:28.329312",
+  "name": "2.A.2. Lime production",
+  "sub_sector": "2.A.2. Lime production"
+ },
+ {
+  "category": "3.B.a. Manure management",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:47:21.499329",
+  "name": "3.B.5. Indirect N2O emissions",
+  "sub_sector": "3.B.5. Indirect N2O emissions"
+ },
+ {
+  "category": "3.D. Agricultural soils",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-11-08 20:53:58.842629",
+  "name": "3.D.1. Direct N2O emissions from managed soils",
+  "sub_sector": "3.D.1. Direct N2O emissions from managed soils"
+ },
+ {
+  "category": "3.D. Agricultural soils",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:48:19.699623",
+  "name": "3.D.2. Indirect N2O Emissions from managed soils",
+  "sub_sector": "3.D.2. Indirect N2O Emissions from managed soils "
+ },
+ {
+  "category": "4.A. Forest land",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:51:04.573826",
+  "name": "4.A.1. Forest land remaining forest land",
+  "sub_sector": "4.A.1. Forest land remaining forest land"
+ },
+ {
+  "category": "4.A. Forest land",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:51:25.779265",
+  "name": "4.A.2. Land converted to forest land",
+  "sub_sector": "4.A.2. Land converted to forest land"
+ },
+ {
+  "category": "4.B. Cropland",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:51:39.813702",
+  "name": "4.B.1. Cropland remaining cropland",
+  "sub_sector": "4.B.1. Cropland remaining cropland"
+ },
+ {
+  "category": "4.B. Cropland",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:53:17.857446",
+  "name": "4.B.2. Land converted to cropland",
+  "sub_sector": "4.B.2. Land converted to cropland"
+ },
+ {
+  "category": "4.C. Grassland",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:53:55.497718",
+  "name": "4.C.1. Grassland remaining grassland",
+  "sub_sector": "4.C.1. Grassland remaining grassland"
+ },
+ {
+  "category": "4.C. Grassland",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:54:23.959676",
+  "name": "4.C.2. Land converted to grassland",
+  "sub_sector": "4.C.2. Land converted to grassland"
+ },
+ {
+  "category": "4.D. Wetlands",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:54:35.609310",
+  "name": "4.D.1. Wetlands remaining wetlands",
+  "sub_sector": "4.D.1. Wetlands remaining wetlands"
+ },
+ {
+  "category": "4.D. Wetlands",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:54:47.893252",
+  "name": "4.D.2. Land converted to wetlands",
+  "sub_sector": "4.D.2. Land converted to wetlands"
+ },
+ {
+  "category": "4.E. Settlements",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:55:02.034268",
+  "name": "4.E.1. Settlements remaining settlements",
+  "sub_sector": "4.E.1. Settlements remaining settlements"
+ },
+ {
+  "category": "4.E. Settlements",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:55:13.369283",
+  "name": "4.E.2. Land converted to settlements",
+  "sub_sector": "4.E.2. Land converted to settlements"
+ },
+ {
+  "category": "4.F. Other land",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:55:22.593037",
+  "name": "4.F.1. Other land remaining other land",
+  "sub_sector": "4.F.1. Other land remaining other land"
+ },
+ {
+  "category": "4.F. Other land",
+  "docstatus": 0,
+  "doctype": "GHG Sub Sector",
+  "modified": "2023-09-07 20:55:43.617244",
+  "name": "4.F.2. Land converted to other land",
+  "sub_sector": "4.F.2. Land converted to other land"
+ }
+]

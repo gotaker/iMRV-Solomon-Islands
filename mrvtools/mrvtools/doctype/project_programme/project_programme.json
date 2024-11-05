@@ -1,0 +1,204 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-03-15 17:05:03.458094",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "action_id",
+  "programme_name",
+  "cause",
+  "area",
+  "sector_affected",
+  "objectives",
+  "start_date",
+  "national_implementing_entity",
+  "international_implementing_entity",
+  "programme_cost",
+  "attach_document_1",
+  "attach_document_3",
+  "column_break_vxobi",
+  "action_name",
+  "programme_discription",
+  "focus",
+  "programme_status",
+  "sub_sector_affected",
+  "ghg_affected",
+  "duration",
+  "recipient_entity",
+  "estimated_investment_needs",
+  "attach_document_2"
+ ],
+ "fields": [
+  {
+   "fieldname": "action_id",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Action ID",
+   "options": "Project Actions",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "action_id.action_name",
+   "fieldname": "action_name",
+   "fieldtype": "Data",
+   "label": "Name of Action",
+   "read_only": 1
+  },
+  {
+   "fieldname": "programme_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Name of Programme",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fetch_from": "action_id.cause",
+   "fieldname": "cause",
+   "fieldtype": "Data",
+   "label": "Cause",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "action_id.focus",
+   "fieldname": "focus",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Focus",
+   "read_only": 1
+  },
+  {
+   "fieldname": "area",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Area",
+   "options": "\nNational\nSub-national"
+  },
+  {
+   "fieldname": "programme_discription",
+   "fieldtype": "Small Text",
+   "label": "Programme Discription"
+  },
+  {
+   "fieldname": "objectives",
+   "fieldtype": "Data",
+   "label": "Objectives"
+  },
+  {
+   "fieldname": "programme_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Programme Status",
+   "options": "\nProposed\nPlanned\nOngoing\nImplemented\nCompleted",
+   "reqd": 1
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Start Date"
+  },
+  {
+   "fieldname": "duration",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Duration"
+  },
+  {
+   "fieldname": "sector_affected",
+   "fieldtype": "Table MultiSelect",
+   "label": "Sector Affected",
+   "options": "Project Actions Sector ChildTable"
+  },
+  {
+   "fieldname": "sub_sector_affected",
+   "fieldtype": "Table MultiSelect",
+   "label": "Sub-Sector(s) affected",
+   "options": "Project Actions Sub Sector ChildTable"
+  },
+  {
+   "fieldname": "ghg_affected",
+   "fieldtype": "Table MultiSelect",
+   "label": "GHG(s) affected",
+   "options": "Mitigation Target GHGs in  ChildTable"
+  },
+  {
+   "fieldname": "recipient_entity",
+   "fieldtype": "Data",
+   "label": "Recipient Entity(s)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "national_implementing_entity",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "National Implementing Entity(s)"
+  },
+  {
+   "fieldname": "international_implementing_entity",
+   "fieldtype": "Data",
+   "label": "International Implementing Entity(s)"
+  },
+  {
+   "fieldname": "estimated_investment_needs",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Estimated investment needs (USD)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_vxobi",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "programme_cost",
+   "fieldtype": "Data",
+   "label": "Programme Cost"
+  },
+  {
+   "fieldname": "attach_document_1",
+   "fieldtype": "Attach",
+   "label": "Attach Document 1"
+  },
+  {
+   "fieldname": "attach_document_2",
+   "fieldtype": "Attach",
+   "label": "Attach Document 2"
+  },
+  {
+   "fieldname": "attach_document_3",
+   "fieldtype": "Attach",
+   "label": "Attach Document 3"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "make_attachments_public": 1,
+ "modified": "2024-09-18 12:53:58.596861",
+ "modified_by": "Administrator",
+ "module": "Mrvtools",
+ "name": "Project Programme",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "programme_name",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

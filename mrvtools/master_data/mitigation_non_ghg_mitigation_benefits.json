@@ -1,0 +1,51 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Mitigation Non GHG mitigation benefits",
+  "modified": "2023-07-01 16:09:32.474110",
+  "name": "Social",
+  "non_ghg_mitigation_benefits": "Social"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Mitigation Non GHG mitigation benefits",
+  "modified": "2023-07-01 16:10:14.756544",
+  "name": "Environmental",
+  "non_ghg_mitigation_benefits": "Environmental"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Mitigation Non GHG mitigation benefits",
+  "modified": "2023-07-01 16:10:23.739405",
+  "name": "Technological",
+  "non_ghg_mitigation_benefits": "Technological"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Mitigation Non GHG mitigation benefits",
+  "modified": "2023-07-01 16:10:38.570884",
+  "name": "Gender and other Vulnerable Groups",
+  "non_ghg_mitigation_benefits": "Gender and other Vulnerable Groups"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Mitigation Non GHG mitigation benefits",
+  "modified": "2023-07-01 16:10:58.821986",
+  "name": "Others",
+  "non_ghg_mitigation_benefits": "Others"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Mitigation Non GHG mitigation benefits",
+  "modified": "2023-07-01 16:09:21.772644",
+  "name": "Economic",
+  "non_ghg_mitigation_benefits": "Economic"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Mitigation Non GHG mitigation benefits",
+  "modified": "2023-07-01 16:10:48.187100",
+  "name": "Cross-cutting",
+  "non_ghg_mitigation_benefits": "Cross-cutting"
+ }
+]

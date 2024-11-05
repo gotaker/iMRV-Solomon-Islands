@@ -1,0 +1,79 @@
+.form-control{
+    border:1px solid #cfcfcfa1 !important;
+}
+ul.sidebar-menu::-webkit-scrollbar-track {
+    right: -2rem !important;
+
+}
+.main-section .navbar.navbar-expand.sticky-top .container #navbar-breadcrumbs {
+    display: none !important;
+}
+.control-value{
+    border:1px solid #efefef9e !important;
+}
+*{
+    --scrollbar-thumb-color: #5e5f5e1b !important;
+    scrollbar-width: thin !important;
+    --scrollbar-track-color: transparent !important;
+    scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
+}
+/* .sidebar-menu{
+    scrollbar-width: none !important;
+    
+} */
+
+
+.main-sidebar .sidebar-menu > li > a span{
+    letter-spacing: 0.5px !important;
+}
+
+/* div[id^=page-List] .custom-actions {display: none;}
+div[id^=page-List] .menu-btn-group{   display: none;} */
+
+div[id^=page-List] .custom-actions,
+div[id^=page-List] .menu-btn-group,
+body[data-route^=Form] .menu-btn-group,
+body[data-route^=Form] button[data-original-title="Print"] {
+    display: none;
+}
+/* .actions-btn-group li{
+    display : none
+} */
+.actions-btn-group span.menu-item-label[data-label='Edit'],
+.actions-btn-group span.menu-item-label[data-label='Assign%20To'],
+.actions-btn-group span.menu-item-label[data-label='Apply%20Assignment%20Rule'],
+.actions-btn-group span.menu-item-label[data-label='Add%20Tags'],
+.actions-btn-group span.menu-item-label[data-label='Print'] {
+    display: none !important;
+}    
+
+
+
+span.row-actions {
+    display: none !important;
+}
+/* .layout-main-section.frappe-card{
+    max-width: 1200px;
+    margin: auto;
+}
+
+.layout-main-section{
+    max-width: 1200px;
+    margin: auto;
+}
+
+.page-head.flex{
+    max-width: 1260px;
+    margin: auto;
+}
+
+.page-head.flex.drop-shadow{
+    max-width: 3900px;
+    margin: auto;
+}
+
+
+.row.flex.align-center.page-head-content.justify-between{
+    max-width: 1230px;
+    margin: auto;
+} */

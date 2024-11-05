@@ -1,0 +1,134 @@
+.list-filters {
+	overflow-y: hidden;
+	padding: 5px
+}
+.datatable .dt-header .dt-cell--header .dt-cell__content{
+	font-weight: 600;
+}
+.dt-cell--header{
+	background-color: #f4f5f6 !important;
+    color: #6b7278;
+}
+
+.list-filter-item {
+	min-width: 150px;
+	float: left;
+	margin: 5px;
+}
+
+.list-item_content {
+	flex: 1;
+	padding-right: 15px;
+	align-items: center;
+}
+
+.select-time, .select-doctype, .select-filter, .select-sort {
+	background: #f0f4f7;
+}
+
+.from-date-field .clearfix{
+	display: none;
+}
+
+.from-date-field {
+	margin-left: 10px;
+}
+
+.select-time:focus, .select-doctype:focus, .select-filter:focus, .select-sort:focus {
+	background: #f0f4f7;
+}
+
+.header-btn-base {
+	border: none;
+	outline: 0;
+	vertical-align: middle;
+	overflow: hidden;
+	text-decoration: none;
+	color: inherit;
+	background-color: inherit;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.header-btn-round {
+	border-radius: 4px;
+}
+
+.item-title-bold {
+	font-weight: bold;
+}
+
+.rank {
+	max-width: 100px;
+}
+
+.ndc_report .result {
+	border-top: 1px solid var(--border-color);
+}
+
+.ndc_report .list-item {
+	padding-left: 45px;
+}
+
+.ndc_report .list-item_content {
+	padding-right: 60px;
+}
+
+.ndc_report-sidebar {
+	padding-left: 0;
+	position: fixed;
+}
+
+.ndc_report-list {
+	padding: var(-padding-sm) 0;
+	min-height: 70vh;
+}
+
+.ndc_report-empty-state {
+	align-items: center;
+	height: 70vh;
+	justify-content: center;
+	display: flex;
+}
+
+/* .ndc_report-graph{
+	width: 100%;
+} */
+
+.totalndc_report-graph, .totalorder_analytics-graph, .avgorder_analytics-graph {
+    margin-bottom: 15px;
+}
+.ndc_report.page-main-content {
+    padding: 15px;
+}
+
+.title{
+	size: 40px;
+}
+/* #page-sales-analytics .layout-side-section{
+	display: none !important;
+} */
+
+.ndc_report.page-main-content{
+	padding: 0px 15px;
+}
+.number-widget-box {
+    width: 100%;
+}
+
+.total_card{
+	flex:calc(33.3% - 5px); 
+	border:1px; 
+	padding: 15px;
+	border-radius: 1px;
+	background-color:rgb(255, 255, 255);
+}
+.layout-main-section .report-wrapper{
+	padding:  0px !important;
+    margin: 11px 30px 1px 30px;
+}
+
+.total_card_div{
+	display:flex; 
+	gap: 5px;
+}

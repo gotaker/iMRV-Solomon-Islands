@@ -1,0 +1,19 @@
+{
+ "content": null,
+ "creation": "2024-01-24 13:10:51.652400",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2024-06-29 18:38:29.739370",
+ "modified_by": "Administrator",
+ "module": "Mrvtools",
+ "name": "main-dashboard",
+ "owner": "Administrator",
+ "page_name": "main-dashboard",
+ "roles": [],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "Main Dashboard"
+}

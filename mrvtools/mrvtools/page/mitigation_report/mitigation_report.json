@@ -1,0 +1,23 @@
+{
+ "content": null,
+ "creation": "2023-12-30 16:11:27.442554",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2024-01-18 15:07:21.422231",
+ "modified_by": "Administrator",
+ "module": "Mrvtools",
+ "name": "mitigation-report",
+ "owner": "Administrator",
+ "page_name": "mitigation-report",
+ "roles": [
+  {
+   "role": "Administrator"
+  }
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "Mitigation Report"
+}

@@ -1,0 +1,87 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-07-27 20:28:39.146220",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "urban_population",
+  "waste_per_capita",
+  "fraction_of_waste",
+  "fractionof_waste_go",
+  "ch4_generation",
+  "ch4_generationper_ton",
+  "reference"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "fieldname": "waste_per_capita",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Waste Per Capita (kg/capita/year)"
+  },
+  {
+   "default": "0",
+   "fieldname": "fraction_of_waste",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Fraction of waste going to managed sites"
+  },
+  {
+   "default": "0",
+   "fieldname": "fractionof_waste_go",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Fraction of waste going to unmanaged sites"
+  },
+  {
+   "default": "0",
+   "fieldname": "ch4_generation",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "CH4 Generation per ton of waste (kg/tonne) - Managed"
+  },
+  {
+   "default": "0",
+   "fieldname": "ch4_generationper_ton",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "CH4 Generation per ton of waste (kg/tonne) - Unmanaged"
+  },
+  {
+   "fieldname": "reference",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Reference"
+  },
+  {
+   "default": "0",
+   "fieldname": "urban_population",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Urban Population"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "make_attachments_public": 1,
+ "modified": "2024-07-22 13:04:19.410045",
+ "modified_by": "Administrator",
+ "module": "GHG Inventory",
+ "name": "Solid Waste Disposal ChildTable",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

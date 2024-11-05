@@ -1,0 +1,23 @@
+{
+ "content": null,
+ "creation": "2024-01-04 12:31:34.003294",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2024-01-18 15:05:57.594436",
+ "modified_by": "Administrator",
+ "module": "Mrvtools",
+ "name": "mrv-report",
+ "owner": "Administrator",
+ "page_name": "mrv-report",
+ "roles": [
+  {
+   "role": "Administrator"
+  }
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "MRV Report"
+}

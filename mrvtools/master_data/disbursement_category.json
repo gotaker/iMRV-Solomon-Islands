@@ -1,0 +1,135 @@
+[
+ {
+  "disbursement_category": null,
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2023-10-10 17:29:50.701058",
+  "name": "71d0f12f02"
+ },
+ {
+  "disbursement_category": "Sample Category",
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2024-01-17 12:25:15.520411",
+  "name": "Sample Category"
+ },
+ {
+  "disbursement_category": "Publicity and Promotions",
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2024-05-16 06:35:28.707990",
+  "name": "Publicity and Promotions"
+ },
+ {
+  "disbursement_category": "Staff Salary & Benefits",
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2024-05-16 06:44:54.093237",
+  "name": "Staff Salary & Benefits"
+ },
+ {
+  "disbursement_category": "Operational Costs",
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2024-05-16 06:52:00.942140",
+  "name": "Operational Costs"
+ },
+ {
+  "disbursement_category": "Others",
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2023-08-05 13:25:04.732277",
+  "name": "Others"
+ },
+ {
+  "disbursement_category": "Audit Fee",
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2023-08-05 13:25:14.762744",
+  "name": "Audit Fee"
+ },
+ {
+  "disbursement_category": "Audio Visual & Printing",
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2023-08-05 13:25:30.653779",
+  "name": "Audio Visual & Printing"
+ },
+ {
+  "disbursement_category": "Meetings/trainings",
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2023-08-05 13:25:41.070429",
+  "name": "Meetings/trainings"
+ },
+ {
+  "disbursement_category": "Workshop/Training",
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2023-08-05 13:25:48.562879",
+  "name": "Workshop/Training"
+ },
+ {
+  "disbursement_category": "Travel - Local",
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2023-08-05 13:25:57.605124",
+  "name": "Travel - Local"
+ },
+ {
+  "disbursement_category": "Travel - International",
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2023-08-05 13:26:04.359080",
+  "name": "Travel - International"
+ },
+ {
+  "disbursement_category": "Office Supplies",
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2023-08-05 13:26:32.262635",
+  "name": "Office Supplies"
+ },
+ {
+  "disbursement_category": "IT Equipment",
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2023-08-05 13:30:01.793587",
+  "name": "IT Equipment"
+ },
+ {
+  "disbursement_category": "Professional Services - Companies",
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2023-08-05 13:30:17.042633",
+  "name": "Professional Services - Companies"
+ },
+ {
+  "disbursement_category": "Consultant - Individual - Local",
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2023-08-05 13:30:27.928815",
+  "name": "Consultant - Individual - Local"
+ },
+ {
+  "disbursement_category": "Consultant - Individual - International",
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2023-08-05 13:31:35.099904",
+  "name": "Consultant - Individual - International"
+ },
+ {
+  "disbursement_category": "Equipment & Machinery",
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2023-08-05 13:31:49.126690",
+  "name": "Equipment & Machinery"
+ },
+ {
+  "disbursement_category": "Civil Work",
+  "docstatus": 0,
+  "doctype": "Disbursement Category",
+  "modified": "2023-08-05 13:32:02.689217",
+  "name": "Civil Work"
+ }
+]

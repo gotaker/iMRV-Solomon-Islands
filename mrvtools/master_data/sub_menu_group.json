@@ -1,0 +1,80 @@
+[
+    {
+      "docstatus": 0,
+      "doctype": "Sub Menu Group",
+      "name": "User",
+      "sub_menu_group": "User"
+    },
+    {
+      "docstatus": 0,
+      "doctype": "Sub Menu Group",
+      "name": "Waste",
+      "sub_menu_group": "Waste"
+    },
+    {
+      "docstatus": 0,
+      "doctype": "Sub Menu Group",
+      "name": "Agriculture",
+      "sub_menu_group": "Agriculture"
+    },
+    {
+      "docstatus": 0,
+      "doctype": "Sub Menu Group",
+      "name": "IPPU",
+      "sub_menu_group": "IPPU"
+    },
+    {
+      "docstatus": 0,
+      "doctype": "Sub Menu Group",
+      "name": "Energy",
+      "sub_menu_group": "Energy"
+    },
+    {
+      "docstatus": 0,
+      "doctype": "Sub Menu Group",
+      "name": "MRV",
+      "sub_menu_group": "MRV"
+    },
+    {
+      "docstatus": 0,
+      "doctype": "Sub Menu Group",
+      "name": "Master Database",
+      "sub_menu_group": "Master Database"
+    },
+    {
+      "docstatus": 0,
+      "doctype": "Sub Menu Group",
+      "name": "GHG Inventory",
+      "sub_menu_group": "GHG Inventory"
+    },
+    {
+      "docstatus": 0,
+      "doctype": "Sub Menu Group",
+      "name": "Climate Finance",
+      "sub_menu_group": "Climate Finance"
+    },
+    {
+      "docstatus": 0,
+      "doctype": "Sub Menu Group",
+      "name": "SDG Assessments",
+      "sub_menu_group": "SDG Assessments"
+    },
+    {
+      "docstatus": 0,
+      "doctype": "Sub Menu Group",
+      "name": "Adaptation Actions",
+      "sub_menu_group": "Adaptation Actions"
+    },
+    {
+      "docstatus": 0,
+      "doctype": "Sub Menu Group",
+      "name": "Mitigation Actions",
+      "sub_menu_group": "Mitigation Actions"
+    },
+    {
+      "docstatus": 0,
+      "doctype": "Sub Menu Group",
+      "name": "Project",
+      "sub_menu_group": "Project"
+    }
+  ]

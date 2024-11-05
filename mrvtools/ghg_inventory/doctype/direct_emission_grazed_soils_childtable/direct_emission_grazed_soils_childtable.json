@@ -1,0 +1,56 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-07-28 15:19:25.562183",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "anthropogenic_n_input",
+  "grazed_soils_amount",
+  "grazed_soils_emissoin_factor",
+  "refrence"
+ ],
+ "fields": [
+  {
+   "fieldname": "anthropogenic_n_input",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Anthropogenic N input type"
+  },
+  {
+   "default": "0",
+   "fieldname": "grazed_soils_amount",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Amount of urine and dung N deposited by grazing animals on pasture, range and paddock (kg per year)"
+  },
+  {
+   "default": "0",
+   "fieldname": "grazed_soils_emissoin_factor",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Emission Factor (kg N2O-N per kg N input)"
+  },
+  {
+   "fieldname": "refrence",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Reference"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "make_attachments_public": 1,
+ "modified": "2024-07-22 13:04:20.893389",
+ "modified_by": "Administrator",
+ "module": "GHG Inventory",
+ "name": "Direct Emission Grazed Soils ChildTable",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -1,0 +1,399 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2023-07-27 11:46:49.648046",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "tab_break_eii2f",
+  "project_id",
+  "financial_year",
+  "applied_exchange_rate",
+  "column_break_jdbsc",
+  "project_name",
+  "financing_mode",
+  "budget_code",
+  "section_break_hosoz",
+  "approval_date",
+  "expected_end_date",
+  "column_break_wgs3g",
+  "financial_closure_date",
+  "effectiveness_date",
+  "select_approver",
+  "financial_flow_tab_tab",
+  "project_size_million",
+  "total_project_cost",
+  "national_budget",
+  "total_sources_of_finance",
+  "column_break_efcnu",
+  "sub_national_budget",
+  "green_bonds",
+  "others",
+  "section_break_ancd0",
+  "sources_of_finance",
+  "edit_button1",
+  "detailed_budget_tab",
+  "cost_breakdown",
+  "edit_button2",
+  "section_break_nemih",
+  "total_amount_of_cost_breakdown",
+  "column_break_norqp",
+  "total_percentage_of_cost_breakdown",
+  "section_break_hkkzc",
+  "budget_disbursement_schedule",
+  "edit_button3",
+  "section_break_x2bqd",
+  "total_amount_of_budget_disbursement_schedule",
+  "column_break_ldoh9",
+  "total_percentage_of_budget_disbursement_schedule",
+  "naming_series",
+  "work_state",
+  "remarks",
+  "tab2",
+  "edited_project_details",
+  "actual_sources_of_finance",
+  "edited_sources_of_finance",
+  "actual_cost_breakdown",
+  "edited_cost_breakdown",
+  "actual_budget_disbursement_schedule",
+  "edited_budget_disbursement_schedule"
+ ],
+ "fields": [
+  {
+   "default": "CLI-FIN-PRO-INFO-.###",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "options": "CLI-FIN-PRO-INFO-.###"
+  },
+  {
+   "fieldname": "financial_year",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Financial Year (YYYY)",
+   "length": 4,
+   "non_negative": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "applied_exchange_rate",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Applied Exchange Rate (USD/SBD)",
+   "precision": "2",
+   "reqd": 1
+  },
+  {
+   "fieldname": "financing_mode",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Financing Mode",
+   "options": "\nOn Budget\nOff Budget\nOthers\nNot Applicable",
+   "reqd": 1
+  },
+  {
+   "fieldname": "budget_code",
+   "fieldtype": "Data",
+   "label": "Programme code/Project Code",
+   "reqd": 1
+  },
+  {
+   "fieldname": "approval_date",
+   "fieldtype": "Date",
+   "label": "Approval Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "expected_end_date",
+   "fieldtype": "Date",
+   "label": "Expected End Date"
+  },
+  {
+   "fieldname": "financial_closure_date",
+   "fieldtype": "Date",
+   "label": "Financial Closure Date",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "effectiveness_date",
+   "fieldtype": "Date",
+   "label": "Effectiveness Date"
+  },
+  {
+   "fieldname": "column_break_jdbsc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_wgs3g",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_hosoz",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "tab_break_eii2f",
+   "fieldtype": "Tab Break",
+   "label": "Project Details"
+  },
+  {
+   "fieldname": "project_size_million",
+   "fieldtype": "Select",
+   "label": "Project Size (million USD)",
+   "options": "\nMicro (<=0.1)\nSmall (>0.1<=0.5)\nMedium (>0.5<=1)\nLarge(>1.0)"
+  },
+  {
+   "fieldname": "total_project_cost",
+   "fieldtype": "Float",
+   "label": "Total Project Cost (USD)",
+   "precision": "2",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "national_budget",
+   "fieldtype": "Float",
+   "label": "National Budget (USD)",
+   "precision": "2"
+  },
+  {
+   "fieldname": "sub_national_budget",
+   "fieldtype": "Float",
+   "label": "Sub National Budget (USD)",
+   "precision": "2"
+  },
+  {
+   "fieldname": "green_bonds",
+   "fieldtype": "Float",
+   "label": "Green Bonds (USD)",
+   "precision": "2"
+  },
+  {
+   "fieldname": "others",
+   "fieldtype": "Float",
+   "label": "Support Needed (USD)",
+   "precision": "2"
+  },
+  {
+   "fieldname": "financial_flow_tab_tab",
+   "fieldtype": "Tab Break",
+   "label": "Financial Flow"
+  },
+  {
+   "fieldname": "column_break_efcnu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sources_of_finance",
+   "fieldtype": "Table",
+   "label": "Sources of Finance",
+   "options": "Sources of Climate Finance ChildTable"
+  },
+  {
+   "fieldname": "section_break_ancd0",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "detailed_budget_tab",
+   "fieldtype": "Tab Break",
+   "label": "detailed Budget"
+  },
+  {
+   "fieldname": "budget_disbursement_schedule",
+   "fieldtype": "Table",
+   "label": "Budget Disbursement Schedule",
+   "options": "Climate Finance Disbursement Schedule ChildTable"
+  },
+  {
+   "fieldname": "cost_breakdown",
+   "fieldtype": "Table",
+   "label": "Cost Breakdown",
+   "options": "Climate Finance detailed Budget ChildTable"
+  },
+  {
+   "fieldname": "section_break_hkkzc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "total_sources_of_finance",
+   "fieldtype": "Float",
+   "label": "Support Received (USD)",
+   "precision": "2"
+  },
+  {
+   "fieldname": "section_break_nemih",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_norqp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_percentage_of_cost_breakdown",
+   "fieldtype": "Percent",
+   "label": "Total Percentage of Cost Breakdown",
+   "precision": "2"
+  },
+  {
+   "fieldname": "section_break_x2bqd",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_ldoh9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_percentage_of_budget_disbursement_schedule",
+   "fieldtype": "Percent",
+   "label": "Total Percentage of Budget Disbursement Schedule ",
+   "precision": "2"
+  },
+  {
+   "fieldname": "total_amount_of_cost_breakdown",
+   "fieldtype": "Float",
+   "label": "Total Amount of Cost Breakdown",
+   "precision": "2"
+  },
+  {
+   "fieldname": "total_amount_of_budget_disbursement_schedule",
+   "fieldtype": "Float",
+   "label": "Total Amount of Budget Disbursement Schedule",
+   "precision": "2"
+  },
+  {
+   "fieldname": "tab2",
+   "fieldtype": "Tab Break",
+   "label": "Edited Climate Finance Details"
+  },
+  {
+   "fieldname": "edited_project_details",
+   "fieldtype": "Table",
+   "label": "Edited Climate Finance Details",
+   "options": "Edited Project Details",
+   "read_only": 1
+  },
+  {
+   "fieldname": "edited_cost_breakdown",
+   "fieldtype": "Table",
+   "label": "Edited Cost Breakdown",
+   "options": "Climate Finance detailed Budget ChildTable",
+   "read_only": 1
+  },
+  {
+   "fieldname": "edited_budget_disbursement_schedule",
+   "fieldtype": "Table",
+   "label": "Edited Budget Disbursement Schedule",
+   "options": "Climate Finance Disbursement Schedule ChildTable",
+   "read_only": 1
+  },
+  {
+   "fieldname": "work_state",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Work State",
+   "options": "\nPending\nApproved\nRejected"
+  },
+  {
+   "fieldname": "edit_button1",
+   "fieldtype": "Button",
+   "label": "Edit Sources of Finance"
+  },
+  {
+   "fieldname": "edit_button2",
+   "fieldtype": "Button",
+   "label": "Edit Cost Breakdown"
+  },
+  {
+   "fieldname": "edit_button3",
+   "fieldtype": "Button",
+   "label": "Edit Budget Disbursement Schedule"
+  },
+  {
+   "fieldname": "edited_sources_of_finance",
+   "fieldtype": "Table",
+   "label": "Edited Source of Finance",
+   "options": "Sources of Climate Finance ChildTable",
+   "read_only": 1
+  },
+  {
+   "fieldname": "project_id",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Project ID",
+   "options": "Project",
+   "reqd": 1
+  },
+  {
+   "fieldname": "project_name",
+   "fieldtype": "Data",
+   "label": "Project Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "select_approver",
+   "fieldtype": "Link",
+   "label": "Select Approver",
+   "options": "User"
+  },
+  {
+   "fieldname": "actual_sources_of_finance",
+   "fieldtype": "Table",
+   "label": "Actual Source of Finance",
+   "options": "Sources of Climate Finance ChildTable",
+   "read_only": 1
+  },
+  {
+   "fieldname": "actual_cost_breakdown",
+   "fieldtype": "Table",
+   "label": "Actual Cost Breakdown",
+   "options": "Climate Finance detailed Budget ChildTable",
+   "read_only": 1
+  },
+  {
+   "fieldname": "actual_budget_disbursement_schedule",
+   "fieldtype": "Table",
+   "label": "Actual Budget Disbursement Schedule",
+   "options": "Climate Finance Disbursement Schedule ChildTable",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "make_attachments_public": 1,
+ "modified": "2024-09-18 13:53:57.773715",
+ "modified_by": "Administrator",
+ "module": "Mrvtools",
+ "name": "Climate Finance",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "project_id",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "project_name",
+ "track_changes": 1
+}

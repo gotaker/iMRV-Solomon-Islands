@@ -1,0 +1,65 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-07-27 20:20:19.031575",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "population",
+  "per_capita_protein",
+  "nitrogen_fraction",
+  "emission_factor",
+  "reference"
+ ],
+ "fields": [
+  {
+   "fieldname": "population",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Population"
+  },
+  {
+   "fieldname": "per_capita_protein",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Per capita Protein Consumption (kg/person/year)"
+  },
+  {
+   "fieldname": "nitrogen_fraction",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Nitrogen Fraction in Protein"
+  },
+  {
+   "fieldname": "emission_factor",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Emission factor (kgN2O-N/kgN)"
+  },
+  {
+   "fieldname": "reference",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Reference"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "make_attachments_public": 1,
+ "modified": "2024-07-22 13:04:40.374937",
+ "modified_by": "Administrator",
+ "module": "GHG Inventory",
+ "name": "Waste Water Treatment Emission ChildTable",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

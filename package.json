@@ -1,0 +1,19 @@
+{
+  "name": "mrvtools",
+  "version": "1.0.0",
+  "description": "mrvtools",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "cd frontend && yarn dev",
+    "build": "cd frontend && yarn build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/tridotstech2019/mrv-tool-custom-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/tridotstech2019/mrv-tool-custom-app#readme"
+}

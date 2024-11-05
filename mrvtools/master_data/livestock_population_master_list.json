@@ -1,0 +1,146 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Livestock Population Master List",
+  "modified": "2024-01-22 11:01:40.439619",
+  "name": "2020",
+  "population": [
+   {
+    "category": "Buffalo",
+    "ghg_emission": null,
+    "heads": "20000",
+    "parent": "2020",
+    "parentfield": "population",
+    "parenttype": "Livestock Population Master List"
+   },
+   {
+    "category": "Camels",
+    "ghg_emission": null,
+    "heads": "1000",
+    "parent": "2020",
+    "parentfield": "population",
+    "parenttype": "Livestock Population Master List"
+   }
+  ],
+  "reference": null,
+  "year": "2020"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Livestock Population Master List",
+  "modified": "2023-08-03 13:02:19.354942",
+  "name": "1990",
+  "population": [
+   {
+    "category": "Buffalo",
+    "ghg_emission": null,
+    "heads": "380",
+    "parent": "1990",
+    "parentfield": "population",
+    "parenttype": "Livestock Population Master List"
+   },
+   {
+    "category": "Camels",
+    "ghg_emission": null,
+    "heads": "59",
+    "parent": "1990",
+    "parentfield": "population",
+    "parenttype": "Livestock Population Master List"
+   },
+   {
+    "category": "Poultry",
+    "ghg_emission": null,
+    "heads": "78",
+    "parent": "1990",
+    "parentfield": "population",
+    "parenttype": "Livestock Population Master List"
+   }
+  ],
+  "reference": null,
+  "year": "1990"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Livestock Population Master List",
+  "modified": "2023-11-07 15:21:35.496128",
+  "name": "1992",
+  "population": [
+   {
+    "category": "Camels",
+    "ghg_emission": null,
+    "heads": "104",
+    "parent": "1992",
+    "parentfield": "population",
+    "parenttype": "Livestock Population Master List"
+   },
+   {
+    "category": "Goats",
+    "ghg_emission": null,
+    "heads": "678",
+    "parent": "1992",
+    "parentfield": "population",
+    "parenttype": "Livestock Population Master List"
+   },
+   {
+    "category": "Buffalo",
+    "ghg_emission": null,
+    "heads": "460",
+    "parent": "1992",
+    "parentfield": "population",
+    "parenttype": "Livestock Population Master List"
+   },
+   {
+    "category": "Dairy Cows",
+    "ghg_emission": null,
+    "heads": "200",
+    "parent": "1992",
+    "parentfield": "population",
+    "parenttype": "Livestock Population Master List"
+   }
+  ],
+  "reference": null,
+  "year": "1992"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Livestock Population Master List",
+  "modified": "2023-11-07 15:22:28.363798",
+  "name": "1993",
+  "population": [
+   {
+    "category": "Buffalo",
+    "ghg_emission": null,
+    "heads": "400",
+    "parent": "1993",
+    "parentfield": "population",
+    "parenttype": "Livestock Population Master List"
+   },
+   {
+    "category": "Camels",
+    "ghg_emission": null,
+    "heads": "230",
+    "parent": "1993",
+    "parentfield": "population",
+    "parenttype": "Livestock Population Master List"
+   },
+   {
+    "category": "Goats",
+    "ghg_emission": null,
+    "heads": "1250",
+    "parent": "1993",
+    "parentfield": "population",
+    "parenttype": "Livestock Population Master List"
+   },
+   {
+    "category": "Mules and Assess",
+    "ghg_emission": null,
+    "heads": "230",
+    "parent": "1993",
+    "parentfield": "population",
+    "parenttype": "Livestock Population Master List"
+   }
+  ],
+  "reference": null,
+  "year": "1993"
+ }
+]

@@ -1,0 +1,51 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Mitigation Target GHGs",
+  "modified": "2023-07-01 15:53:33.681707",
+  "name": "CH4",
+  "target_ghgs": "CH4"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Mitigation Target GHGs",
+  "modified": "2023-07-01 15:55:10.957835",
+  "name": "N2O",
+  "target_ghgs": "N2O"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Mitigation Target GHGs",
+  "modified": "2023-07-01 15:55:31.006553",
+  "name": "PFCs",
+  "target_ghgs": "PFCs"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Mitigation Target GHGs",
+  "modified": "2023-07-01 15:55:39.276246",
+  "name": "SF6",
+  "target_ghgs": "SF6"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Mitigation Target GHGs",
+  "modified": "2023-07-01 15:53:16.867417",
+  "name": "CO2",
+  "target_ghgs": "CO2"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Mitigation Target GHGs",
+  "modified": "2023-07-01 15:55:20.419920",
+  "name": "HFCs",
+  "target_ghgs": "HFCs"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Mitigation Target GHGs",
+  "modified": "2023-07-01 15:55:53.563979",
+  "name": "NF3",
+  "target_ghgs": "NF3"
+ }
+]

@@ -1,0 +1,300 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2023-07-01 15:45:30.622164",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "tab1",
+  "project_id",
+  "column_break_jfwbz",
+  "project_name",
+  "section_break_z1cqh",
+  "project_description",
+  "column_break_uxdpi",
+  "key_sector",
+  "key_sub_sector",
+  "included_in",
+  "implementing_entity",
+  "other_agency",
+  "column_break_wsxo0",
+  "start_date",
+  "financial_closure_date",
+  "end_date",
+  "section_break_bbseg",
+  "ndp_cov",
+  "ndp_coverage",
+  "section_break_imllt",
+  "beneficiaries",
+  "column_break_mdmpy",
+  "select_approver",
+  "section_break_62rin",
+  "category_json",
+  "category_html",
+  "section_break_vppam",
+  "json",
+  "load_categories",
+  "qualitative_impact",
+  "quantitative_impact",
+  "naming_series",
+  "work_state",
+  "remarks",
+  "tab2",
+  "html_json",
+  "edited_project_details",
+  "html_table"
+ ],
+ "fields": [
+  {
+   "fetch_from": "project_name.project_description",
+   "fieldname": "project_description",
+   "fieldtype": "Small Text",
+   "label": "Brief Description",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "project_name.key_sector",
+   "fieldname": "key_sector",
+   "fieldtype": "Data",
+   "label": "Adaptation Sector",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "project_name.key_sub_sector",
+   "fieldname": "key_sub_sector",
+   "fieldtype": "Data",
+   "label": "Adaptation Sub-Sector",
+   "read_only": 1
+  },
+  {
+   "fieldname": "included_in",
+   "fieldtype": "Data",
+   "label": "Included in",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "project_name.financial_closure_date",
+   "fieldname": "financial_closure_date",
+   "fieldtype": "Date",
+   "label": "Financial Closure Date",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "project_name.implementing_entity",
+   "fieldname": "implementing_entity",
+   "fieldtype": "Data",
+   "label": "Implementing Entities or entity",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "project_name.other_agency",
+   "fieldname": "other_agency",
+   "fieldtype": "Data",
+   "label": "Other Party",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "project_name.end_date",
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "Project End Date",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "project_name.start_date",
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Project Start Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ndp_coverage",
+   "fieldtype": "Link",
+   "label": "NDS Objectives Coverage",
+   "options": "NDP Objective Coverage"
+  },
+  {
+   "fieldname": "ndp_cov",
+   "fieldtype": "Table MultiSelect",
+   "label": "National Development Strategy Coverage",
+   "options": "NDP Objective Coverage Child table"
+  },
+  {
+   "fieldname": "section_break_z1cqh",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_wsxo0",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_bbseg",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_uxdpi",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_mdmpy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_62rin",
+   "fieldtype": "Section Break",
+   "label": "Select Categories and Click Load Categories Button"
+  },
+  {
+   "fieldname": "qualitative_impact",
+   "fieldtype": "Table",
+   "label": "Qualitative Impact",
+   "options": "Adaptation Qualitative ChildTable"
+  },
+  {
+   "fieldname": "quantitative_impact",
+   "fieldtype": "Table",
+   "label": "Quantitative Impact",
+   "options": "Adaptation Quantitative ChildTable"
+  },
+  {
+   "fieldname": "load_categories",
+   "fieldtype": "Button",
+   "label": "Load Categories"
+  },
+  {
+   "fieldname": "select_approver",
+   "fieldtype": "Link",
+   "label": "Select Approver",
+   "options": "User"
+  },
+  {
+   "fieldname": "json",
+   "fieldtype": "JSON",
+   "hidden": 1,
+   "label": "JSON"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "options": "ADA-PRO-INFO-.###"
+  },
+  {
+   "fieldname": "html_table",
+   "fieldtype": "HTML",
+   "label": "Edited Table Details",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tab1",
+   "fieldtype": "Tab Break",
+   "label": "Details"
+  },
+  {
+   "fieldname": "tab2",
+   "fieldtype": "Tab Break",
+   "label": "Edited Adaptation Details"
+  },
+  {
+   "fieldname": "edited_project_details",
+   "fieldtype": "Table",
+   "label": "Edited Adaptation Details",
+   "options": "Edited Project Details",
+   "read_only": 1
+  },
+  {
+   "fieldname": "work_state",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Work State",
+   "options": "\nPending\nApproved\nRejected"
+  },
+  {
+   "fieldname": "html_json",
+   "fieldtype": "JSON",
+   "hidden": 1,
+   "label": "Html Json",
+   "read_only": 1
+  },
+  {
+   "fieldname": "project_id",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Project ID",
+   "options": "Project",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_jfwbz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "project_name",
+   "fieldtype": "Data",
+   "label": "Project Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "section_break_imllt",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "beneficiaries",
+   "fieldtype": "Data",
+   "label": "Beneficiaries "
+  },
+  {
+   "fieldname": "section_break_vppam",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "category_json",
+   "fieldtype": "JSON",
+   "hidden": 1,
+   "label": "Categories JSON"
+  },
+  {
+   "fieldname": "category_html",
+   "fieldtype": "HTML",
+   "label": "Categories HTML"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "make_attachments_public": 1,
+ "modified": "2024-09-18 13:51:06.122751",
+ "modified_by": "Administrator",
+ "module": "Mrvtools",
+ "name": "Adaptation",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "project_id",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "project_name",
+ "track_changes": 1
+}

@@ -1,0 +1,273 @@
+<!--    <footer class="footer area-bg">
+        <div class="area-bg__inner">
+            <div class="footer__main">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <a class="footer__logo" href="/">
+                                            <img class="img-responsive" src="/assets/gscommunity/assets/media/general/logo.png" alt="Logo" />
+                                        </a>
+                            <section class="footer-section footer-section_list-columns">
+                                <div class="row pad-footer footer__info">
+                                    <div class="col-md-3 col-sm-3 mb-30 text-center">
+                                        <a href="/tours">
+                                            <div class="featured-item flat-border-box">
+                                                <div class="icon text-center">
+                                                    <img src="/assets/gscommunity/assets/media/footer-1.png" class="b-advantages-2__icon pad-row2" alt="icon">
+                                                </div>
+                                                <div class="desc">
+                                                    <p class="b-advantages-1__footer color-white">Tours </p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3 mb-30 text-center">
+                                        <a href="/excursions">
+                                            <div class="featured-item flat-border-box">
+                                                <div class="icon text-center">
+                                                    <img src="/assets/gscommunity/assets/media/footer-2.png" class="b-advantages-2__icon pad-row2" alt="icon">
+                                                </div>
+                                                <div class="desc">
+                                                    <p class="b-advantages-1__footer color-white">Excursions</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3 mb-30 text-center">
+                                        <a href="/destinations">
+                                            <div class="featured-item flat-border-box">
+                                                <div class="icon text-center">
+                                                    <img src="/assets/gscommunity/assets/media/footer-3.png" class="b-advantages-2__icon pad-row2" alt="icon">
+                                                </div>
+                                                <div class="desc">
+                                                    <p class="b-advantages-1__footer color-white">Destinations</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3 mb-30 text-center">
+                                        <a href="/accommodations">
+                                            <div class="featured-item flat-border-box">
+                                                <div class="icon text-center">
+                                                    <img src="/assets/gscommunity/assets/media/footer-4.png" class="b-advantages-2__icon pad-row2" alt="icon">
+                                                </div>
+                                                <div class="desc">
+                                                    <p class="b-advantages-1__footer color-white">Accommodations</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="row text-center">
+                                    <div>
+                                        <a class="copyright__link" href="/">Home</a>
+                                        <a class="copyright__link" href="/aboutus">About</a>
+                                        <a class="copyright__link" href="/">Sri Lanka</a>
+                                        <a class="copyright__link" href="/reviews">Client Says</a>
+                                        <a class="copyright__link" href="/termsconditions">Terms &amp; Conditions</a>
+                                        <a class="copyright__link" href="/contact-us">Contact</a>
+                                        <a class="copyright__link" href="/blogposts">Blog</a>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <section class="footer-section" style="padding-left: 25px;">
+
+                                <h3 class="footer-section__title ui-title-inner">Experience</h3>
+                                <ul class="footer-list list-unstyled">
+                                    {%if TourCategory %}
+                                      {%for item in TourCategory %}
+                                    <li class="">
+                                    <a class="footer-list__link" href="{{item.route}}">{{item.category_name}}</a>
+                                    </li>
+                                    {% endfor %}
+                                      {% endif %}
+                                </ul>
+                            </section>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                         
+                            {% if ContactInfo %}
+                            {% for item in ContactInfo %}
+                           
+                            <section class="footer-section">
+                                <h3 class="footer-section__title ui-title-inner">Contact Info</h3>
+                                <div class="footer-contact footer-contact_lg">Call us<span class="text-primary"> {{item.mobile_no}}</span>
+                                </div>
+                                <div class="footer-contact"><i class="icon icon-xs fa fa-envelope-o"></i> {{item.email_id}}</div>
+                                <div class="footer-contact"><i class="icon icon-lg fa fa-map-marker"></i>{{item.address}}</div>
+                                <div class="footer-contact"><i class="icon fa fa-clock-o"></i>Mon - Fri : {{item.from_info}} to {{item.to_info}}</div>
+                            </section>
+                            <ul class="social-net list-inline">
+                                <li class="social-net__item"><a class="social-net__link text-primary_h" href="http://www.facebook.com/{{item.facebook_id}}"><i class="icon fa fa-facebook"></i></a>
+                                </li>
+                                <li class="social-net__item"><a class="social-net__link text-primary_h" href="https://twitter.com/{{item.tweeter}}"><i class="icon fa fa-twitter"></i></a>
+                                </li>
+                                <li class="social-net__item"><a class="social-net__link text-primary_h" href="http://www.linkedin.com/{{item.linked_in}}"><i class="icon fa fa-linkedin"></i></a>
+                                </li>
+                                <li class="social-net__item"><a class="social-net__link text-primary_h" href="https://www.instagram.com/{{item.instagram}}"><i class="icon fa fa-instagram"></i></a>
+                                </li>
+                                <li class="social-net__item"><a class="social-net__link text-primary_h" href="http://www.youtube.com/{{item.youtube}}"><i class="icon fa fa-youtube-play"></i></a>
+                                </li>
+                            </ul>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-12">Copyrights 2018<a class="copyright__brand" href="/"> srilankantraveller</a> All Rights Reserved.
+                        </div>
+                    </div>
+                </div>
+            </div><span class="btn-up" id="toTop">TOP</span>
+        </div>
+    </footer> -->
+
+<!-- 
+<div class="row">   
+
+<div class="col-md-9" style="margin: 15px 5px;">  
+
+
+
+<div id="homepagead_slide" style="z-index: 0;position: relative;">
+            <div class="team-carousel-2 owl-carousel owl-theme enable-owl-carousel" data-min768="1" data-min992="1" data-min1200="1" data-margin="30" data-pagination="false" data-navigation="false" data-stop-on-hover="true"> 
+{% for ads in BottomAdsList %}
+     <section data-timing='{{ads.slot_timing}}' 
+     class="b-team-200">
+        <div class="b-team-2__media">
+        <img src="{{ads.image_upload}}" class="img-responsive" href="{{ads.redirect_url}}" 
+        style="width: 1000px;height: 100px;margin: auto;">
+        </div>
+    </section>
+{% endfor %}
+              
+            </div>
+        </div>
+
+
+         </div>
+
+<div class="col-md-3">   </div>
+
+
+</div> -->
+<footer class="footer area-bg" style="background:#8c6373;">
+    <div class="area-bg__inner">
+        <div class="footer__main">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="footer-section">
+                                  <!--   <a class="footer__logo" href="home.html">
+                                        <img class="img-responsive" src="assets/media/gsod-logo.png" alt="Logo" />
+                                    </a> -->
+                                    <h3 class="footer-section__title ui-title-inner">About Us</h3>
+                                    <div class="footer__info" style="text-align:justify;">Gujarati Samaj of Detroit (GSOD) was founded in 1975 and has become an icon in Michigan community. GSOD is one of the largest ethnic, cultural organizations in the entire mid west area. The goal of GSOD was to unite all Gujarati people under one roof...</div>
+                                    
+                                    <!-- end .social-list-->
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <section class="footer-section footer-section_list-columns">
+                                    <h3 class="footer-section__title ui-title-inner">Top Links</h3>
+                                    <ul class="footer-list footer-list_columns list-unstyled">
+                                        <li class="footer-list__item1"><a class="footer-list__link" href="/aboutus">About Us</a>
+                                        </li>
+                                        <li class="footer-list__item1"><a class="footer-list__link" href="/event">Events</a>
+                                        </li>
+                                        <li class="footer-list__item1"><a class="footer-list__link" href="/albums">Gallery</a>
+                                        </li>
+                                        <li class="footer-list__item1"><a class="footer-list__link" href="/yellowpages">yellow Pages</a>
+                                        </li>
+                                        <li class="footer-list__item1"><a class="footer-list__link" href="/contact_us">Contact Us</a>
+                                        </li>
+                                        <li class="footer-list__item1"><a class="footer-list__link" href="/gsod-donation">Donation</a>
+                                        </li>
+                                       
+                                    </ul>
+                                </section>
+                            </div>
+                            <div class="col-md-3">
+                                <section class="footer-section footer-section_list-one">
+                                    <h3 class="footer-section__title ui-title-inner">Yellow Pages</h3>
+                                    <ul class="footer-list ">
+                                        <li class="footer-list__item1"><a class="footer-list__link" href="/accounting-tax">Accounting/Tax</a>
+                                        </li>
+                                        <li class="footer-list__item1"><a class="footer-list__link" href="/astrology">Astrology</a>
+                                        </li>
+                                        <li class="footer-list__item1"><a class="footer-list__link" href="/bank">Bank</a>
+                                        </li>
+                                        <li class="footer-list__item1"><a class="footer-list__link" href="/beauty-parlour">Beauty Parlour</a>
+                                        </li>
+                                        <li class="footer-list__item1"><a class="footer-list__link" href="/djs">DJs</a>
+                                        </li>
+                                        <li class="footer-list__item1"><a class="footer-list__link" href="/fashion">Fashion</a>
+                                        </li>
+                                    </ul>
+                                </section>
+                            </div>
+                            <div class="col-md-12">
+                                <section class="footer-section">
+                                    <h3 class="footer-section__title ui-title-inner">In Association with</h3>
+                                    <div class="col-md-3">
+                                        <a href="https://www.valiantsystems.com/" target="_blank"><img class="img-responsive" src="/assets/gscommunity/images/valiant.gif" alt="foto" style="margin-bottom: 4%"></a>
+                                    </div>
+                                    <div class="col-md-6" style="
+width: auto;
+">
+                                        <img class="img-responsive" src="/assets/gscommunity/images/danysoni-label.jpg" alt="foto" style="height: 94px;">
+                                    </div>
+                                    <div class="col-md-3" style="
+width: auto;
+">
+                                            <img class="img-responsive" src="/assets/gscommunity/images/dte-gsod.jpg" alt="DTE Energy" style="
+height: 94px;
+width: auto;
+"> 
+                                    </div>
+                                </section>
+                            </div>
+                            <div class="col-md-3" style="display: none;">
+                                <section class="footer-section">
+                                    <h3 class="footer-section__title ui-title-inner">In Association with</h3>
+                                   <a href="https://www.valiantsystems.com/" target="_blank"><img class="img-responsive" src="/assets/gscommunity/images/valiant.gif" alt="foto" style="margin-bottom: 4%"></a>
+                                   <a href="https://www.i9live.com/" target="_blank"> <img class="img-responsive" src="/assets/gscommunity/images/i9live.gif" alt="foto"></a>
+
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        <div class="copyright">
+            <div class="container">
+                <div class="row">
+
+                      
+
+                    <div class="col-xs-12" style="padding: 0">
+                       
+                             <div class="col-md-8" style="text-align: left;"> 
+                                    Copyrights 2019
+                               <a class="copyright__brand" href="/"> Gsod</a> All Rights Reserved.
+
+                           </div>
+                             <div class="col-md-4" style="text-align: right;"> 
+                        Powered by
+                               <a class="copyright__brand" href="http://www.valiantsystems.com/" target="_blank"> Valiantsystems.com</a> 
+
+                         </div>
+
+
+                      
+                    </div>
+                </div>
+            </div>
+        </div><span class="btn-up" id="toTop">TOP</span>
+    </div>
+</footer>

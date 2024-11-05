@@ -1,0 +1,44 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sector",
+  "modified": "2023-07-28 12:24:45.658471",
+  "name": "1. Energy",
+  "sector": "1. Energy"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sector",
+  "modified": "2023-07-28 12:25:02.162808",
+  "name": "2. Industrial processes and product use",
+  "sector": "2. Industrial processes and product use"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sector",
+  "modified": "2023-09-07 19:11:17.268779",
+  "name": "3. Agriculture",
+  "sector": "3. Agriculture"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sector",
+  "modified": "2023-11-04 17:11:31.259332",
+  "name": "5. Waste",
+  "sector": "5. Waste"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sector",
+  "modified": "2023-09-07 19:13:07.216751",
+  "name": "4. LAND USE, LAND-USE CHANGE AND FORESTRY",
+  "sector": "4. LAND USE, LAND-USE CHANGE AND FORESTRY"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Sector",
+  "modified": "2023-09-07 19:13:19.665503",
+  "name": "6. Other",
+  "sector": "6. Other "
+ }
+]

@@ -1,0 +1,146 @@
+[
+ {
+  "category": "GHG",
+  "docstatus": 0,
+  "doctype": "User Permissions",
+  "modified": "2023-07-01 16:09:12.834442",
+  "module": "AFOLU",
+  "name": "AFOLU"
+ },
+ {
+  "category": "GHG",
+  "docstatus": 0,
+  "doctype": "User Permissions",
+  "modified": "2023-07-01 16:08:32.243397",
+  "module": "Energy",
+  "name": "Energy"
+ },
+ {
+  "category": "GHG",
+  "docstatus": 0,
+  "doctype": "User Permissions",
+  "modified": "2023-07-01 16:08:45.875602",
+  "module": "IPPU",
+  "name": "IPPU"
+ },
+ {
+  "category": "GHG",
+  "docstatus": 0,
+  "doctype": "User Permissions",
+  "modified": "2023-07-01 16:09:02.578554",
+  "module": "Waste",
+  "name": "Waste"
+ },
+ {
+  "category": "GHG",
+  "docstatus": 0,
+  "doctype": "User Permissions",
+  "modified": "2023-10-23 17:21:21.117943",
+  "module": "Agriculture",
+  "name": "Agriculture"
+ },
+ {
+  "category": "Project Tracking",
+  "docstatus": 0,
+  "doctype": "User Permissions",
+  "modified": "2023-07-01 16:09:37.149609",
+  "module": "Mitigation Tracking",
+  "name": "Mitigation Tracking"
+ },
+ {
+  "category": "Project Tracking",
+  "docstatus": 0,
+  "doctype": "User Permissions",
+  "modified": "2023-07-01 16:10:09.394560",
+  "module": "Adaptation Tracking",
+  "name": "Adaptation Tracking"
+ },
+ {
+  "category": "Project Tracking",
+  "docstatus": 0,
+  "doctype": "User Permissions",
+  "modified": "2023-07-01 16:10:28.612134",
+  "module": "Climate Finance",
+  "name": "Climate Finance"
+ },
+ {
+  "category": "Project Tracking",
+  "docstatus": 0,
+  "doctype": "User Permissions",
+  "modified": "2023-07-01 16:10:44.461511",
+  "module": "SDG Tracking",
+  "name": "SDG Tracking"
+ },
+ {
+  "category": "Reports",
+  "docstatus": 0,
+  "doctype": "User Permissions",
+  "modified": "2023-07-01 16:11:02.085846",
+  "module": "Mitigation Report",
+  "name": "Mitigation Report"
+ },
+ {
+  "category": "Reports",
+  "docstatus": 0,
+  "doctype": "User Permissions",
+  "modified": "2023-07-01 16:11:21.208822",
+  "module": "Adaptation Report",
+  "name": "Adaptation Report"
+ },
+ {
+  "category": "Reports",
+  "docstatus": 0,
+  "doctype": "User Permissions",
+  "modified": "2023-07-01 16:13:27.960254",
+  "module": "Climate Finance Report",
+  "name": "Climate Finance Report"
+ },
+ {
+  "category": "Reports",
+  "docstatus": 0,
+  "doctype": "User Permissions",
+  "modified": "2023-07-01 16:12:00.062766",
+  "module": "SDG Report",
+  "name": "SDG Report"
+ },
+ {
+  "category": "Reports",
+  "docstatus": 0,
+  "doctype": "User Permissions",
+  "modified": "2023-07-01 16:12:15.999567",
+  "module": "Project MRV Report",
+  "name": "Project MRV Report"
+ },
+ {
+  "category": "Reports",
+  "docstatus": 0,
+  "doctype": "User Permissions",
+  "modified": "2023-07-01 16:12:36.423265",
+  "module": "NDC Tracking Report",
+  "name": "NDC Tracking Report"
+ },
+ {
+  "category": "Reports",
+  "docstatus": 0,
+  "doctype": "User Permissions",
+  "modified": "2023-07-01 16:12:51.845905",
+  "module": "GHG Inventory Report",
+  "name": "GHG Inventory Report"
+ },
+ {
+  "category": "GHG",
+  "docstatus": 0,
+  "doctype": "User Permissions",
+  "modified": "2023-10-23 17:22:20.055725",
+  "module": "Land Use",
+  "name": "Land Use"
+ },
+ {
+  "category": "GHG",
+  "docstatus": 0,
+  "doctype": "User Permissions",
+  "modified": "2023-10-23 17:22:31.298283",
+  "module": "Other",
+  "name": "Other"
+ }
+]

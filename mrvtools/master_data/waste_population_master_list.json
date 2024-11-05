@@ -1,0 +1,35 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Waste Population Master List",
+  "modified": "2023-08-01 16:38:41.124079",
+  "name": "1990",
+  "reference": null,
+  "rural_population": 200,
+  "total_population": 500,
+  "urban_population": 300,
+  "year": "1990"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Waste Population Master List",
+  "modified": "2023-08-01 16:38:27.514409",
+  "name": "1991",
+  "reference": null,
+  "rural_population": 550,
+  "total_population": 1000,
+  "urban_population": 450,
+  "year": "1991"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Waste Population Master List",
+  "modified": "2023-11-06 20:58:58.662261",
+  "name": "1993",
+  "reference": null,
+  "rural_population": 200,
+  "total_population": 300,
+  "urban_population": 100,
+  "year": "1993"
+ }
+]

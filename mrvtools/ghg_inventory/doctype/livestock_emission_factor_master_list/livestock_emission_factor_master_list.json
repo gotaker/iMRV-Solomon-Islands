@@ -1,0 +1,112 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "format:{category}",
+ "creation": "2023-07-28 16:30:01.745859",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "category",
+  "enteric_fermentation",
+  "manure_management",
+  "excretion_rate",
+  "typical_animal_mass",
+  "nitrogen_excretion",
+  "column_break_ac6ec",
+  "direct_n2o_n_emissions",
+  "managed_manure",
+  "managed_ivestock_manure",
+  "atmospheric_deposition",
+  "reference"
+ ],
+ "fields": [
+  {
+   "fieldname": "category",
+   "fieldtype": "Data",
+   "label": "Category"
+  },
+  {
+   "fieldname": "enteric_fermentation",
+   "fieldtype": "Data",
+   "label": "EFEnteric Fermentation (kgCH4/ head/ year)"
+  },
+  {
+   "fieldname": "manure_management",
+   "fieldtype": "Data",
+   "label": "EFManure Management (kgCH4/ head/ year)"
+  },
+  {
+   "fieldname": "excretion_rate",
+   "fieldtype": "Data",
+   "label": "N Excretion Rate (kgN/ 1000kg animal/ day)"
+  },
+  {
+   "fieldname": "typical_animal_mass",
+   "fieldtype": "Data",
+   "label": "Typical Animal Mass (kg)"
+  },
+  {
+   "fieldname": "nitrogen_excretion",
+   "fieldtype": "Data",
+   "label": "Nitrogen Excretion Managed in MMS (%)"
+  },
+  {
+   "fieldname": "direct_n2o_n_emissions",
+   "fieldtype": "Data",
+   "label": "EF Direct N2O-N Emissions from MMS"
+  },
+  {
+   "fieldname": "managed_manure",
+   "fieldtype": "Data",
+   "label": "Managed Manure N lost in MMS (%)"
+  },
+  {
+   "fieldname": "managed_ivestock_manure",
+   "fieldtype": "Data",
+   "label": "Fraction of managed livestock manure nitrogen that volatilises"
+  },
+  {
+   "fieldname": "atmospheric_deposition",
+   "fieldtype": "Data",
+   "label": "EF N2O emissions from atmospheric deposition of nitrogen on soils and water surfaces"
+  },
+  {
+   "fieldname": "reference",
+   "fieldtype": "Data",
+   "label": "Reference"
+  },
+  {
+   "fieldname": "column_break_ac6ec",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "make_attachments_public": 1,
+ "modified": "2024-07-22 13:04:41.653200",
+ "modified_by": "Administrator",
+ "module": "GHG Inventory",
+ "name": "Livestock Emission Factor Master List",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

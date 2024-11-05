@@ -1,0 +1,16 @@
+[
+ {
+  "cement_subsector": "Cement",
+  "docstatus": 0,
+  "doctype": "IPPU Emission Factors Master List",
+  "emission_factor_1": 10.0,
+  "emission_factor_2": 20.0,
+  "lime_subsector": "Lime",
+  "modified": "2023-11-02 15:48:52.309622",
+  "name": "IPPU Emission Factors Master List",
+  "reference_1": null,
+  "reference_2": null,
+  "unit_1": null,
+  "unit_2": null
+ }
+]

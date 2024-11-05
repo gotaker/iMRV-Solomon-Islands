@@ -1,0 +1,23 @@
+{
+ "content": null,
+ "creation": "2024-01-02 20:09:19.280708",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2024-01-18 15:06:49.342970",
+ "modified_by": "Administrator",
+ "module": "Mrvtools",
+ "name": "ndc-report",
+ "owner": "Administrator",
+ "page_name": "ndc-report",
+ "roles": [
+  {
+   "role": "Administrator"
+  }
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "NDC Report"
+}

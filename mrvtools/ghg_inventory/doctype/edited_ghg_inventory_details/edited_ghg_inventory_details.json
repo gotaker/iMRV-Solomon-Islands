@@ -1,0 +1,54 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-10-18 16:15:36.664519",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "field_name",
+  "field_label",
+  "old_values",
+  "new_values"
+ ],
+ "fields": [
+  {
+   "fieldname": "field_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Field"
+  },
+  {
+   "fieldname": "field_label",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Field Name"
+  },
+  {
+   "fieldname": "old_values",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Old Values"
+  },
+  {
+   "fieldname": "new_values",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "New Values"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "make_attachments_public": 1,
+ "modified": "2024-07-22 13:04:35.858810",
+ "modified_by": "Administrator",
+ "module": "GHG Inventory",
+ "name": "Edited GHG Inventory Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

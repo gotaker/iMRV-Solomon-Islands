@@ -1,0 +1,149 @@
+[
+ {
+  "category": "Agriculture",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.392157",
+  "name": "Agriculture"
+ },
+ {
+  "category": "Forestry",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.423253",
+  "name": "Forestry"
+ },
+ {
+  "category": "Water",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.428497",
+  "name": "Water"
+ },
+ {
+  "category": "Energy",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.433521",
+  "name": "Energy"
+ },
+ {
+  "category": "Health",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.439517",
+  "name": "Health"
+ },
+ {
+  "category": "Risk management",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.444782",
+  "name": "Risk management"
+ },
+ {
+  "category": "MTS-1",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.449698",
+  "name": "MTS-1"
+ },
+ {
+  "category": "MTS-2",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.455581",
+  "name": "MTS-2"
+ },
+ {
+  "category": "MTS-3",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.462316",
+  "name": "MTS-3"
+ },
+ {
+  "category": "MTS-4",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.470087",
+  "name": "MTS-4"
+ },
+ {
+  "category": "MTS-5",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.477224",
+  "name": "MTS-5"
+ },
+ {
+  "category": "MTS-6",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.482860",
+  "name": "MTS-6"
+ },
+ {
+  "category": "MTS-7",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.488609",
+  "name": "MTS-7"
+ },
+ {
+  "category": "MTS-8",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.493729",
+  "name": "MTS-8"
+ },
+ {
+  "category": "MTS-9",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.499598",
+  "name": "MTS-9"
+ },
+ {
+  "category": "MTS-10",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.505718",
+  "name": "MTS-10"
+ },
+ {
+  "category": "MTS-11",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.511350",
+  "name": "MTS-11"
+ },
+ {
+  "category": "MTS-12",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.516478",
+  "name": "MTS-12"
+ },
+ {
+  "category": "MTS-13",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.521892",
+  "name": "MTS-13"
+ },
+ {
+  "category": "MTS-14",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.526524",
+  "name": "MTS-14"
+ },
+ {
+  "category": "MTS-15",
+  "docstatus": 0,
+  "doctype": "Adaptation Category",
+  "modified": "2024-07-15 11:19:48.532045",
+  "name": "MTS-15"
+ }
+]

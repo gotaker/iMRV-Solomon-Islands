@@ -1,0 +1,366 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:54.617203",
+  "name": "activity_data",
+  "table_name": "activity_data"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:54.685601",
+  "name": "activity_data_agriculture",
+  "table_name": "activity_data_agriculture"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:54.703593",
+  "name": "activity_data_burning",
+  "table_name": "activity_data_burning"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:54.727678",
+  "name": "aerosols",
+  "table_name": "aerosols"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:54.753391",
+  "name": "atmospheric_deposit",
+  "table_name": "atmospheric_deposit"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:54.777240",
+  "name": "biological_treatment",
+  "table_name": "biological_treatment"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:54.794377",
+  "name": "biomass_burning",
+  "table_name": "biomass_burning"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:54.810968",
+  "name": "cement_production",
+  "table_name": "cement_production"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:54.838070",
+  "name": "ch4_wastewater_treatment",
+  "table_name": "ch4_wastewater_treatment"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:54.861540",
+  "name": "chemical_industry",
+  "table_name": "chemical_industry"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:54.885921",
+  "name": "clinker_data",
+  "table_name": "clinker_data"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:54.902444",
+  "name": "co2_emissions_from_biomass",
+  "table_name": "co2_emissions_from_biomass"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:54.927725",
+  "name": "cropland",
+  "table_name": "cropland"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:54.944096",
+  "name": "direct_emissions_mms",
+  "table_name": "direct_emissions_mms"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:54.969327",
+  "name": "direct_managed_soils",
+  "table_name": "direct_managed_soils"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:54.986621",
+  "name": "electrical_equipment",
+  "table_name": "electrical_equipment"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.011401",
+  "name": "electricity_generation",
+  "table_name": "electricity_generation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.035787",
+  "name": "enteric_fermentation",
+  "table_name": "enteric_fermentation"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.052399",
+  "name": "fire_protection",
+  "table_name": "fire_protection"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.068994",
+  "name": "foam_blowing_agents",
+  "table_name": "foam_blowing_agents"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.086028",
+  "name": "forest_land",
+  "table_name": "forest_land"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.102295",
+  "name": "grassland",
+  "table_name": "grassland"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.127840",
+  "name": "harvested_wood_products",
+  "table_name": "harvested_wood_products"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.144062",
+  "name": "indirect_manure_management",
+  "table_name": "indirect_manure_management"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.162089",
+  "name": "industrial_wastewater_treatment",
+  "table_name": "industrial_wastewater_treatment"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.185698",
+  "name": "international_bunkers",
+  "table_name": "international_bunkers"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.203188",
+  "name": "lime_production",
+  "table_name": "lime_production"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.218805",
+  "name": "lubricant_use",
+  "table_name": "lubricant_use"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.236695",
+  "name": "manufacturing_industries",
+  "table_name": "manufacturing_industries"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.277562",
+  "name": "n2o_from_n_leaching",
+  "table_name": "n2o_from_n_leaching"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.302642",
+  "name": "n2o_from_product_uses",
+  "table_name": "n2o_from_product_uses"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.319896",
+  "name": "n2o_wastewater_treatment",
+  "table_name": "n2o_wastewater_treatment"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.345143",
+  "name": "open_burning_of_waste",
+  "table_name": "open_burning_of_waste"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.369673",
+  "name": "other_applications",
+  "table_name": "other_applications"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.394693",
+  "name": "other_energy",
+  "table_name": "other_energy"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.419894",
+  "name": "other_ippu",
+  "table_name": "other_ippu"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.445388",
+  "name": "other_land",
+  "table_name": "other_land"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.469912",
+  "name": "other_sector",
+  "table_name": "other_sector"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.494354",
+  "name": "other_sectors",
+  "table_name": "other_sectors"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.510482",
+  "name": "other_use",
+  "table_name": "other_use"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.528104",
+  "name": "other_waste",
+  "table_name": "other_waste"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.553075",
+  "name": "other_wastewater_treatement",
+  "table_name": "other_wastewater_treatement"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.569845",
+  "name": "reference_approach",
+  "table_name": "reference_approach"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.594424",
+  "name": "refrigeration",
+  "table_name": "refrigeration"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.619228",
+  "name": "settlements",
+  "table_name": "settlements"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.634839",
+  "name": "sf6_and_pfcs_from_other_product_use",
+  "table_name": "sf6_and_pfcs_from_other_product_use"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.653051",
+  "name": "solid_waste",
+  "table_name": "solid_waste"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.686153",
+  "name": "solvents",
+  "table_name": "solvents"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.702014",
+  "name": "transport",
+  "table_name": "transport"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.722958",
+  "name": "urea_application",
+  "table_name": "urea_application"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.751865",
+  "name": "waste_incineration",
+  "table_name": "waste_incineration"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "GHG Inventory Table Name Master List",
+  "modified": "2023-11-01 16:23:55.776934",
+  "name": "wetlands",
+  "table_name": "wetlands"
+ }
+]
