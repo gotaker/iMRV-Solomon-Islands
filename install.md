@@ -1,6 +1,6 @@
 # Installation Guide
 
-One command bootstraps a fresh laptop or server into a working MRV Solomon Islands environment. Runs on **macOS**, **Ubuntu**, and **Windows (via WSL2 + Ubuntu)**.
+One command bootstraps a fresh laptop or server into a working MRV Solomon Islands environment, **with the stack started and the URL live when the script exits**. Runs on **macOS**, **Ubuntu**, and **Windows (via WSL2 + Ubuntu)**. After install, `start.sh` and `shutdown.sh` manage the stack day-to-day.
 
 ```bash
 MYSQL_ROOT_PASSWORD=<pw> ./install.sh --dev     # local development
@@ -41,6 +41,28 @@ In order:
    - `--dev`: patches `site_config.json` to set `developer_mode=1` and `ignore_csrf=1`, then prints next-step instructions.
    - `--prod`: enables `dns_multitenant`, runs `bench setup production <user>` (supervisor + nginx), attaches `PROD_DOMAIN`, optionally provisions Let's Encrypt TLS.
 
+## Service lifecycle
+
+After install, three scripts manage the stack:
+
+| Script | What it does |
+| --- | --- |
+| `./install.sh --dev\|--prod` | One-time bootstrap. Final phase calls `start.sh`. |
+| `./start.sh --dev\|--prod` | Bring up an installed stack. Idempotent — re-running with services already up is a no-op. |
+| `./shutdown.sh` | Soft stop: bench + Vite. Leaves system MariaDB and Redis running. |
+| `./shutdown.sh --full` | Full teardown: also stops MariaDB and Redis system services. |
+
+State files (created by `start.sh` on first run, survive reboot):
+
+- PIDs: `$BENCH_DIR/.mrv/pids/{bench,vite}.pid`
+- Logs: `$BENCH_DIR/.mrv/logs/{bench,vite}.log`
+
+Tail logs with `tail -f $BENCH_DIR/.mrv/logs/bench.log` (or `vite.log`).
+
+`shutdown.sh` always runs an orphan-port sweep over the bench's actual ports (read from `common_site_config.json`, defaults `8000, 9000, 13000, 11000`) plus `8080` (Vite). Safe to run any time, even when nothing is recorded in the PID files (it cleans up bench-managed Redis processes left behind by a hard kill).
+
+**Production note:** real prod stacks managed by supervisor (set up by `bench setup production` during `--prod` install) are detected automatically. `start.sh --prod` will skip the bench-start step if it sees supervisor managing bench, and `shutdown.sh` does NOT stop supervisor — full prod teardown requires `./shutdown.sh --full` plus `sudo supervisorctl stop <bench-group>`.
+
 ## Environment variables
 
 | Variable | Default | Purpose |
@@ -68,11 +90,11 @@ In order:
 # Clone, cd in, then:
 MYSQL_ROOT_PASSWORD=changeme ./install.sh --dev
 
-# Then, in two terminals:
-cd ~/frappe-bench && bench start                          # terminal A
-cd <repo>/frontend && yarn dev                            # terminal B
-
-# Open http://mrv.localhost:8000
+# When install.sh exits, the URL is already live:
+#   http://mrv.localhost:8000
+# Logs:    tail -f ~/frappe-bench/.mrv/logs/bench.log
+# Stop:    ./shutdown.sh
+# Restart: ./start.sh --dev
 ```
 
 ### Production server (Ubuntu, with TLS)
@@ -134,6 +156,8 @@ If a step fails, fix the underlying cause and re-run — completed phases log `-
 | Site responds `403 CSRF` in dev | Vite dev server running but `ignore_csrf` wasn't set. | The dev path patches `site_config.json` automatically. Confirm with `grep ignore_csrf ~/frappe-bench/sites/mrv.localhost/site_config.json`. |
 | Blank `/frontend/*` page | `mrvtools/www/frontend.html` missing. | Re-run the script (or `cd frontend && yarn build`) — the copy-html step must succeed. |
 | wkhtmltopdf PDF export breaks | Stock distro `wkhtmltopdf` (unpatched Qt) on Ubuntu. | The script replaces it with the patched `.deb` automatically. Verify with `wkhtmltopdf --version` — output must include `with patched qt`. |
+| `start.sh` reports stale pid OR a bench-managed redis port (e.g. 13000/11000, or 13001/11001 on offset benches) is bound by an orphaned `redis-server` | Previous `bench start` killed without cleanup, leaving orphaned processes. | `./shutdown.sh` is safe to run any time — it sweeps orphan listeners on the bench/vite ports. |
+| `start.sh` reports `wait_for_readiness` timeout: bench started but URL never responded | Frappe's `bench schedule` (run via honcho) sometimes exits cleanly under `nohup`; honcho's all-or-nothing semantics then kill the whole bench process tree. Intermittent on macOS. | Re-run `./start.sh --dev` (often succeeds on second try). If it persists, run `cd $BENCH_DIR && bench start` manually in a foreground terminal. |
 
 ## Verification
 
@@ -152,22 +176,25 @@ wkhtmltopdf --version                                # Ubuntu: must say "with pa
 The script does not provide a destroy command. To remove a dev install:
 
 ```bash
+# stop everything, including system services
+./shutdown.sh --full
+
 # drop the bench (includes the site and all fetched apps)
 rm -rf ~/frappe-bench
 
-# on macOS, stop and optionally uninstall services
-brew services stop mariadb redis
-brew uninstall mariadb redis node@18 yarn wkhtmltopdf       # optional
-
-# on Ubuntu
-sudo service mariadb stop
-sudo service redis-server stop
-sudo apt-get remove mariadb-server redis-server             # optional
+# (optional) uninstall packages
+# macOS:
+brew uninstall mariadb redis node@18 yarn wkhtmltopdf
+# Ubuntu:
+sudo apt-get remove mariadb-server redis-server
 ```
 
 ## See also
 
-- [install.sh](install.sh) — the script itself
+- [install.sh](install.sh) — the installer
+- [start.sh](start.sh) — bring up an installed stack
+- [shutdown.sh](shutdown.sh) — bring it down
 - [CLAUDE.md](CLAUDE.md) — high-level repo architecture
-- [docs/superpowers/specs/2026-04-19-unified-setup-script-design.md](docs/superpowers/specs/2026-04-19-unified-setup-script-design.md) — full design spec
+- [docs/superpowers/specs/2026-04-19-unified-setup-script-design.md](docs/superpowers/specs/2026-04-19-unified-setup-script-design.md) — installer design spec
+- [docs/superpowers/specs/2026-04-19-start-shutdown-scripts-design.md](docs/superpowers/specs/2026-04-19-start-shutdown-scripts-design.md) — start/shutdown scripts design spec
 - [docs/superpowers/plans/2026-04-19-install-manual-deltas.md](docs/superpowers/plans/2026-04-19-install-manual-deltas.md) — deltas applied from the upstream SI-iMRV installation manual
