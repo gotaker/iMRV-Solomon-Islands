@@ -266,7 +266,35 @@ _get_and_install_one() {
     fi
   )
 }
-patch_site_config()    { step "patch_site_config"; :; }
+patch_site_config() {
+  step "patch_site_config"
+  local config_path="$BENCH_DIR/sites/$SITE_NAME/site_config.json"
+  if [[ "$DRY_RUN" == "1" ]]; then
+    printf 'DRY_RUN: patch %s (ignore_csrf=1, developer_mode=1)\n' "$config_path"
+    return
+  fi
+  if [[ ! -f "$config_path" ]]; then
+    err "site_config.json not found at $config_path"
+    exit 1
+  fi
+  python3 - "$config_path" <<'PY'
+import json, sys
+path = sys.argv[1]
+with open(path) as f:
+    cfg = json.load(f)
+changed = False
+for key, want in (("ignore_csrf", 1), ("developer_mode", 1)):
+    if cfg.get(key) != want:
+        cfg[key] = want
+        changed = True
+if changed:
+    with open(path, "w") as f:
+        json.dump(cfg, f, indent=1, sort_keys=True)
+    print(f"patched {path}")
+else:
+    print(f"no changes needed: {path}")
+PY
+}
 build_frontend()       { step "build_frontend"; :; }
 configure_dev()        { step "configure_dev"; :; }
 configure_prod()       { step "configure_prod"; :; }
