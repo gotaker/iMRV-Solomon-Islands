@@ -30,3 +30,5 @@ ignore = [
 "**/test_*.py" = ["F403", "F405"]
 # __init__.py re-exports
 "**/__init__.py" = ["F401"]
+# hooks.py exposes app_version / module-level attributes read by Frappe at runtime
+"**/hooks.py" = ["F401"]
