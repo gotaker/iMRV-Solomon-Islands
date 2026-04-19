@@ -480,11 +480,76 @@ git commit -m "feat(start.sh): add stale-PID detection and bench background-star
 
 ---
 
-## Task 4: `start_vite` + `wait_for_readiness` + `print_summary`
+## Task 4: bench port discovery + `start_vite` + `wait_for_readiness` + `print_summary`
 
 **Files:**
 
-- Modify: `start.sh` — replace three stubs.
+- Modify: `start.sh` — add port-discovery helper + replace three stubs.
+
+- [ ] **Step 4.0: Add `discover_bench_ports` helper and call it from `main()`**
+
+The bench's actual ports come from `$BENCH_DIR/sites/common_site_config.json` (e.g. a second bench on the same host gets `webserver_port=8001`, `redis_cache=redis://127.0.0.1:13001`, etc.). Hardcoding 8000/9000/13000/11000 makes the scripts only work for the first bench. Defaults stay at the well-known values when the config file or a key is missing.
+
+In `start.sh`, after the `BENCH_LOG=""` / `VITE_LOG=""` lines in the env-defaults block, add:
+
+```bash
+WEB_PORT=8000
+SOCKETIO_PORT=9000
+REDIS_CACHE_PORT=13000
+REDIS_QUEUE_PORT=11000
+```
+
+Then, after the `verify_bench_dir()` function (and before the `# --- PID file helpers ---` block from Task 3), add:
+
+```bash
+# --- Bench port discovery ------------------------------------------------
+# Reads $BENCH_DIR/sites/common_site_config.json and sets WEB_PORT,
+# SOCKETIO_PORT, REDIS_CACHE_PORT, REDIS_QUEUE_PORT. Falls back to defaults
+# (8000/9000/13000/11000) if the file or a key is missing.
+discover_bench_ports() {
+  local cfg="$BENCH_DIR/sites/common_site_config.json"
+  if [[ ! -f "$cfg" ]]; then
+    info "common_site_config.json not found; using default ports (8000/9000/13000/11000)"
+    return
+  fi
+  local out
+  out="$(python3 - "$cfg" <<'PY'
+import json, re, sys
+cfg = json.load(open(sys.argv[1]))
+def port_of(url, default):
+    m = re.search(r':(\d+)', url or "")
+    return int(m.group(1)) if m else default
+print(cfg.get("webserver_port", 8000))
+print(cfg.get("socketio_port", 9000))
+print(port_of(cfg.get("redis_cache"), 13000))
+print(port_of(cfg.get("redis_queue"), 11000))
+PY
+)"
+  { read -r WEB_PORT
+    read -r SOCKETIO_PORT
+    read -r REDIS_CACHE_PORT
+    read -r REDIS_QUEUE_PORT
+  } <<<"$out"
+  info "bench ports: web=$WEB_PORT socketio=$SOCKETIO_PORT redis_cache=$REDIS_CACHE_PORT redis_queue=$REDIS_QUEUE_PORT"
+}
+```
+
+Then in `main()`, insert the call between `verify_bench_dir` and `verify_system_services`:
+
+```bash
+main() {
+  parse_args "$@"
+  detect_os
+  init_state_paths
+  verify_bench_dir
+  discover_bench_ports     # ← new
+
+  verify_system_services
+  start_bench
+  ...
+```
+
+DRY_RUN smoke test: `DRY_RUN=1 BENCH_DIR=$HOME/frappe-bench-mrv ./start.sh --dev` — the new step should print `bench ports: web=8001 socketio=9001 redis_cache=13001 redis_queue=11001` (because the test bench has offset ports). On a default bench it would print `web=8000 socketio=9000 redis_cache=13000 redis_queue=11000`.
 
 - [ ] **Step 4.1: Replace `start_vite` stub**
 
@@ -564,13 +629,13 @@ wait_for_url() {
 wait_for_readiness() {
   step "wait_for_readiness"
   if [[ "$DRY_RUN" == "1" ]]; then
-    printf 'DRY_RUN: poll http://127.0.0.1:8000/api/method/ping (60s)\n'
+    printf 'DRY_RUN: poll http://127.0.0.1:%s/api/method/ping (60s)\n' "$WEB_PORT"
     if [[ "$MODE" == "dev" ]]; then
       printf 'DRY_RUN: poll http://127.0.0.1:8080 (30s)\n'
     fi
     return
   fi
-  wait_for_url "http://127.0.0.1:8000/api/method/ping" 60 "Frappe (bench)" "$BENCH_LOG"
+  wait_for_url "http://127.0.0.1:$WEB_PORT/api/method/ping" 60 "Frappe (bench)" "$BENCH_LOG"
   if [[ "$MODE" == "dev" ]]; then
     wait_for_url "http://127.0.0.1:8080" 30 "Vite" "$VITE_LOG"
   fi
@@ -590,7 +655,7 @@ With:
 ```bash
 print_summary() {
   step "print_summary"
-  local frappe_url="http://$SITE_NAME:8000"
+  local frappe_url="http://$SITE_NAME:$WEB_PORT"
   cat >&2 <<EOF
 
 Stack is up.
@@ -616,14 +681,16 @@ Expected: `start_vite` shows DRY_RUN lines for `cd ... yarn dev`. `wait_for_read
 
 - [ ] **Step 4.5: Live test — full dev stack startup**
 
-Pre-check: ports 8000, 8080 free. PID files absent.
+The test bench `~/frappe-bench-mrv` runs on offset ports (8001/9001/11001/13001) because `~/frappe-bench` already uses the defaults. The discover_bench_ports step at the start of the run will print which ports are in use; expected output below uses 8001 for that reason. On a default-port bench, substitute 8000.
+
+Pre-check (use the bench's actual web port — read from `$BENCH_DIR/sites/common_site_config.json` or just `cat`): ports for that bench are free, PID files absent.
 
 Run: `BENCH_DIR=$HOME/frappe-bench-mrv ./start.sh --dev`
 Expected output ends with:
 
 ```text
 ==> wait_for_readiness
-    waiting for Frappe (bench) at http://127.0.0.1:8000/api/method/ping (timeout 60s)
+    waiting for Frappe (bench) at http://127.0.0.1:8001/api/method/ping (timeout 60s)
     Frappe (bench) is up after Ns
     waiting for Vite at http://127.0.0.1:8080 (timeout 30s)
     Vite is up after Ns
@@ -632,14 +699,14 @@ Expected output ends with:
 
 Stack is up.
 
-  Frappe:  http://mrv.localhost:8000   (logs: tail -f .../bench.log)
+  Frappe:  http://mrv.localhost:8001   (logs: tail -f .../bench.log)
   Vite:    http://localhost:8080       (logs: tail -f .../vite.log)
   Stop:    ./shutdown.sh
 
 ==> start.sh finished (mode=dev)
 ```
 
-Verify URL responds in another shell: `curl -I http://127.0.0.1:8000` → expect `HTTP/1.1 200`.
+Verify URL responds in another shell: `curl -I http://127.0.0.1:8001` → expect `HTTP/1.1 200`.
 Verify Vite responds: `curl -I http://127.0.0.1:8080` → expect `HTTP/1.1 200`.
 
 - [ ] **Step 4.6: Live test — Vite already running, skip path**
@@ -664,7 +731,7 @@ Expected: `start_bench` runs (since `nohup bench` would fail), `wait_for_readine
 
 (If `nohup bench` errors out before backgrounding, the trap will fire earlier — also acceptable, exit=1.)
 
-Cleanup before next task:
+Cleanup before next task (use the bench's actual redis ports — for `~/frappe-bench-mrv` they are 11001/13001):
 
 ```bash
 # remove the broken pid file
@@ -672,7 +739,7 @@ rm -f ~/frappe-bench-mrv/.mrv/pids/bench.pid
 # kill any half-started bench/vite
 kill $(cat ~/frappe-bench-mrv/.mrv/pids/vite.pid) 2>/dev/null
 rm -f ~/frappe-bench-mrv/.mrv/pids/vite.pid
-for p in 11000 13000 8080; do
+for p in 11001 13001 8080; do
   pid=$(lsof -tiTCP:$p -sTCP:LISTEN 2>/dev/null)
   [[ -n "$pid" ]] && kill "$pid"
 done
@@ -769,8 +836,9 @@ Stops the MRV stack:
   default   Stop bench + Vite only. System MariaDB/Redis are left running.
   --full    Also stop MariaDB and Redis system services.
 
-Always sweeps orphan listeners on bench/vite ports (8000, 8080, 9000,
-11000, 13000) — safe to run any time.
+Always sweeps orphan listeners on the bench's actual ports (read from
+common_site_config.json, defaults 8000/9000/13000/11000) plus 8080 (Vite).
+Safe to run any time.
 
 Environment variables (defaults in parens):
   BENCH_DIR        ($HOME/frappe-bench)  Bench root
@@ -793,10 +861,18 @@ PID_DIR=""
 BENCH_PID_FILE=""
 VITE_PID_FILE=""
 
-# Ports we know belong to the MRV stack:
-#  8000 = bench web, 8080 = Vite, 9000 = socketio,
-#  11000 = redis_queue, 13000 = redis_cache
-SWEEP_PORTS=(8000 8080 9000 11000 13000)
+# Bench ports — defaults; discover_bench_ports() overrides these from
+# $BENCH_DIR/sites/common_site_config.json (offset benches use 8001/9001/etc).
+WEB_PORT=8000
+SOCKETIO_PORT=9000
+REDIS_CACHE_PORT=13000
+REDIS_QUEUE_PORT=11000
+
+# Vite is not bench-managed and stays on 8080.
+VITE_PORT=8080
+
+# Populated by main() after discover_bench_ports.
+SWEEP_PORTS=()
 
 # Process names we are willing to kill during the orphan sweep.
 ORPHAN_COMMANDS_REGEX='^(bench|node|redis-ser|gunicorn|honcho)$'
@@ -849,6 +925,37 @@ init_state_paths() {
   VITE_PID_FILE="$PID_DIR/vite.pid"
 }
 
+# --- Bench port discovery ------------------------------------------------
+# Reads $BENCH_DIR/sites/common_site_config.json and overrides WEB_PORT,
+# SOCKETIO_PORT, REDIS_CACHE_PORT, REDIS_QUEUE_PORT. Falls back to the
+# globals' defaults if the file or a key is missing.
+discover_bench_ports() {
+  local cfg="$BENCH_DIR/sites/common_site_config.json"
+  if [[ ! -f "$cfg" ]]; then
+    info "common_site_config.json not found; using default ports (8000/9000/13000/11000)"
+    return
+  fi
+  local out
+  out="$(python3 - "$cfg" <<'PY'
+import json, re, sys
+cfg = json.load(open(sys.argv[1]))
+def port_of(url, default):
+    m = re.search(r':(\d+)', url or "")
+    return int(m.group(1)) if m else default
+print(cfg.get("webserver_port", 8000))
+print(cfg.get("socketio_port", 9000))
+print(port_of(cfg.get("redis_cache"), 13000))
+print(port_of(cfg.get("redis_queue"), 11000))
+PY
+)"
+  { read -r WEB_PORT
+    read -r SOCKETIO_PORT
+    read -r REDIS_CACHE_PORT
+    read -r REDIS_QUEUE_PORT
+  } <<<"$out"
+  info "bench ports: web=$WEB_PORT socketio=$SOCKETIO_PORT redis_cache=$REDIS_CACHE_PORT redis_queue=$REDIS_QUEUE_PORT"
+}
+
 # --- Phases (filled in by later tasks) -----------------------------------
 stop_tracked_processes() { step "stop_tracked_processes"; info "(not yet implemented)"; }
 sweep_orphan_ports()     { step "sweep_orphan_ports";     info "(not yet implemented)"; }
@@ -871,6 +978,8 @@ main() {
   parse_args "$@"
   detect_os
   init_state_paths
+  discover_bench_ports
+  SWEEP_PORTS=("$WEB_PORT" "$VITE_PORT" "$SOCKETIO_PORT" "$REDIS_QUEUE_PORT" "$REDIS_CACHE_PORT")
 
   if [[ ! -d "$PID_DIR" ]]; then
     info "no managed services found at $PID_DIR (continuing to orphan sweep)"
