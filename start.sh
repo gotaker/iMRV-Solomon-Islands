@@ -121,7 +121,7 @@ verify_bench_dir() {
     err "Site $SITE_NAME not found in $BENCH_DIR/sites/. Run install.sh first."
     exit 1
   fi
-  run mkdir -p "$PID_DIR" "$LOG_DIR"
+  mkdir -p "$PID_DIR" "$LOG_DIR"
 }
 
 # --- Bench port discovery ------------------------------------------------
@@ -268,6 +268,13 @@ start_bench() {
     echo $! >"$BENCH_PID_FILE"
   )
   info "bench pid: $(cat "$BENCH_PID_FILE")"
+  sleep 1
+  if ! pid_alive "$(cat "$BENCH_PID_FILE")"; then
+    err "bench exited immediately. Last 20 lines of $BENCH_LOG:"
+    [[ -f "$BENCH_LOG" ]] && tail -20 "$BENCH_LOG" >&2
+    rm -f "$BENCH_PID_FILE"
+    exit 1
+  fi
 }
 start_vite() {
   step "start_vite"
@@ -296,6 +303,13 @@ start_vite() {
     echo $! >"$VITE_PID_FILE"
   )
   info "vite pid: $(cat "$VITE_PID_FILE")"
+  sleep 1
+  if ! pid_alive "$(cat "$VITE_PID_FILE")"; then
+    err "vite exited immediately. Last 20 lines of $VITE_LOG:"
+    [[ -f "$VITE_LOG" ]] && tail -20 "$VITE_LOG" >&2
+    rm -f "$VITE_PID_FILE"
+    exit 1
+  fi
 }
 # wait_for_url URL TIMEOUT_SECONDS LABEL LOG_FILE
 #   Polls URL once per second up to TIMEOUT_SECONDS. On timeout, prints the
@@ -329,6 +343,7 @@ wait_for_readiness() {
     fi
     return
   fi
+  # Use $SITE_NAME (not 127.0.0.1) — Frappe routes by Host header; an IP host returns 404.
   wait_for_url "http://$SITE_NAME:$WEB_PORT/api/method/ping" 60 "Frappe (bench)" "$BENCH_LOG"
   if [[ "$MODE" == "dev" ]]; then
     wait_for_url "http://127.0.0.1:8080" 30 "Vite" "$VITE_LOG"
