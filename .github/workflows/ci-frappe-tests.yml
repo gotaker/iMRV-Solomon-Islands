@@ -83,12 +83,29 @@ jobs:
             --python python3.11 \
             frappe-bench
 
-      - name: Layout apps inside bench
+      - name: Fetch mrvtools via bench get-app
         working-directory: frappe-bench
         run: |
-          ln -s "$GITHUB_WORKSPACE/apps/mrvtools_repo/mrvtools" apps/mrvtools
-          ln -s "$GITHUB_WORKSPACE/apps/mrvtools_repo/frappe_side_menu" apps/frappe_side_menu
-          ls -la apps/
+          bench get-app --skip-assets mrvtools "$GITHUB_WORKSPACE/apps/mrvtools_repo"
+
+      - name: Stage and fetch frappe_side_menu via bench get-app
+        working-directory: frappe-bench
+        run: |
+          REPO="$GITHUB_WORKSPACE/apps/mrvtools_repo"
+          STAGE="$GITHUB_WORKSPACE/.stage/frappe_side_menu"
+          rm -rf "$STAGE"
+          mkdir -p "$STAGE"
+          cp -R "$REPO/frappe_side_menu" "$STAGE/frappe_side_menu"
+          cp "$REPO/setup_sidebarmenu.py" "$STAGE/setup.py"
+          cp "$REPO/requirements.txt" "$STAGE/requirements.txt"
+          [ -f "$REPO/license.txt" ] && cp "$REPO/license.txt" "$STAGE/license.txt"
+          (
+            cd "$STAGE"
+            git -c init.defaultBranch=master init -q
+            git add -A
+            git -c user.name=ci -c user.email=ci@localhost commit -q -m "stage"
+          )
+          bench get-app --skip-assets frappe_side_menu "$STAGE"
 
       - name: Point bench redis at the service container
         working-directory: frappe-bench
