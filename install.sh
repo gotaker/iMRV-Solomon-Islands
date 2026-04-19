@@ -176,6 +176,7 @@ _install_system_deps_ubuntu() {
     run sudo systemctl start mariadb
     run sudo systemctl start redis-server
   fi
+  _install_wkhtmltopdf_patched
 }
 
 _ensure_mariadb_root_password() {
@@ -193,6 +194,38 @@ _ensure_mariadb_root_password() {
     exit 1
   fi
 }
+
+_install_wkhtmltopdf_patched() {
+  # Only Ubuntu/WSL. macOS brew already ships the patched Qt build.
+  if [[ "$OS" != "ubuntu" ]]; then
+    return
+  fi
+  if command -v wkhtmltopdf &>/dev/null && \
+     wkhtmltopdf --version 2>&1 | grep -qi 'with patched qt'; then
+    skip "wkhtmltopdf (patched Qt build already installed)"
+    return
+  fi
+  local codename arch version='0.12.6.1-2'
+  # shellcheck disable=SC1091
+  codename="$(. /etc/os-release && echo "$VERSION_CODENAME")"
+  arch="$(dpkg --print-architecture)"
+  if [[ -z "$codename" || -z "$arch" ]]; then
+    err "could not determine Ubuntu codename or architecture for wkhtmltopdf download"
+    exit 1
+  fi
+  local deb_name="wkhtmltox_${version}.${codename}_${arch}.deb"
+  local url="https://github.com/wkhtmltopdf/packaging/releases/download/${version}/${deb_name}"
+  local tmp="/tmp/${deb_name}"
+  info "downloading patched wkhtmltopdf: $url"
+  run_sh "curl -fsSL -o '$tmp' '$url'"
+  # Stock wkhtmltopdf (if present) conflicts with wkhtmltox; remove it quietly.
+  if dpkg -s wkhtmltopdf &>/dev/null; then
+    run sudo apt-get remove -y wkhtmltopdf
+  fi
+  run_sh "sudo dpkg -i '$tmp' || sudo apt-get install -f -y"
+  run rm -f "$tmp"
+}
+
 install_bench_cli() {
   step "install_bench_cli"
   if command -v bench &>/dev/null; then
