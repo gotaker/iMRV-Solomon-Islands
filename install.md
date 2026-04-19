@@ -40,6 +40,7 @@ In order:
 9. **Mode-specific finishing:**
    - `--dev`: patches `site_config.json` to set `developer_mode=1` and `ignore_csrf=1`, then prints next-step instructions.
    - `--prod`: enables `dns_multitenant`, runs `bench setup production <user>` (supervisor + nginx), attaches `PROD_DOMAIN`, optionally provisions Let's Encrypt TLS.
+10. **Start the stack** — invokes `start.sh --$MODE`; the URL is live when `install.sh` exits.
 
 ## Service lifecycle
 
