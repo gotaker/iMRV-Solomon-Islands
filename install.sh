@@ -26,7 +26,9 @@ Environment variables (defaults in parens):
   MRVTOOLS_SRC            (auto)                Repo path for bench get-app mrvtools
   SIDE_MENU_SRC           (auto)                Repo path for bench get-app frappe_side_menu
   SKIP_SYSTEM_DEPS        (0)                   Set to 1 to skip OS package install
-  PROD_USER               ($USER)               User for bench setup production
+  PROD_USER               ($USER)                       User for bench setup production
+  PROD_DOMAIN             (demo.imrv.netzerolabs.com)    In --prod, the FQDN attached via bench setup add-domain
+  PROD_ENABLE_TLS         (0)                            If 1 in --prod, run bench setup lets-encrypt (Ubuntu only)
   DRY_RUN                 (0)                   Set to 1 to echo commands instead of running
 EOF
 }
@@ -44,6 +46,8 @@ MRVTOOLS_SRC="${MRVTOOLS_SRC:-$SCRIPT_DIR}"
 SIDE_MENU_SRC="${SIDE_MENU_SRC:-$MRVTOOLS_SRC/frappe_side_menu}"
 SKIP_SYSTEM_DEPS="${SKIP_SYSTEM_DEPS:-0}"
 PROD_USER="${PROD_USER:-${USER:-root}}"
+PROD_DOMAIN="${PROD_DOMAIN:-demo.imrv.netzerolabs.com}"
+PROD_ENABLE_TLS="${PROD_ENABLE_TLS:-0}"
 DRY_RUN="${DRY_RUN:-0}"
 
 MODE=""
@@ -362,12 +366,38 @@ EOF
 
 configure_prod() {
   step "configure_prod"
+  (
+    [[ "$DRY_RUN" == "1" ]] || cd "$BENCH_DIR"
+    run bench config dns_multitenant on
+  )
   run sudo bench setup production "$PROD_USER"
   (
     [[ "$DRY_RUN" == "1" ]] || cd "$BENCH_DIR"
     run bench --site "$SITE_NAME" set-config developer_mode 0
     run bench --site "$SITE_NAME" set-config ignore_csrf 0
   )
+  if [[ -n "$PROD_DOMAIN" ]]; then
+    info "attaching domain $PROD_DOMAIN to $SITE_NAME"
+    (
+      [[ "$DRY_RUN" == "1" ]] || cd "$BENCH_DIR"
+      run bench setup add-domain "$PROD_DOMAIN" --site "$SITE_NAME"
+    )
+  fi
+  if [[ "$PROD_ENABLE_TLS" == "1" ]]; then
+    if [[ -z "$PROD_DOMAIN" ]]; then
+      err "PROD_ENABLE_TLS=1 requires PROD_DOMAIN to be set"
+      exit 1
+    fi
+    if [[ "$OS" != "ubuntu" ]]; then
+      warn "TLS setup skipped: Let's Encrypt path is Ubuntu-only (current OS: $OS)"
+    else
+      info "provisioning Let's Encrypt certificate for $PROD_DOMAIN"
+      (
+        [[ "$DRY_RUN" == "1" ]] || cd "$BENCH_DIR"
+        run sudo -H bench setup lets-encrypt "$SITE_NAME" --custom-domain "$PROD_DOMAIN"
+      )
+    fi
+  fi
 }
 
 # --- Arg parsing ---------------------------------------------------------
