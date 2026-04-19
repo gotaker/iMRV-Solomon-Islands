@@ -234,8 +234,45 @@ sweep_orphan_ports() {
     done <<<"$pid_list"
   done
 }
-stop_system_services()   { step "stop_system_services";   info "(not yet implemented)"; }
-final_verification()     { step "final_verification";     info "(not yet implemented)"; }
+stop_system_services() {
+  step "stop_system_services"
+  if [[ "$OS" == "macos" ]]; then
+    run brew services stop mariadb
+    run brew services stop redis
+  else
+    if [[ "$IS_WSL" == "1" ]]; then
+      run sudo service mariadb stop
+      run sudo service redis-server stop
+    else
+      run sudo systemctl stop mariadb redis-server
+    fi
+  fi
+}
+final_verification() {
+  step "final_verification"
+  if [[ "$DRY_RUN" == "1" ]]; then
+    printf 'DRY_RUN: re-check sweep ports for any remaining listeners\n'
+    return
+  fi
+  if ! command -v lsof &>/dev/null; then
+    warn "lsof not found; skipping verification"
+    return
+  fi
+  local port out remaining=0
+  for port in "${SWEEP_PORTS[@]}"; do
+    out="$(lsof -iTCP:"$port" -sTCP:LISTEN -P -n 2>/dev/null | tail -n +2 || true)"
+    if [[ -n "$out" ]]; then
+      remaining=1
+      err "port $port still bound:"
+      printf '%s\n' "$out" >&2
+    fi
+  done
+  if (( remaining )); then
+    err "shutdown incomplete — see above"
+    exit 1
+  fi
+  info "all stopped"
+}
 
 # --- Arg parsing ---------------------------------------------------------
 parse_args() {
