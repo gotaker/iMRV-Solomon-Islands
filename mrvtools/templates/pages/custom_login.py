@@ -1,11 +1,8 @@
 from __future__ import unicode_literals
+
 import frappe
 import frappe.utils
-import json
-import calendar
-from frappe import _
-from frappe.utils import getdate,nowdate
-from datetime import date
+
 no_cache = True
 
 def get_context(context):

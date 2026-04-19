@@ -2,7 +2,7 @@ import './index.css'
 import { createApp } from 'vue'
 import router from './router'
 import App from './App.vue'
-import AOS from 'aos';
+import AOS from 'aos'
 import 'aos/dist/aos.css'
 import {
   Button,
@@ -15,7 +15,7 @@ import {
 
 let app = createApp(App)
 
-AOS.init();
+AOS.init()
 
 setConfig('resourceFetcher', frappeRequest)
 

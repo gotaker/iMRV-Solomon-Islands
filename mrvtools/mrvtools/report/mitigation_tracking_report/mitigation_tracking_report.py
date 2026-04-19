@@ -1,8 +1,10 @@
 # Copyright (c) 2023, NetZeroLabs and contributors
 # For license information, please see license.txt
 
-import frappe
 from datetime import datetime
+
+import frappe
+
 chartData =[]
 
 def execute(filters=None):
@@ -111,9 +113,9 @@ def getData(filters):
 	if filters.get("location"):
 		conditions += f" AND location = '{filters.get('location')}'"
 	if filters.get("ndc") == 'Yes':
-		conditions += f" AND MT.included_in like '%NDC%' "
+		conditions += " AND MT.included_in like '%NDC%' "
 	if filters.get("ndc") == 'No':
-		conditions += f" AND MT.included_in not like '%NDC%' "
+		conditions += " AND MT.included_in not like '%NDC%' "
 	if filters.get("market_mechanism"):
 		conditions += f" AND MT.market_based_mechanism = '{filters.get('market_mechanism')}'"
 	
@@ -177,9 +179,9 @@ def get_chart(filters):
 	if filters.get("monitoring_year"):
 		conditions += f"AND YEAR(start_date) <= '{filters.get('monitoring_year')}'"
 	if filters.get("ndc") == 'Yes':
-		conditions += f" AND included_in like '%NDC%' "
+		conditions += " AND included_in like '%NDC%' "
 	if filters.get("ndc") == 'No':
-		conditions += f" AND included_in not like '%NDC%' "
+		conditions += " AND included_in not like '%NDC%' "
 		
 	project = frappe.db.sql(f"""
         SELECT project_name

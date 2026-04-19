@@ -1,0 +1,34 @@
+# Minimal ruff config for CI. Deliberately conservative so the first
+# CI run passes without requiring reformatting. Add rules incrementally.
+
+target-version = "py311"
+line-length = 110
+
+[lint]
+select = [
+    "E",  # pycodestyle errors
+    "F",  # pyflakes (undefined names, unused imports)
+    "I",  # import sorting
+]
+
+ignore = [
+    "E501",  # line too long — not enforced yet; revisit when codebase is cleaner
+    "E101",  # mixed spaces and tabs — pre-existing in legacy Frappe modules; re-enable after cleanup
+    "E401",  # multiple imports on one line — pre-existing style in legacy controllers
+    "E402",  # module-level import not at top — pre-existing in one legacy file
+    "E702",  # multiple statements on one line (semicolon) — pre-existing in legacy controllers
+    "E711",  # comparison to None — pre-existing `== None` pattern throughout legacy controllers
+    "E712",  # comparison to True/False — pre-existing in legacy controllers
+    "E721",  # type comparison — pre-existing in legacy controllers
+    "E722",  # bare except — pre-existing defensive `except:` in legacy controllers
+    "F522",  # .format extra named arguments — pre-existing dead kwargs in two legacy SQL builders
+    "F841",  # unused local variable — pre-existing throughout GHG inventory calc modules
+]
+
+[lint.per-file-ignores]
+# Frappe test files import * from a controller module by convention
+"**/test_*.py" = ["F403", "F405"]
+# __init__.py re-exports
+"**/__init__.py" = ["F401"]
+# hooks.py exposes app_version / module-level attributes read by Frappe at runtime
+"**/hooks.py" = ["F401"]

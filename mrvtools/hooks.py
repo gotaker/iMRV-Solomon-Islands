@@ -1,4 +1,3 @@
-from . import __version__ as app_version
 # from mrvtools.route import routes
 
 

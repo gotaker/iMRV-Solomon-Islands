@@ -1,47 +1,46 @@
 <template>
-
   <div class="templa">
     <router-view />
   </div>
 </template>
 
 <script>
- import AOS from 'aos';
- 
- import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import AOS from 'aos'
 
-const data = ref([]);
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
+const data = ref([])
 // const partnerLogos = ref([]);
 
 const fetchData = async () => {
   try {
-    const response = await axios.get('/api/method/mrvtools.mrvtools.doctype.mrvfrontend.mrvfrontend.get_all');
+    const response = await axios.get(
+      '/api/method/mrvtools.mrvtools.doctype.mrvfrontend.mrvfrontend.get_all',
+    )
 
     if (response.status === 200) {
-      data.value = response.data;
+      data.value = response.data
     } else {
-      throw new Error('Network response was not ok');
+      throw new Error('Network response was not ok')
     }
-    console.log("Check response", response);
-
+    console.log('Check response', response)
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error:', error)
   }
   var values = data._rawValue.message.parent_data
   var childField = data._rawValue.message.child_table_data
 
-  for (var item of childField){
-    if (item.image){
-      console.log("item",item.image);
-    }
-    else{
-      console.log("no item found");
+  for (var item of childField) {
+    if (item.image) {
+      console.log('item', item.image)
+    } else {
+      console.log('no item found')
     }
   }
 
-  console.log("responseee", values);
-};
+  console.log('responseee', values)
+}
 
 // const fetchPartnerLogos = async () => {
 //   try {
@@ -57,17 +56,15 @@ const fetchData = async () => {
 // };
 
 onMounted(() => {
-  fetchData();
+  fetchData()
   // fetchPartnerLogos();
-});
+})
 
- 
-
- AOS.init({
-   duration: 300,
-   offset: 100,
-   once: true,
- });
+AOS.init({
+  duration: 300,
+  offset: 100,
+  once: true,
+})
 </script>
 <!-- 
 .breadcrumb-area {
@@ -86,7 +83,7 @@ onMounted(() => {
   bottom: 0;
   color: #f1f1f1;
   width: 100%;
-  transition: .2s ease;
+  transition: 0.2s ease;
   opacity: 0;
   color: #fff;
   font-size: 20px;
@@ -101,7 +98,11 @@ onMounted(() => {
   opacity: 1;
 }
 
-a, p, h4, h5, h6{
+a,
+p,
+h4,
+h5,
+h6 {
   font-family: 'Inter', sans-serif;
   font-family: 'Poppins', sans-serif;
 }
@@ -111,19 +112,17 @@ a, p, h4, h5, h6{
 }
 
 @media (max-width: 768px) {
-    .img {
-      /* Your styles for .img at max-width: 576px */
-      position: relative;
-      background-color: #00220012;
-      height: 19rem;
-    }
-    .report-image {
+  .img {
+    /* Your styles for .img at max-width: 576px */
+    position: relative;
+    background-color: #00220012;
+    height: 19rem;
+  }
+  .report-image {
     width: 94%;
     height: 120% !important;
     margin: auto;
     position: unset;
-}
   }
-
-
+}
 </style>

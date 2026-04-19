@@ -3,6 +3,7 @@
 
 import frappe
 
+
 def execute(filters=None):
 	columns, data, chart = getColumns(filters),getData(filters), get_chart(filters)
 	return columns, data , None, chart
@@ -41,7 +42,7 @@ def getData(filters):
 	n2o_value = []
 	if not filters.get("inventory_unit") or filters.get("inventory_unit") == 'tCO2e':
 		if(filters.get('from_year')):
-			query = f"""
+			query = """
 					Select
 						category_name as categories
 					from
@@ -106,7 +107,7 @@ def getData(filters):
 			return data
 
 	if filters.get("inventory_unit") == 'GgCO2e':
-		query = f"""
+		query = """
 				Select
 					category_name as categories
 				from

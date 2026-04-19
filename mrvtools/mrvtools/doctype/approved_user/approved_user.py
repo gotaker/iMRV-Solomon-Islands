@@ -1,38 +1,23 @@
 # Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
 # License: MIT. See LICENSE
-from datetime import timedelta
 
 import frappe
 import frappe.defaults
 import frappe.permissions
 import frappe.share
-from frappe import STANDARD_USERS, _, msgprint, throw
-from frappe.core.doctype.user_type.user_type import user_linked_with_permission_on_doctype
+from frappe import STANDARD_USERS, _, throw
 from frappe.desk.doctype.notification_settings.notification_settings import (
 	create_notification_settings,
-	toggle_notifications,
 )
-from frappe.desk.notifications import clear_notifications
 from frappe.model.document import Document
-from frappe.query_builder import DocType
 from frappe.rate_limiter import rate_limit
-from frappe.utils.password import update_password
-from frappe.utils.password import get_decrypted_password
 from frappe.utils import (
 	cint,
-	escape_html,
-	flt,
-	format_datetime,
 	get_formatted_email,
-	get_system_timezone,
-	has_gravatar,
 	now_datetime,
-	today,
 )
 from frappe.utils.deprecations import deprecated
-from frappe.utils.password import check_password, get_password_reset_limit
-from frappe.utils.user import get_system_managers
-from frappe.website.utils import is_signup_disabled
+from frappe.utils.password import get_decrypted_password, get_password_reset_limit, update_password
 
 
 class ApprovedUser(Document):

@@ -1,9 +1,11 @@
 # Copyright (c) 2017, Frappe Technologies Pvt. Ltd. and Contributors
 # License: MIT. See LICENSE
-import frappe,json
-import pandas as pd
+import json
 
-from frappe.utils import get_site_base_path,now
+import frappe
+import pandas as pd
+from frappe.utils import get_site_base_path, now
+
 
 @frappe.whitelist()
 def get_total_adaptation_report_data1(year,impact_area,key_sector = None,key_sub_sector = None):

@@ -1,0 +1,52 @@
+name: CI (fast checks)
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: yarn
+          cache-dependency-path: frontend/yarn.lock
+      - name: Install frontend deps
+        working-directory: frontend
+        run: yarn install --frozen-lockfile
+      - name: Build frontend
+        working-directory: frontend
+        run: yarn build
+
+  frontend-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: yarn
+          cache-dependency-path: frontend/yarn.lock
+      - name: Install frontend deps
+        working-directory: frontend
+        run: yarn install --frozen-lockfile
+      - name: Check Prettier formatting
+        working-directory: frontend
+        run: yarn exec -- prettier --check "src/**/*.{js,vue,css}"
+
+  python-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install ruff
+        run: pip install ruff==0.6.9
+      - name: Run ruff
+        run: ruff check mrvtools/ frappe_side_menu/

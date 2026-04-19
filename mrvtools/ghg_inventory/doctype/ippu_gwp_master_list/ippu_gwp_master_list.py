@@ -3,12 +3,13 @@
 
 import frappe
 from frappe.model.document import Document
+
+from mrvtools.ghg_inventory.doctype.ghg_inventory.agriculture import agri_calculation
 from mrvtools.ghg_inventory.doctype.ghg_inventory.energy import energy_calculation
 from mrvtools.ghg_inventory.doctype.ghg_inventory.ippu import ippu_calculation
-from mrvtools.ghg_inventory.doctype.ghg_inventory.agriculture import agri_calculation
 from mrvtools.ghg_inventory.doctype.ghg_inventory.land_use import land_calculation
-from mrvtools.ghg_inventory.doctype.ghg_inventory.waste import waste_calculation
 from mrvtools.ghg_inventory.doctype.ghg_inventory.other import other_calculation
+from mrvtools.ghg_inventory.doctype.ghg_inventory.waste import waste_calculation
 
 
 class IPPUGWPMasterList(Document):
@@ -24,7 +25,7 @@ class IPPUGWPMasterList(Document):
 					tablefields.append(field["fieldname"])
 
 
-		document_name = frappe.db.sql(f"""SELECT name,sector FROM `tabGHG Inventory`""",as_dict =1)
+		document_name = frappe.db.sql("""SELECT name,sector FROM `tabGHG Inventory`""",as_dict =1)
 		doc = "GHG Inventory"
 		for i in document_name:
 			doc_name = i.name

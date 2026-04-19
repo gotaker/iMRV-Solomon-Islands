@@ -1,10 +1,11 @@
 # Copyright (c) 2023, NetZeroLabs and contributors
 # For license information, please see license.txt
 
-import frappe , json
+import json
+
+import frappe
 from frappe.model.document import Document
-from frappe.utils.password import update_password
-from frappe.utils.password import get_decrypted_password
+
 
 class UserRegistration(Document):
 	def on_submit(self):

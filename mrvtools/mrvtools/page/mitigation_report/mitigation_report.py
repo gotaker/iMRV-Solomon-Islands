@@ -1,11 +1,13 @@
 # Copyright (c) 2023, NetZeroLabs and contributors
 # For license information, please see license.txt
 
-import frappe,json
+import json
 from datetime import datetime
-import pandas as pd
 
-from frappe.utils import get_site_base_path,now
+import frappe
+import pandas as pd
+from frappe.utils import get_site_base_path, now
+
 till_sum_actual_annual_ghg =0
 till_sum_expected_annual_ghg = 0
 sum_actual_annual_ghg = 0
@@ -131,9 +133,9 @@ def getData(monitoring_year = None,key_sector = None,key_sub_sector = None,locat
 	if location:
 		conditions += f" AND P.location = '{location}'"
 	if ndc == 'Yes':
-		conditions += f" AND MT.included_in like '%NDC%' "
+		conditions += " AND MT.included_in like '%NDC%' "
 	if ndc == 'No':
-		conditions += f" AND MT.included_in not like '%NDC%' "
+		conditions += " AND MT.included_in not like '%NDC%' "
 	if market_mechanism:
 		conditions += f" AND MT.market_based_mechanism = '{market_mechanism}'"
 	
@@ -257,9 +259,9 @@ def get_pie_chart(monitoring_year = None,key_sector = None,key_sub_sector = None
 	if location:
 		conditions += f" AND Mt.location = '{location}'"
 	if ndc == 'Yes':
-		conditions += f" AND MT.included_in like '%NDC%' "
+		conditions += " AND MT.included_in like '%NDC%' "
 	if ndc == 'No':
-		conditions += f" AND MT.included_in not like '%NDC%' "
+		conditions += " AND MT.included_in not like '%NDC%' "
 	if market_mechanism:
 		conditions += f" AND MT.market_based_mechanism = '{market_mechanism}'"
 	query = f"""

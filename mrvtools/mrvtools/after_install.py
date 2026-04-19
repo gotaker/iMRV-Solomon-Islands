@@ -1,9 +1,10 @@
-import frappe,json
+import json
 import os
 import zipfile
-import shutil
-from urllib.request import urlopen
+
+import frappe
 from frappe.utils import get_files_path
+
 
 @frappe.whitelist(allow_guest=True)
 def after_install():

@@ -1,5 +1,6 @@
 import frappe
 
+
 def get_menu_list():
 	return []
 
