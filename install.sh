@@ -301,6 +301,7 @@ get_and_install_apps() {
     [[ "$DRY_RUN" == "1" ]] || cd "$BENCH_DIR"
     run bench --site "$SITE_NAME" migrate
   )
+  _stop_bench_redis_daemons
 }
 
 _ensure_bench_redis() {
@@ -322,6 +323,29 @@ _ensure_bench_redis() {
       else
         info "starting $name"
         redis-server "$conf" --daemonize yes
+      fi
+    done
+  )
+}
+
+_stop_bench_redis_daemons() {
+  # Stops the daemonized redis processes that _ensure_bench_redis started for `bench migrate`.
+  # Necessary so `bench start` (run later via start_services) can claim those ports.
+  if [[ "$DRY_RUN" == "1" ]]; then
+    printf 'DRY_RUN: stop bench-managed redis daemons started for migrate\n'
+    return
+  fi
+  (
+    cd "$BENCH_DIR"
+    for name in redis_cache redis_queue; do
+      local conf="config/$name.conf"
+      local port pid
+      port="$(awk '/^port/ {print $2; exit}' "$conf" 2>/dev/null || true)"
+      [[ -z "$port" ]] && continue
+      pid="$(lsof -tiTCP:"$port" -sTCP:LISTEN 2>/dev/null || true)"
+      if [[ -n "$pid" ]]; then
+        info "stopping $name (pid $pid on :$port)"
+        kill "$pid" 2>/dev/null || true
       fi
     done
   )
