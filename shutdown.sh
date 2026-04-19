@@ -236,15 +236,17 @@ sweep_orphan_ports() {
 }
 stop_system_services() {
   step "stop_system_services"
+  # Service stops are best-effort: a failure here shouldn't block final_verification
+  # from reporting which port (if any) is still bound. Downgrade non-zero to a warn.
   if [[ "$OS" == "macos" ]]; then
-    run brew services stop mariadb
-    run brew services stop redis
+    run brew services stop mariadb || warn "brew services stop mariadb failed"
+    run brew services stop redis   || warn "brew services stop redis failed"
   else
     if [[ "$IS_WSL" == "1" ]]; then
-      run sudo service mariadb stop
-      run sudo service redis-server stop
+      run sudo service mariadb stop      || warn "service mariadb stop failed"
+      run sudo service redis-server stop || warn "service redis-server stop failed"
     else
-      run sudo systemctl stop mariadb redis-server
+      run sudo systemctl stop mariadb redis-server || warn "systemctl stop mariadb redis-server failed"
     fi
   fi
 }
