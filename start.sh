@@ -227,8 +227,27 @@ _verify_services_ubuntu() {
     fi
   done
 }
+# Returns 0 if supervisor is running AND a frappe-bench supervisor conf exists.
+# Used by --prod start_bench to skip starting bench manually when the
+# real prod stack is already supervisor-managed.
+_bench_managed_by_supervisor() {
+  if ! command -v pgrep &>/dev/null; then
+    return 1
+  fi
+  if ! pgrep -f supervisord &>/dev/null; then
+    return 1
+  fi
+  # Ubuntu/Debian: /etc/supervisor/conf.d/frappe-bench-*.conf
+  # macOS prod is unusual; we only check the linux path.
+  compgen -G '/etc/supervisor/conf.d/frappe-bench-*' >/dev/null
+}
+
 start_bench() {
   step "start_bench"
+  if [[ "$MODE" == "prod" ]] && _bench_managed_by_supervisor; then
+    skip "bench (managed by supervisor)"
+    return
+  fi
   local status
   status="$(check_or_clean_pid bench "$BENCH_PID_FILE")"
   case "$status" in
