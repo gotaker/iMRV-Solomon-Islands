@@ -8,15 +8,15 @@
 
 The repo ships two Frappe apps (`mrvtools`, `frappe_side_menu`) and a Vue 3 SPA under `frontend/`. A contributor cloning the repo currently has to derive the full install path from [CLAUDE.md](../../../CLAUDE.md) and [README.md](../../../README.md): install system prerequisites (Python, Node, MariaDB, redis, wkhtmltopdf), install `bench`, run `bench init`, create a site, `bench get-app` each app, install and migrate them, patch `site_config.json` with `ignore_csrf` for dev, and run `yarn install && yarn build`. That is five+ documents of implicit knowledge, and a partial failure on any step requires manual resume.
 
-A single `install.sh` at the repo root unifies the bootstrap into one command that works from a clean macOS or Ubuntu laptop, supports both dev and prod targets, is idempotent (safe to re-run after a failure), and is configured entirely through environment variables so it's scriptable for CI.
+A single `install.sh` at the repo root unifies the bootstrap into one command that works from a clean macOS, Ubuntu, or Windows-via-WSL2 laptop, supports both dev and prod targets, is idempotent (safe to re-run after a failure), and is configured entirely through environment variables so it's scriptable for CI.
 
 Goal: run the app as-is. No refactoring of the two Frappe apps, the frontend, or the existing `setup.py` / `setup_sidebarmenu.py`. The script only orchestrates existing entry points.
 
 ## Non-goals
 
-- Windows support.
+- Native Windows support (WSL2 is supported — see OS detection below).
 - Docker/containerized setup (a separate design, not this one).
-- Consolidating the two `setup.py` files or changing packaging.
+- Consolidating the two `setup.py` files or changing packaging. Three options were considered (true merge into one Frappe app; colocating `setup_sidebarmenu.py` inside the app dir; no change) and **no change** was chosen — `bench get-app <name> <path>` requires each app's source path to contain a `setup.py` declaring a matching package name, so "one pip manifest + two bench apps" is not achievable without restructuring. The unified `install.sh` provides the single-command install surface; the two packaging files stay as they are.
 - Editing any Frappe app code, hooks, or doctypes.
 - CI pipeline wiring (the design makes CI *possible* via env vars, but does not add workflows).
 
@@ -26,12 +26,12 @@ One file at the repo root: `install.sh`. Zero runtime dependencies beyond a POSI
 
 Structure inside the file:
 
-```
+```text
 install.sh
 ├── Shebang + `set -euo pipefail` + usage/help text
 ├── CONFIG block — env var reads with defaults
 ├── LOG helpers — info / warn / err / step
-├── OS detection — sets $OS to 'macos' or 'ubuntu', errs otherwise
+├── OS detection — sets $OS to 'macos' or 'ubuntu' (covers WSL2), errs otherwise
 ├── Per-phase functions (each idempotent, each logs its step):
 │     install_system_deps()
 │     install_bench_cli()
@@ -45,6 +45,15 @@ install.sh
 ├── parse_args()                # --dev | --prod | --help
 └── main()                      # dispatches phases, branches dev/prod at the end
 ```
+
+### OS detection
+
+`$OS` is set by inspecting `uname -s` and `/proc/version`:
+
+- `Darwin` → `macos`
+- `Linux` and `/proc/version` contains `microsoft` or `WSL` → `ubuntu` (WSL2 is treated as an Ubuntu variant; tested only against the default `Ubuntu` WSL distro — other distros may work but are not supported)
+- `Linux` otherwise with `/etc/os-release` ID=`ubuntu` or `debian` → `ubuntu`
+- Anything else → error with a clear message pointing native-Windows users at WSL2.
 
 No helper scripts, no sub-files. Only one new file in the repo; a short pointer is added to [CLAUDE.md](../../../CLAUDE.md).
 
@@ -79,19 +88,24 @@ Each phase is idempotent: it checks state before acting and logs `--> skipping <
 Branches on `$OS`. Skipped entirely if `SKIP_SYSTEM_DEPS=1`.
 
 **macOS:**
-```
+
+```text
 brew list <pkg> &>/dev/null || brew install <pkg>
 ```
+
 for each of: `python@3.11`, `node@18`, `yarn`, `mariadb`, `redis`, `wkhtmltopdf`, `pipx`.
 Then `brew services start mariadb` and `brew services start redis` (idempotent — brew skips if already started).
 
-**Ubuntu:**
-```
+**Ubuntu (including WSL2):**
+
+```text
 dpkg -s <pkg> &>/dev/null || apt install -y <pkg>
 ```
+
 for each of: `python3.11`, `python3.11-venv`, `python3-dev`, `mariadb-server`, `redis-server`, `wkhtmltopdf`, `build-essential`, `libssl-dev`, `libffi-dev`, `xvfb`, `libfontconfig`, `pipx`.
 Node via NodeSource setup script (only if `node -v` reports a version below `$NODE_VERSION`); yarn via `corepack enable`.
-`systemctl start mariadb` and `systemctl start redis-server`.
+
+Service startup branches on WSL vs native Linux: WSL2 does not run `systemd` by default, so on WSL the script starts MariaDB and redis via `sudo service mariadb start` and `sudo service redis-server start`; on native Ubuntu it uses `systemctl start mariadb` and `systemctl start redis-server`. Detection reuses the OS check (`/proc/version` WSL marker).
 
 **MariaDB root password:** probe with `mysqladmin ping -u root -p"$MYSQL_ROOT_PASSWORD"`. If the probe succeeds, root is already set and the phase is done. If the probe fails and root has no password set, run `mysqladmin -u root password "$MYSQL_ROOT_PASSWORD"`. If the probe fails and a different password is already set, abort with a clear error telling the user to fix `$MYSQL_ROOT_PASSWORD`.
 
@@ -101,7 +115,7 @@ Node via NodeSource setup script (only if `node -v` reports a version below `$NO
 
 ### `init_bench`
 
-```
+```bash
 [ -d "$BENCH_DIR" ] || bench init \
   --python "python$PYTHON_VERSION" \
   --frappe-branch "$FRAPPE_BRANCH" \
@@ -111,7 +125,8 @@ Node via NodeSource setup script (only if `node -v` reports a version below `$NO
 ### `create_site`
 
 From inside `$BENCH_DIR`:
-```
+
+```bash
 [ -d "sites/$SITE_NAME" ] || bench new-site \
   --mariadb-root-password "$MYSQL_ROOT_PASSWORD" \
   --admin-password "$ADMIN_PASSWORD" \
@@ -133,18 +148,19 @@ Inline `python3 -c` loads `sites/$SITE_NAME/site_config.json`, sets `ignore_csrf
 
 ### `build_frontend`
 
-```
+```bash
 cd "$MRVTOOLS_SRC/frontend"
 yarn install --frozen-lockfile
 yarn build
 ```
+
 Runs in both dev and prod. Dev needs at least one build so `mrvtools/www/frontend.html` exists before `yarn dev` is run — otherwise `/frontend` 404s in the browser while Vite is serving.
 
 ### `configure_dev`
 
 No actions beyond printing next-step instructions:
 
-```
+```bash
 cd $BENCH_DIR && bench start      # terminal 1
 cd $MRVTOOLS_SRC/frontend && yarn dev    # terminal 2
 # then open http://$SITE_NAME:8000
@@ -152,7 +168,7 @@ cd $MRVTOOLS_SRC/frontend && yarn dev    # terminal 2
 
 ### `configure_prod`
 
-```
+```bash
 sudo bench setup production "$PROD_USER"
 bench --site "$SITE_NAME" set-config developer_mode 0
 bench --site "$SITE_NAME" set-config ignore_csrf 0
@@ -193,5 +209,19 @@ Three layers, from cheapest to most expensive:
 
 - **New:** `install.sh` at the repo root.
 - **Modified:** [CLAUDE.md](../../../CLAUDE.md) — add one paragraph under "Build and run" pointing contributors at `install.sh` as the unified entry point and noting that the documented `bench`/`yarn` sequence is what the script automates.
+- **Modified (rename):** ~100 files touched by a `tridotstech` → `NetZeroLabs` rename — details below.
 
-No other files are touched. The existing `setup.py`, `setup_sidebarmenu.py`, `requirements.txt`, app hooks, and frontend build remain as they are.
+The existing `requirements.txt`, app hooks, and frontend build remain structurally unchanged; the two `setup.py` files stay as separate pip entry points (the author/email metadata inside them is rewritten by the rename step).
+
+## Rename: `tridotstech` → `NetZeroLabs`
+
+A repo-wide find/replace covers every occurrence of the string `tridotstech` (case-insensitive match, case-preserving replacement to `NetZeroLabs`). Occurrences fall into four buckets:
+
+1. **Copyright headers** in ~90 DocType `.py` and `.js` files — `# Copyright (c) 2023, tridotstech and contributors` / `// Copyright (c) 2024, tridotstech and Contributors`. Mechanical replace.
+2. **Package metadata:** [setup.py](../../../setup.py) (`author`, `author_email`), [setup_sidebarmenu.py](../../../setup_sidebarmenu.py) (`author`, `author_email`), [mrvtools/hooks.py](../../../mrvtools/hooks.py) (`app_publisher`, `app_email`), [frappe_side_menu/hooks.py](../../../frappe_side_menu/hooks.py) (`app_publisher`, `app_email`).
+3. **Email addresses:** `info@tridotstech.com` in `setup.py` / `mrvtools/hooks.py`, and the already-broken `info@tridotstech.om` (missing `c`) in `setup_sidebarmenu.py` / `frappe_side_menu/hooks.py`. The rename fixes both addresses and the typo in one pass — rewritten as `info@netzerolabs.com` (lowercase by email convention).
+4. **External URLs in `package.json`:** `git+ssh://git@bitbucket.org/tridotstech2019/mrv-tool-custom-app.git` and `https://bitbucket.org/tridotstech2019/mrv-tool-custom-app`. These reference a remote Bitbucket org (`tridotstech2019`, note the numeric suffix) that may or may not still exist under the new name. **Out of scope for the automated rename** — a naive find/replace would produce `NetZeroLabs2019` which is probably not the correct new org name. The plan will call this out and leave the URLs untouched; the user can update them manually once the new org/repo home is known.
+
+Implementation approach: a single `sed -i` pass over the tracked files under buckets 1–3, driven by `git ls-files`. `package.json` is explicitly excluded.
+
+Verification: after the rename, `grep -r -i "tridotstech" .` returns only the two `package.json` lines and nothing else.
