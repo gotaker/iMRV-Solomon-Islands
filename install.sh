@@ -295,7 +295,19 @@ else:
     print(f"no changes needed: {path}")
 PY
 }
-build_frontend()       { step "build_frontend"; :; }
+build_frontend() {
+  step "build_frontend"
+  local fe="$MRVTOOLS_SRC/frontend"
+  if [[ ! -d "$fe" ]]; then
+    err "frontend directory not found at $fe"
+    exit 1
+  fi
+  (
+    cd "$fe"
+    run yarn install --frozen-lockfile
+    run yarn build
+  )
+}
 configure_dev()        { step "configure_dev"; :; }
 configure_prod()       { step "configure_prod"; :; }
 
