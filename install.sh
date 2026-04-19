@@ -226,7 +226,7 @@ create_site() {
     return
   fi
   (
-    cd "$BENCH_DIR"
+    [[ "$DRY_RUN" == "1" ]] || cd "$BENCH_DIR"
     run bench new-site \
       --mariadb-root-password "$MYSQL_ROOT_PASSWORD" \
       --admin-password "$ADMIN_PASSWORD" \
@@ -239,7 +239,7 @@ get_and_install_apps() {
   _get_and_install_one frappe_side_menu  "$SIDE_MENU_SRC"
   info "running bench migrate"
   (
-    cd "$BENCH_DIR"
+    [[ "$DRY_RUN" == "1" ]] || cd "$BENCH_DIR"
     run bench --site "$SITE_NAME" migrate
   )
 }
@@ -248,7 +248,7 @@ _get_and_install_one() {
   local app="$1"
   local src="$2"
   (
-    cd "$BENCH_DIR"
+    [[ "$DRY_RUN" == "1" ]] || cd "$BENCH_DIR"
     if [[ -d "apps/$app" ]]; then
       skip "apps/$app already fetched"
     else
@@ -331,7 +331,7 @@ configure_prod() {
   step "configure_prod"
   run sudo bench setup production "$PROD_USER"
   (
-    cd "$BENCH_DIR"
+    [[ "$DRY_RUN" == "1" ]] || cd "$BENCH_DIR"
     run bench --site "$SITE_NAME" set-config developer_mode 0
     run bench --site "$SITE_NAME" set-config ignore_csrf 0
   )
