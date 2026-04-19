@@ -120,7 +120,45 @@ verify_bench_dir() {
 }
 
 # --- Phases (filled in by later tasks) -----------------------------------
-verify_system_services() { step "verify_system_services"; info "(not yet implemented)"; }
+verify_system_services() {
+  step "verify_system_services"
+  if [[ "$OS" == "macos" ]]; then
+    _verify_services_macos
+  else
+    _verify_services_ubuntu
+  fi
+}
+
+_verify_services_macos() {
+  local svc
+  for svc in mariadb redis; do
+    if brew services list 2>/dev/null | awk -v s="$svc" '$1==s && $2=="started" {found=1} END {exit !found}'; then
+      skip "$svc (brew service already started)"
+    else
+      info "starting $svc via brew services"
+      run brew services start "$svc"
+    fi
+  done
+}
+
+_verify_services_ubuntu() {
+  local svc check_cmd start_cmd
+  for svc in mariadb redis-server; do
+    if [[ "$IS_WSL" == "1" ]]; then
+      check_cmd=(service "$svc" status)
+      start_cmd=(sudo service "$svc" start)
+    else
+      check_cmd=(systemctl is-active --quiet "$svc")
+      start_cmd=(sudo systemctl start "$svc")
+    fi
+    if "${check_cmd[@]}" &>/dev/null; then
+      skip "$svc (already running)"
+    else
+      info "starting $svc"
+      run "${start_cmd[@]}"
+    fi
+  done
+}
 start_bench()            { step "start_bench";            info "(not yet implemented)"; }
 start_vite()             { step "start_vite";             info "(not yet implemented)"; }
 wait_for_readiness()     { step "wait_for_readiness";     info "(not yet implemented)"; }
