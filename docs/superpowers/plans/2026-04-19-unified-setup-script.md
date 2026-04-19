@@ -84,9 +84,9 @@ Confirm lines 13, 17, 18 currently read:
 Replace the three lines with:
 
 ```json
-    "url": "git+https://github.com/rajeshscs/MRV-Solomon-Islands.git"
+    "url": "git+https://github.com/gotaker/iMRV-Solomon-Islands.git"
   "license": "MIT",
-  "homepage": "https://github.com/rajeshscs/MRV-Solomon-Islands#readme"
+  "homepage": "https://github.com/gotaker/iMRV-Solomon-Islands#readme"
 ```
 
 Preserve surrounding JSON structure (commas, braces, indentation) exactly.
@@ -94,7 +94,7 @@ Preserve surrounding JSON structure (commas, braces, indentation) exactly.
 - [ ] **Step 3: Verify JSON is valid and fields are correct**
 
 Run: `python3 -c 'import json; d=json.load(open("package.json")); print(d["license"], d["repository"]["url"], d["homepage"])'`
-Expected: `MIT git+https://github.com/rajeshscs/MRV-Solomon-Islands.git https://github.com/rajeshscs/MRV-Solomon-Islands#readme`
+Expected: `MIT git+https://github.com/gotaker/iMRV-Solomon-Islands.git https://github.com/gotaker/iMRV-Solomon-Islands#readme`
 
 - [ ] **Step 4: Verify no bitbucket references remain in package.json**
 

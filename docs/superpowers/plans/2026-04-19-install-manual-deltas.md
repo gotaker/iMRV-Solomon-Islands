@@ -9,7 +9,7 @@
 - PDF export is a **critical** requirement → install the patched-Qt `wkhtmltopdf` on Ubuntu, not the distro package.
 - Keep `MRVTOOLS_SRC` / `SIDE_MENU_SRC` defaulting to the local repo path for now. No new URL-override env vars.
 - DNS multitenant is **always on** in prod.
-- `github.com/rajeshscs/MRV-Solomon-Islands` is the canonical origin of record after this branch lands.
+- `github.com/gotaker/iMRV-Solomon-Islands` is the canonical origin of record after this branch lands.
 - Production domain is `demo.imrv.netzerolabs.io` — hardcoded as the default value of `PROD_DOMAIN`, overridable via env var.
 - TLS path uses `bench setup lets-encrypt` (Frappe-blessed one-liner), not the manual's raw snap+certbot flow. Remains opt-in (`PROD_ENABLE_TLS=1`).
 

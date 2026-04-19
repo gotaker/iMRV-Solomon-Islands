@@ -221,8 +221,8 @@ A repo-wide find/replace covers every occurrence of the string `NetZeroLabs` (ca
 2. **Package metadata:** [setup.py](../../../setup.py) (`author`, `author_email`), [setup_sidebarmenu.py](../../../setup_sidebarmenu.py) (`author`, `author_email`), [mrvtools/hooks.py](../../../mrvtools/hooks.py) (`app_publisher`, `app_email`), [frappe_side_menu/hooks.py](../../../frappe_side_menu/hooks.py) (`app_publisher`, `app_email`).
 3. **Email addresses:** `info@netzerolabs.io` in `setup.py` / `mrvtools/hooks.py`, and the already-broken `info@netzerolabs.io` (missing `c`) in `setup_sidebarmenu.py` / `frappe_side_menu/hooks.py`. The rename fixes both addresses and the typo in one pass — rewritten as `info@netzerolabs.io` (lowercase by email convention).
 4. **External URLs in `package.json`:** the old Bitbucket URLs point at a repo (`bitbucket.org/NetZeroLabs2019/mrv-tool-custom-app`) that no longer exists. They are rewritten to the current GitHub origin:
-   - `repository.url` → `git+https://github.com/rajeshscs/MRV-Solomon-Islands.git`
-   - `homepage` → `https://github.com/rajeshscs/MRV-Solomon-Islands#readme`
+   - `repository.url` → `git+https://github.com/gotaker/iMRV-Solomon-Islands.git`
+   - `homepage` → `https://github.com/gotaker/iMRV-Solomon-Islands#readme`
 
 Implementation approach: a single `sed -i` pass over the tracked files under buckets 1–3, driven by `git ls-files`. `package.json` is rewritten separately (the Bitbucket URL pair is a literal two-line substitution, not driven by the `NetZeroLabs` regex) to avoid collateral damage from replacing `NetZeroLabs2019` with `NetZeroLabs2019`.
 
