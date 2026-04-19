@@ -421,9 +421,11 @@ build_frontend() {
   # /assets/mrvtools/frontend/ from apps/mrvtools/mrvtools/public/ and the
   # Vite build's outDir resolves relative to this frontend/ location.
   local fe="$BENCH_DIR/apps/mrvtools/frontend"
+  local src_fe="$MRVTOOLS_SRC/frontend"
   if [[ "$DRY_RUN" == "1" ]]; then
     printf 'DRY_RUN: yarn install --frozen-lockfile (in %s)\n' "$fe"
     printf 'DRY_RUN: yarn build (in %s)\n' "$fe"
+    printf 'DRY_RUN: yarn install --frozen-lockfile (in %s) — for start.sh yarn dev\n' "$src_fe"
     return
   fi
   if [[ ! -d "$fe" ]]; then
@@ -435,24 +437,23 @@ build_frontend() {
     run yarn install --frozen-lockfile
     run yarn build
   )
+  # Source-repo frontend needs node_modules so start.sh can run `yarn dev` here.
+  # Skip if already installed.
+  if [[ -d "$src_fe" && ! -d "$src_fe/node_modules" ]]; then
+    info "installing source-repo frontend deps for start.sh's yarn dev"
+    (
+      cd "$src_fe"
+      run yarn install --frozen-lockfile
+    )
+  elif [[ -d "$src_fe/node_modules" ]]; then
+    skip "source-repo frontend deps (node_modules exists)"
+  fi
 }
 configure_dev() {
   step "configure_dev"
-  cat <<EOF
-
-Dev install complete. Next steps:
-
-  1) In terminal A, start the Frappe bench:
-       cd "$BENCH_DIR" && bench start
-
-  2) In terminal B, start the Vite dev server:
-       cd "$MRVTOOLS_SRC/frontend" && yarn dev
-
-  3) Open the site:
-       http://$SITE_NAME:8000
-
-Admin credentials: user 'Administrator', password '$ADMIN_PASSWORD'.
-EOF
+  info "site_config patched (developer_mode=1, ignore_csrf=1)"
+  info "starting services..."
+  info "(admin user: 'Administrator', password: '$ADMIN_PASSWORD')"
 }
 
 configure_prod() {
@@ -486,6 +487,11 @@ configure_prod() {
       )
     fi
   fi
+}
+
+start_services() {
+  step "start_services"
+  run "$SCRIPT_DIR/start.sh" "--$MODE"
 }
 
 # --- Arg parsing ---------------------------------------------------------
@@ -527,6 +533,8 @@ main() {
   else
     configure_prod
   fi
+
+  start_services
 
   printf '\n==> install.sh finished (mode=%s)\n' "$MODE" >&2
 }
