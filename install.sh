@@ -308,8 +308,34 @@ build_frontend() {
     run yarn build
   )
 }
-configure_dev()        { step "configure_dev"; :; }
-configure_prod()       { step "configure_prod"; :; }
+configure_dev() {
+  step "configure_dev"
+  cat <<EOF
+
+Dev install complete. Next steps:
+
+  1) In terminal A, start the Frappe bench:
+       cd "$BENCH_DIR" && bench start
+
+  2) In terminal B, start the Vite dev server:
+       cd "$MRVTOOLS_SRC/frontend" && yarn dev
+
+  3) Open the site:
+       http://$SITE_NAME:8000
+
+Admin credentials: user 'Administrator', password '$ADMIN_PASSWORD'.
+EOF
+}
+
+configure_prod() {
+  step "configure_prod"
+  run sudo bench setup production "$PROD_USER"
+  (
+    cd "$BENCH_DIR"
+    run bench --site "$SITE_NAME" set-config developer_mode 0
+    run bench --site "$SITE_NAME" set-config ignore_csrf 0
+  )
+}
 
 # --- Arg parsing ---------------------------------------------------------
 parse_args() {
