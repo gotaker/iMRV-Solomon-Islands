@@ -186,7 +186,50 @@ stop_tracked_processes() {
   stop_pid vite  "$VITE_PID_FILE"
   stop_pid bench "$BENCH_PID_FILE"
 }
-sweep_orphan_ports()     { step "sweep_orphan_ports";     info "(not yet implemented)"; }
+sweep_orphan_ports() {
+  step "sweep_orphan_ports"
+  if ! command -v lsof &>/dev/null; then
+    warn "lsof not found; cannot sweep orphan ports"
+    return
+  fi
+  local me port pid_list pid cmd
+  me="$(id -un)"
+  for port in "${SWEEP_PORTS[@]}"; do
+    # -t = pid only, one per line
+    pid_list="$(lsof -tiTCP:"$port" -sTCP:LISTEN 2>/dev/null || true)"
+    [[ -z "$pid_list" ]] && continue
+    while IFS= read -r pid; do
+      [[ -z "$pid" ]] && continue
+      # Skip pids we don't own (avoid touching root/system processes).
+      local owner
+      owner="$(ps -o user= -p "$pid" 2>/dev/null | tr -d '[:space:]')"
+      if [[ "$owner" != "$me" ]]; then
+        info "port $port held by pid $pid (user=$owner) — not ours, skipping"
+        continue
+      fi
+      cmd="$(ps -o comm= -p "$pid" 2>/dev/null | awk -F/ '{print $NF}' | tr -d '[:space:]')"
+      if [[ ! "$cmd" =~ $ORPHAN_COMMANDS_REGEX ]]; then
+        info "port $port held by pid $pid (cmd=$cmd) — not in allowlist, skipping"
+        continue
+      fi
+      info "port $port: orphan $cmd (pid=$pid), SIGTERM"
+      if [[ "$DRY_RUN" == "1" ]]; then
+        printf 'DRY_RUN: kill -TERM %s; wait up to 10s; SIGKILL if alive\n' "$pid"
+        continue
+      fi
+      kill -TERM "$pid" 2>/dev/null || true
+      local waited=0
+      while pid_alive "$pid" && (( waited < 10 )); do
+        sleep 1
+        waited=$((waited + 1))
+      done
+      if pid_alive "$pid"; then
+        warn "port $port: pid $pid did not exit on SIGTERM; SIGKILL"
+        kill -KILL "$pid" 2>/dev/null || true
+      fi
+    done <<<"$pid_list"
+  done
+}
 stop_system_services()   { step "stop_system_services";   info "(not yet implemented)"; }
 final_verification()     { step "final_verification";     info "(not yet implemented)"; }
 
