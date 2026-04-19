@@ -132,8 +132,60 @@ PY
   info "bench ports: web=$WEB_PORT socketio=$SOCKETIO_PORT redis_cache=$REDIS_CACHE_PORT redis_queue=$REDIS_QUEUE_PORT"
 }
 
+# --- PID helpers ---------------------------------------------------------
+
+# pid_alive PID — returns 0 if the pid is alive.
+pid_alive() {
+  local pid="$1"
+  [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null
+}
+
+# stop_pid LABEL FILE
+#   If FILE has a live pid: SIGTERM, wait up to 10s, then SIGKILL if needed.
+#   Always removes the pid file at the end (even if it was missing/stale).
+stop_pid() {
+  local label="$1" file="$2" pid waited
+  if [[ ! -f "$file" ]]; then
+    info "$label: no pid file"
+    return
+  fi
+  pid="$(tr -d '[:space:]' <"$file")"
+  if [[ -z "$pid" ]] || ! pid_alive "$pid"; then
+    info "$label: pid file present but process not running (pid=$pid)"
+    run rm -f "$file"
+    return
+  fi
+  info "$label: SIGTERM pid $pid"
+  if [[ "$DRY_RUN" == "1" ]]; then
+    printf 'DRY_RUN: kill -TERM %s; wait up to 10s; SIGKILL if alive; rm %s\n' "$pid" "$file"
+    return
+  fi
+  kill -TERM "$pid" 2>/dev/null || true
+  waited=0
+  while pid_alive "$pid" && (( waited < 10 )); do
+    sleep 1
+    waited=$((waited + 1))
+  done
+  if pid_alive "$pid"; then
+    warn "$label: did not exit on SIGTERM; sending SIGKILL"
+    kill -KILL "$pid" 2>/dev/null || true
+    sleep 1
+  fi
+  if pid_alive "$pid"; then
+    err "$label: pid $pid still alive after SIGKILL"
+    return 1
+  fi
+  info "$label: stopped"
+  run rm -f "$file"
+}
+
 # --- Phases (filled in by later tasks) -----------------------------------
-stop_tracked_processes() { step "stop_tracked_processes"; info "(not yet implemented)"; }
+stop_tracked_processes() {
+  step "stop_tracked_processes"
+  # Reverse of start order: vite first (so it doesn't error-spam during bench shutdown), then bench.
+  stop_pid vite  "$VITE_PID_FILE"
+  stop_pid bench "$BENCH_PID_FILE"
+}
 sweep_orphan_ports()     { step "sweep_orphan_ports";     info "(not yet implemented)"; }
 stop_system_services()   { step "stop_system_services";   info "(not yet implemented)"; }
 final_verification()     { step "final_verification";     info "(not yet implemented)"; }
