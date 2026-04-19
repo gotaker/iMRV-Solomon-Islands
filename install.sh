@@ -369,10 +369,7 @@ configure_prod() {
   (
     [[ "$DRY_RUN" == "1" ]] || cd "$BENCH_DIR"
     run bench config dns_multitenant on
-  )
-  run sudo bench setup production "$PROD_USER"
-  (
-    [[ "$DRY_RUN" == "1" ]] || cd "$BENCH_DIR"
+    run sudo bench setup production "$PROD_USER"
     run bench --site "$SITE_NAME" set-config developer_mode 0
     run bench --site "$SITE_NAME" set-config ignore_csrf 0
   )
