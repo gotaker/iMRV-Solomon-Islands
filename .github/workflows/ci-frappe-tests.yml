@@ -1,0 +1,151 @@
+name: CI (Frappe tests)
+
+on:
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: '0 2 * * *'
+
+# To require this check on master, configure branch protection
+# manually via repo Settings -> Branches. This cannot be encoded
+# in the workflow itself.
+
+jobs:
+  frappe-tests:
+    runs-on: ubuntu-22.04
+
+    services:
+      mariadb:
+        image: mariadb:10.6
+        env:
+          MARIADB_ROOT_PASSWORD: ${{ secrets.MARIADB_ROOT_PASSWORD }}
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping -uroot -p${{ secrets.MARIADB_ROOT_PASSWORD }}"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Checkout repo at apps/mrvtools_repo
+        uses: actions/checkout@v4
+        with:
+          path: apps/mrvtools_repo
+
+      - name: Install system apt deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git \
+            python3.11 python3.11-venv python3-dev \
+            build-essential libssl-dev libffi-dev \
+            xvfb libfontconfig
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install frappe-bench
+        run: pip install frappe-bench
+
+      - name: Configure MariaDB for Frappe
+        env:
+          MARIADB_ROOT_PASSWORD: ${{ secrets.MARIADB_ROOT_PASSWORD }}
+        run: |
+          mariadb -uroot -p"$MARIADB_ROOT_PASSWORD" -h 127.0.0.1 <<'SQL'
+          SET GLOBAL innodb_read_only_compressed = OFF;
+          SQL
+
+      - name: Initialize bench
+        run: |
+          bench init \
+            --skip-redis-config-generation \
+            --frappe-branch version-15 \
+            --python python3.11 \
+            frappe-bench
+
+      - name: Layout apps inside bench
+        working-directory: frappe-bench
+        run: |
+          ln -s "$GITHUB_WORKSPACE/apps/mrvtools_repo/mrvtools" apps/mrvtools
+          ln -s "$GITHUB_WORKSPACE/apps/mrvtools_repo/frappe_side_menu" apps/frappe_side_menu
+          ls -la apps/
+
+      - name: Point bench redis at the service container
+        working-directory: frappe-bench
+        run: |
+          python3 - <<'PY'
+          import json, pathlib
+          cfg_path = pathlib.Path("sites/common_site_config.json")
+          cfg = json.loads(cfg_path.read_text()) if cfg_path.exists() else {}
+          cfg.update({
+              "redis_cache": "redis://127.0.0.1:6379",
+              "redis_queue": "redis://127.0.0.1:6379",
+              "redis_socketio": "redis://127.0.0.1:6379",
+          })
+          cfg_path.write_text(json.dumps(cfg, indent=1))
+          PY
+
+      - name: Create site
+        working-directory: frappe-bench
+        env:
+          MARIADB_ROOT_PASSWORD: ${{ secrets.MARIADB_ROOT_PASSWORD }}
+        run: |
+          bench new-site test_site \
+            --mariadb-root-password "$MARIADB_ROOT_PASSWORD" \
+            --admin-password admin \
+            --no-mariadb-socket \
+            --db-host 127.0.0.1
+
+      - name: Install mrvtools
+        working-directory: frappe-bench
+        run: bench --site test_site install-app mrvtools
+
+      - name: Install frappe_side_menu
+        working-directory: frappe-bench
+        run: bench --site test_site install-app frappe_side_menu
+
+      - name: Migrate
+        working-directory: frappe-bench
+        run: bench --site test_site migrate
+
+      - name: Run mrvtools tests
+        working-directory: frappe-bench
+        run: bench --site test_site run-tests --app mrvtools
+
+      - name: Run frappe_side_menu tests
+        working-directory: frappe-bench
+        run: bench --site test_site run-tests --app frappe_side_menu
+
+      - name: Upload bench logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frappe-bench-logs
+          path: frappe-bench/logs/
+          retention-days: 7
+
+      - name: Open issue on nightly failure
+        if: failure() && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --title "Nightly CI failure: $(date -u +%Y-%m-%d)" \
+            --label "ci-nightly-failure" \
+            --body "Nightly Frappe-tests run failed. See [workflow run](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}). Logs artifact: \`frappe-bench-logs\`."
