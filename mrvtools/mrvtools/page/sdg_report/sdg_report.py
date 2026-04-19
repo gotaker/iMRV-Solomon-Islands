@@ -1,7 +1,8 @@
-import frappe,json
-import pandas as pd
+import json
 
-from frappe.utils import get_site_base_path,now
+import frappe
+import pandas as pd
+from frappe.utils import get_site_base_path, now
 
 
 @frappe.whitelist()

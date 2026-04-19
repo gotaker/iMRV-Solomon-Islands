@@ -4,6 +4,7 @@
 import frappe
 from frappe.model.document import Document
 
+
 class SDGMonitoringInformation(Document):
 
 	
@@ -49,7 +50,7 @@ class SDGMonitoringInformation(Document):
 		
 	@frappe.whitelist()
 	def get_user(self):
-		doc = frappe.db.sql(f""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver SDG Tracking'""")
+		doc = frappe.db.sql(""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver SDG Tracking'""")
 		return doc
 	
 	@frappe.whitelist()

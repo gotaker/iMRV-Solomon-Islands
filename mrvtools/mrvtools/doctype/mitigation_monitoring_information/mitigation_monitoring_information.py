@@ -1,12 +1,16 @@
 # Copyright (c) 2023, NetZeroLabs and contributors
 # For license information, please see license.txt
 
-import frappe,json
+import json
+
+import frappe
+from frappe.desk.reportview import compress, execute
+from frappe.model.base_document import get_controller
 from frappe.model.document import Document
 from frappe.model.utils import is_virtual_doctype
-from frappe.model.base_document import get_controller
-from frappe.desk.reportview import compress,execute
 from frappe.model.utils.user_settings import save
+
+
 class MitigationMonitoringInformation(Document):
 	
 # _____________________________________________________________________________________________________________________
@@ -99,7 +103,7 @@ class MitigationMonitoringInformation(Document):
 	
 	@frappe.whitelist()
 	def get_user(self):
-		doc = frappe.db.sql(f""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver Mitigation Tracking'""")
+		doc = frappe.db.sql(""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver Mitigation Tracking'""")
 		return doc
 	
 	@frappe.whitelist()

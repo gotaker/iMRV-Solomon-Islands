@@ -1,10 +1,12 @@
 # Copyright (c) 2023, NetZeroLabs and contributors
 # For license information, please see license.txt
 
-import frappe,json
-import pandas as pd
+import json
 
-from frappe.utils import get_site_base_path,now
+import frappe
+import pandas as pd
+from frappe.utils import get_site_base_path, now
+
 
 @frappe.whitelist()
 def execute(year = None,objective =None,key_sector = None,key_sub_sector = None):

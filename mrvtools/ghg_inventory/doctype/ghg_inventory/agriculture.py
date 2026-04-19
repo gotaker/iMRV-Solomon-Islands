@@ -1,5 +1,7 @@
-import frappe
 import json
+
+import frappe
+
 # from frappe.model.document import Document
 
 @frappe.whitelist()

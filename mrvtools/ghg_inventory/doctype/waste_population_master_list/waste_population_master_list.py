@@ -3,7 +3,10 @@
 
 import frappe
 from frappe.model.document import Document
+
 from mrvtools.ghg_inventory.doctype.ghg_inventory.waste import waste_calculation
+
+
 class WastePopulationMasterList(Document):
 	def on_update(self):
 		tablefields=[]
@@ -16,7 +19,7 @@ class WastePopulationMasterList(Document):
 					tablefields.append(field["fieldname"])
 
 			if field["fieldname"] == "workflow_state":
-				document_name = frappe.db.sql(f"""SELECT name,sector,workflow_state FROM `tabGHG Inventory`""",as_dict =1)
+				document_name = frappe.db.sql("""SELECT name,sector,workflow_state FROM `tabGHG Inventory`""",as_dict =1)
 				doc = "GHG Inventory"
 				for i in document_name:
 					if i.workflow_state == "Approved":

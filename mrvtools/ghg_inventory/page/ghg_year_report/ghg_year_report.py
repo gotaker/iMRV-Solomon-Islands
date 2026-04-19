@@ -1,10 +1,13 @@
 # Copyright (c) 2023, NetZeroLabs and contributors
 # For license information, please see license.txt
 
-import frappe,json
-import pandas as pd
+import json
 
-from frappe.utils import get_site_base_path,now
+import frappe
+import pandas as pd
+from frappe.utils import get_site_base_path, now
+
+
 @frappe.whitelist()
 def execute(inventory_unit, to_year, from_year):
 	columns, data = getColumns(to_year, from_year),getData(inventory_unit, from_year, to_year)
@@ -62,7 +65,7 @@ def getData(inventory_unit, from_year, to_year):
 
 				"""
 	value = frappe.db.sql(val,as_dict = 1)
-	query = f"""
+	query = """
 					Select
 						category_name as categories,indent
 					from

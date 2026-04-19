@@ -4,6 +4,7 @@
 import frappe
 from frappe.model.document import Document
 
+
 class Mitigations(Document):
 	@frappe.whitelist()
 	def before_saving_table(self):
@@ -45,7 +46,7 @@ class Mitigations(Document):
 	
 	@frappe.whitelist()
 	def get_user(self):
-		doc = frappe.db.sql(f""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver Mitigation Tracking'""")
+		doc = frappe.db.sql(""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver Mitigation Tracking'""")
 		return doc
 	
 	

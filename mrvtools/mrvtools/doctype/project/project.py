@@ -3,6 +3,8 @@
 
 import frappe
 from frappe.model.document import Document
+
+
 class Project(Document):
 
 	def on_update(self):
@@ -13,7 +15,7 @@ class Project(Document):
 
 	@frappe.whitelist()
 	def get_user(self):
-		doc = frappe.db.sql(f""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver Project'""")
+		doc = frappe.db.sql(""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver Project'""")
 		return doc
 	
 	@frappe.whitelist()

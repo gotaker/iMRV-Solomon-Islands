@@ -1,10 +1,7 @@
-import frappe
 # import pandas as pd
-from frappe.utils import get_fullname
-from datetime import date, timedelta ,datetime
-import statistics
- 
- 
+from datetime import datetime, timedelta
+
+
 def dates_bwn_twodates(start_dt = None,end_dt=None):
 	start_date = datetime.strptime(start_dt, "%Y-%m-%d")
 	end_date = datetime.strptime(end_dt, "%Y-%m-%d")

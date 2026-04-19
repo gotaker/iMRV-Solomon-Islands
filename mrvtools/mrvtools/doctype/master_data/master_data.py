@@ -4,6 +4,7 @@
 import frappe
 from frappe.model.document import Document
 
+
 class MasterData(Document):
 	@frappe.whitelist()
 	def getMasterValues(self):

@@ -4,27 +4,28 @@
 import frappe
 from frappe.model.document import Document
 
+
 class GHGInventory(Document):
 
 	@frappe.whitelist()
 	def get_user(self):
 		if self.sector == "1. Energy":
-			doc = frappe.db.sql(f""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver Energy'""")
+			doc = frappe.db.sql(""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver Energy'""")
 			return doc
 		elif self.sector == "2. Industrial processes and product use":
-			doc = frappe.db.sql(f""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver IPPU'""")
+			doc = frappe.db.sql(""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver IPPU'""")
 			return doc
 		elif self.sector == "3. Agriculture":
-			doc = frappe.db.sql(f""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver Agriculture'""")
+			doc = frappe.db.sql(""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver Agriculture'""")
 			return doc
 		elif self.sector == "4. LAND USE, LAND-USE CHANGE AND FORESTRY":
-			doc = frappe.db.sql(f""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver Land Use'""")
+			doc = frappe.db.sql(""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver Land Use'""")
 			return doc
 		elif self.sector == "5. Waste":
-			doc = frappe.db.sql(f""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver Waste'""")
+			doc = frappe.db.sql(""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver Waste'""")
 			return doc
 		elif self.sector == "6. Other":
-			doc = frappe.db.sql(f""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver Other'""")
+			doc = frappe.db.sql(""" SELECT parent FROM `tabHas Role` WHERE role = 'Approver Other'""")
 			return doc
 		
 

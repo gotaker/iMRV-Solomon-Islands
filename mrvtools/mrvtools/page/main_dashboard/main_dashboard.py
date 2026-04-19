@@ -1,5 +1,7 @@
-import frappe,json
+import json
 from datetime import datetime
+
+import frappe
 
 # @frappe.whitelist(allow_guest=True)
 # def get_cards_data():
@@ -162,14 +164,14 @@ def get_document_count():
 	data_counts["Transparency"]=total_transparency_projects[0]['count']
 
 
-	miti_keySector = frappe.db.sql(f'''SELECT name from `tabProject Key Sector` WHERE objective in ("Mitigation","Cross-Cutting")''',as_dict=1)
+	miti_keySector = frappe.db.sql('''SELECT name from `tabProject Key Sector` WHERE objective in ("Mitigation","Cross-Cutting")''',as_dict=1)
 	miti_count_list=[]
 	for i in miti_keySector:
 		if frappe.db.exists("Mitigations",{"key_sector":i.name}):
 			miti_count = frappe.db.get_all("Mitigations",fields=["key_sector","COUNT(name) count"],filters={'key_sector':i.name})
 			miti_count_list.append(miti_count[0])
 			
-	adapt_keySector = frappe.db.sql(f'''SELECT name from `tabProject Key Sector` WHERE objective in ("Adaptation","Cross-Cutting")''',as_dict=1)
+	adapt_keySector = frappe.db.sql('''SELECT name from `tabProject Key Sector` WHERE objective in ("Adaptation","Cross-Cutting")''',as_dict=1)
 	adapt_count_list=[]
 	for i in adapt_keySector:
 		if frappe.db.exists("Adaptation",{"key_sector":i.name}):
@@ -196,7 +198,7 @@ def get_document_count():
 
 @frappe.whitelist()
 def get_commulative_mitigation_till_date():
-	query = f"""
+	query = """
 	SELECT
 		MT.key_sector
 	FROM
@@ -226,7 +228,7 @@ def get_commulative_mitigation_till_date():
 
 @frappe.whitelist()
 def get_commulative_mitigation_last_year():
-	query = f"""
+	query = """
 	SELECT
 		MT.key_sector
 	FROM
