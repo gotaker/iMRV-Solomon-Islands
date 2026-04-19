@@ -119,6 +119,38 @@ verify_bench_dir() {
   run mkdir -p "$PID_DIR" "$LOG_DIR"
 }
 
+# --- PID file helpers ----------------------------------------------------
+# pid_alive PID — returns 0 if the pid is alive, non-zero otherwise.
+pid_alive() {
+  local pid="$1"
+  [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null
+}
+
+# read_pid FILE — echoes the pid in FILE (empty if file missing/empty).
+read_pid() {
+  local file="$1"
+  [[ -f "$file" ]] && tr -d '[:space:]' <"$file"
+}
+
+# check_or_clean_pid LABEL FILE
+#   Echoes one of: "alive <pid>", "stale", "missing".
+#   Removes the file if stale.
+check_or_clean_pid() {
+  local label="$1" file="$2" pid
+  pid="$(read_pid "$file" || true)"
+  if [[ -z "$pid" ]]; then
+    echo "missing"
+    return
+  fi
+  if pid_alive "$pid"; then
+    echo "alive $pid"
+    return
+  fi
+  info "$label: stale pid $pid in $file, removing"
+  run rm -f "$file"
+  echo "stale"
+}
+
 # --- Phases (filled in by later tasks) -----------------------------------
 verify_system_services() {
   step "verify_system_services"
@@ -159,7 +191,29 @@ _verify_services_ubuntu() {
     fi
   done
 }
-start_bench()            { step "start_bench";            info "(not yet implemented)"; }
+start_bench() {
+  step "start_bench"
+  local status
+  status="$(check_or_clean_pid bench "$BENCH_PID_FILE")"
+  case "$status" in
+    "alive "*)
+      skip "bench (already running, pid=${status#alive })"
+      return
+      ;;
+  esac
+  if [[ "$DRY_RUN" == "1" ]]; then
+    printf 'DRY_RUN: cd %q && nohup bench start >>%q 2>&1 &\n' "$BENCH_DIR" "$BENCH_LOG"
+    printf 'DRY_RUN: echo $! > %q\n' "$BENCH_PID_FILE"
+    return
+  fi
+  info "starting bench (logs: $BENCH_LOG)"
+  (
+    cd "$BENCH_DIR"
+    nohup bench start >>"$BENCH_LOG" 2>&1 &
+    echo $! >"$BENCH_PID_FILE"
+  )
+  info "bench pid: $(cat "$BENCH_PID_FILE")"
+}
 start_vite()             { step "start_vite";             info "(not yet implemented)"; }
 wait_for_readiness()     { step "wait_for_readiness";     info "(not yet implemented)"; }
 print_summary()          { step "print_summary";          info "(not yet implemented)"; }
