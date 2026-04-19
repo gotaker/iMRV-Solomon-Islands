@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "aos": "^2.3.4",
-    "axios": "^1.5.1",
+    "axios": "^1.15.0",
     "feather-icons": "^4.28.0",
     "frappe-ui": "^0.1.14",
     "lightgallery": "^2.7.2",
