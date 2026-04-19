@@ -6,3 +6,4 @@ tags
 mrvtools/docs/current
 node_modules/
 ._*
+.worktrees/
