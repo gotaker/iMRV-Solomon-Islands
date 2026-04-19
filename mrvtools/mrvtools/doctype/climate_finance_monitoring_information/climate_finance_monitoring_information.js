@@ -1,4 +1,4 @@
-// Copyright (c) 2023, tridotstech and contributors
+// Copyright (c) 2023, NetZeroLabs and contributors
 // For license information, please see license.txt
 var counter = 0
 frappe.ui.form.on('Climate Finance Monitoring Information', {

@@ -4,9 +4,9 @@ from . import __version__ as app_version
 
 app_name = "mrvtools"
 app_title = "Mrvtools"
-app_publisher = "tridotstech"
+app_publisher = "NetZeroLabs"
 app_description = "mrvtools"
-app_email = "info@tridotstech.com"
+app_email = "info@netzerolabs.com"
 app_license = "MIT"
 
 

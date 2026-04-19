@@ -209,24 +209,24 @@ Three layers, from cheapest to most expensive:
 
 - **New:** `install.sh` at the repo root.
 - **Modified:** [CLAUDE.md](../../../CLAUDE.md) — add one paragraph under "Build and run" pointing contributors at `install.sh` as the unified entry point and noting that the documented `bench`/`yarn` sequence is what the script automates.
-- **Modified (rename):** ~100 files touched by a `tridotstech` → `NetZeroLabs` rename — details below.
+- **Modified (rename):** ~100 files touched by a `NetZeroLabs` → `NetZeroLabs` rename — details below.
 
 The existing `requirements.txt`, app hooks, and frontend build remain structurally unchanged; the two `setup.py` files stay as separate pip entry points (the author/email metadata inside them is rewritten by the rename step).
 
-## Rename: `tridotstech` → `NetZeroLabs`
+## Rename: `NetZeroLabs` → `NetZeroLabs`
 
-A repo-wide find/replace covers every occurrence of the string `tridotstech` (case-insensitive match, case-preserving replacement to `NetZeroLabs`). Occurrences fall into four buckets:
+A repo-wide find/replace covers every occurrence of the string `NetZeroLabs` (case-insensitive match, case-preserving replacement to `NetZeroLabs`). Occurrences fall into four buckets:
 
-1. **Copyright headers** in ~90 DocType `.py` and `.js` files — `# Copyright (c) 2023, tridotstech and contributors` / `// Copyright (c) 2024, tridotstech and Contributors`. Mechanical replace.
+1. **Copyright headers** in ~90 DocType `.py` and `.js` files — `# Copyright (c) 2023, NetZeroLabs and contributors` / `// Copyright (c) 2024, NetZeroLabs and Contributors`. Mechanical replace.
 2. **Package metadata:** [setup.py](../../../setup.py) (`author`, `author_email`), [setup_sidebarmenu.py](../../../setup_sidebarmenu.py) (`author`, `author_email`), [mrvtools/hooks.py](../../../mrvtools/hooks.py) (`app_publisher`, `app_email`), [frappe_side_menu/hooks.py](../../../frappe_side_menu/hooks.py) (`app_publisher`, `app_email`).
-3. **Email addresses:** `info@tridotstech.com` in `setup.py` / `mrvtools/hooks.py`, and the already-broken `info@tridotstech.om` (missing `c`) in `setup_sidebarmenu.py` / `frappe_side_menu/hooks.py`. The rename fixes both addresses and the typo in one pass — rewritten as `info@netzerolabs.com` (lowercase by email convention).
-4. **External URLs in `package.json`:** the old Bitbucket URLs point at a repo (`bitbucket.org/tridotstech2019/mrv-tool-custom-app`) that no longer exists. They are rewritten to the current GitHub origin:
+3. **Email addresses:** `info@netzerolabs.com` in `setup.py` / `mrvtools/hooks.py`, and the already-broken `info@netzerolabs.com` (missing `c`) in `setup_sidebarmenu.py` / `frappe_side_menu/hooks.py`. The rename fixes both addresses and the typo in one pass — rewritten as `info@netzerolabs.com` (lowercase by email convention).
+4. **External URLs in `package.json`:** the old Bitbucket URLs point at a repo (`bitbucket.org/NetZeroLabs2019/mrv-tool-custom-app`) that no longer exists. They are rewritten to the current GitHub origin:
    - `repository.url` → `git+https://github.com/rajeshscs/MRV-Solomon-Islands.git`
    - `homepage` → `https://github.com/rajeshscs/MRV-Solomon-Islands#readme`
 
-Implementation approach: a single `sed -i` pass over the tracked files under buckets 1–3, driven by `git ls-files`. `package.json` is rewritten separately (the Bitbucket URL pair is a literal two-line substitution, not driven by the `tridotstech` regex) to avoid collateral damage from replacing `tridotstech2019` with `NetZeroLabs2019`.
+Implementation approach: a single `sed -i` pass over the tracked files under buckets 1–3, driven by `git ls-files`. `package.json` is rewritten separately (the Bitbucket URL pair is a literal two-line substitution, not driven by the `NetZeroLabs` regex) to avoid collateral damage from replacing `NetZeroLabs2019` with `NetZeroLabs2019`.
 
-Verification: after the rename, `grep -r -i "tridotstech" .` returns zero matches and `grep -r "bitbucket.org/tridotstech2019" .` returns zero matches.
+Verification: after the rename, `grep -r -i "NetZeroLabs" .` returns zero matches and `grep -r "bitbucket.org/NetZeroLabs2019" .` returns zero matches.
 
 ## License: switch to MIT
 
@@ -234,13 +234,13 @@ The repo currently has an inconsistent license declaration:
 
 - [license.txt](../../../license.txt) is a one-line file containing `License: MIT` — it declares MIT but ships no actual license text.
 - [package.json](../../../package.json) line 17 declares `"license": "ISC"` — contradicts `license.txt`.
-- Source files carry `# Copyright (c) YYYY, tridotstech and contributors` headers with no SPDX notice.
+- Source files carry `# Copyright (c) YYYY, NetZeroLabs and contributors` headers with no SPDX notice.
 
 Two changes:
 
 1. **Rewrite `license.txt`** with the full MIT License text. Copyright line: `Copyright (c) 2023-2026 NetZeroLabs and contributors` (aligns with the post-rename copyright string and covers the range of years already present in source headers). Filename stays as-is — renaming to `LICENSE` would ripple through `MANIFEST.in` and is out of scope.
 2. **Update `package.json`** line 17: `"license": "ISC"` → `"license": "MIT"`.
 
-No changes to per-file copyright headers beyond the `tridotstech` → `NetZeroLabs` rename already covered above. The root `license.txt` is authoritative for the whole repo; SPDX per-file notices are not being added.
+No changes to per-file copyright headers beyond the `NetZeroLabs` → `NetZeroLabs` rename already covered above. The root `license.txt` is authoritative for the whole repo; SPDX per-file notices are not being added.
 
 Verification: `license.txt` begins with `MIT License`, contains the standard permission/warranty paragraphs; `jq -r .license package.json` returns `MIT`.
