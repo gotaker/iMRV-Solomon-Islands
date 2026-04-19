@@ -90,8 +90,8 @@ Both new scripts source the same defaults block `install.sh` already uses, so a 
    - `cd $MRVTOOLS_SRC/frontend && nohup yarn dev >>$BENCH_DIR/.mrv/logs/vite.log 2>&1 &`
    - `echo $! > $BENCH_DIR/.mrv/pids/vite.pid`
 5. **Wait for readiness.**
-   - Poll `curl -fsS http://127.0.0.1:$WEB_PORT/api/method/ping` every 1s, 60s timeout. `$WEB_PORT` comes from `webserver_port` in `$BENCH_DIR/sites/common_site_config.json` (default 8000) — bench uses offset ports when multiple benches coexist on one host (e.g. `frappe-bench-mrv` on a host that already has `frappe-bench` will get 8001).
-   - Dev only: also poll `curl -fsS http://127.0.0.1:8080`, 30s timeout. (Vite is not bench-managed and stays on 8080.)
+   - Poll `curl -fsS http://$SITE_NAME:$WEB_PORT/api/method/ping` every 1s, 60s timeout. Use `$SITE_NAME` (not `127.0.0.1`) because Frappe matches the `Host` header against site names — a request to `127.0.0.1` wouldn't match any site and would return 404. `*.localhost` resolves to 127.0.0.1 via reserved-TLD behavior, so `mrv.localhost` works without /etc/hosts edits. `$WEB_PORT` comes from `webserver_port` in `$BENCH_DIR/sites/common_site_config.json` (default 8000) — bench uses offset ports when multiple benches coexist on one host (e.g. `frappe-bench-mrv` on a host that already has `frappe-bench` will get 8001).
+   - Dev only: also poll `curl -fsS http://127.0.0.1:8080`, 30s timeout. (Vite is not bench-managed and stays on 8080; it has no host-based routing so 127.0.0.1 is fine.)
    - On timeout → print last 20 lines of the relevant log + non-zero exit.
 6. **Print URLs and tail hints** on success (URL uses `$WEB_PORT` discovered above):
 
