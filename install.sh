@@ -63,18 +63,24 @@ trap 'err "phase [${CURRENT_PHASE:-startup}] failed at line $LINENO"; exit 1' ER
 # --- Command runner (honours DRY_RUN) ------------------------------------
 run() {
   if [[ "$DRY_RUN" == "1" ]]; then
-    printf 'DRY_RUN: %s\n' "$*"
+    printf 'DRY_RUN:'; printf ' %q' "$@"; printf '\n'
   else
     "$@"
   fi
 }
 
 # Shell-eval variant for pipelines that need shell metacharacters.
+# Accepts exactly one pre-formed shell-command string, e.g.:
+#   run_sh "curl -fsSL https://example.com | sudo -E bash -"
 run_sh() {
+  if [[ $# -ne 1 ]]; then
+    err "run_sh requires exactly one pre-formed shell string (got $# args)"
+    exit 1
+  fi
   if [[ "$DRY_RUN" == "1" ]]; then
-    printf 'DRY_RUN: %s\n' "$*"
+    printf 'DRY_RUN: %s\n' "$1"
   else
-    bash -c "$*"
+    bash -c "$1"
   fi
 }
 
