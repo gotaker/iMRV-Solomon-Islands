@@ -233,7 +233,39 @@ create_site() {
       "$SITE_NAME"
   )
 }
-get_and_install_apps() { step "get_and_install_apps"; :; }
+get_and_install_apps() {
+  step "get_and_install_apps"
+  _get_and_install_one mrvtools          "$MRVTOOLS_SRC"
+  _get_and_install_one frappe_side_menu  "$SIDE_MENU_SRC"
+  info "running bench migrate"
+  (
+    cd "$BENCH_DIR"
+    run bench --site "$SITE_NAME" migrate
+  )
+}
+
+_get_and_install_one() {
+  local app="$1"
+  local src="$2"
+  (
+    cd "$BENCH_DIR"
+    if [[ -d "apps/$app" ]]; then
+      skip "apps/$app already fetched"
+    else
+      run bench get-app "$app" "$src"
+    fi
+    if [[ "$DRY_RUN" == "1" ]]; then
+      printf 'DRY_RUN: bench --site %s install-app %s (if not already installed)\n' \
+        "$SITE_NAME" "$app"
+    else
+      if bench --site "$SITE_NAME" list-apps 2>/dev/null | grep -q "^$app$"; then
+        skip "$app already installed on $SITE_NAME"
+      else
+        bench --site "$SITE_NAME" install-app "$app"
+      fi
+    fi
+  )
+}
 patch_site_config()    { step "patch_site_config"; :; }
 build_frontend()       { step "build_frontend"; :; }
 configure_dev()        { step "configure_dev"; :; }
