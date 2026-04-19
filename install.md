@@ -93,9 +93,16 @@ MYSQL_ROOT_PASSWORD=changeme ./install.sh --dev
 
 # When install.sh exits, the URL is already live:
 #   http://mrv.localhost:8000
+# Login:   user 'Administrator', password 'admin'  (override via ADMIN_PASSWORD env)
 # Logs:    tail -f ~/frappe-bench/.mrv/logs/bench.log
 # Stop:    ./shutdown.sh
 # Restart: ./start.sh --dev
+```
+
+If you forget the admin password later, reset it:
+
+```bash
+cd ~/frappe-bench && bench --site mrv.localhost set-admin-password <new-password>
 ```
 
 ### Production server (Ubuntu, with TLS)
