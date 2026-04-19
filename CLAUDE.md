@@ -53,6 +53,21 @@ bench --site <site> run-tests --app frappe_side_menu
 
 There is no standalone Python test harness in this repo — every `test_*.py` lives next to a doctype and depends on the Frappe test runner.
 
+## Continuous integration
+
+CI runs via GitHub Actions. Two workflows:
+
+- [.github/workflows/ci-fast.yml](.github/workflows/ci-fast.yml) — runs on every PR and on pushes to `master`. Three parallel jobs: `frontend-build` (Vite build), `frontend-format` (Prettier `--check` against `frontend/src/**/*.{js,vue,css}`), `python-lint` (ruff on both Frappe apps). Target <2 min.
+- [.github/workflows/ci-frappe-tests.yml](.github/workflows/ci-frappe-tests.yml) — runs on PRs targeting `master` and nightly at 02:00 UTC. Spins up MariaDB 10.6 + Redis 7 service containers, runs `bench init`, installs both apps into a fresh `test_site`, then `bench run-tests --app mrvtools` and `--app frappe_side_menu`. On failure, uploads `frappe-bench/logs/` as an artifact; nightly failures also auto-open a GitHub issue labelled `ci-nightly-failure` (the label must exist in the repo).
+
+Design spec: [docs/superpowers/specs/2026-04-19-ci-pipeline-design.md](docs/superpowers/specs/2026-04-19-ci-pipeline-design.md).
+
+Version pins live in both workflow files and in [install.sh](install.sh) — keep them in sync. Bumping Python, Node, or the Frappe branch in `install.sh` requires a matching edit to `ci-frappe-tests.yml` in the same PR.
+
+Branch protection on `master` requires these status checks (configure manually via repo Settings → Branches): `frontend-build`, `frontend-format`, `python-lint`, `frappe-tests`.
+
+Secrets needed: `MARIADB_ROOT_PASSWORD` (any strong password — only used inside the ephemeral MariaDB service container).
+
 ## Architecture notes worth knowing before editing
 
 **Routing handoff.** [mrvtools/hooks.py](mrvtools/hooks.py) defines `website_route_rules` mapping `/frontend/<path:app_path>` to the `frontend` web template, and redirects `/` → `/frontend/home`. Inside the SPA, `createWebHistory('/frontend')` takes over. A route that "doesn't work" may be failing at either the Frappe route-rule layer or the Vue router layer — check both. `/login` is also overridden to a `custom_login` web template.
