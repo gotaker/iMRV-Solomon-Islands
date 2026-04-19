@@ -42,6 +42,11 @@ VITE_PID_FILE=""
 BENCH_LOG=""
 VITE_LOG=""
 
+WEB_PORT=8000
+SOCKETIO_PORT=9000
+REDIS_CACHE_PORT=13000
+REDIS_QUEUE_PORT=11000
+
 # --- Logging -------------------------------------------------------------
 step() { CURRENT_PHASE="$1"; printf '\n==> %s\n' "$1" >&2; }
 info() { printf '    %s\n' "$*" >&2; }
@@ -117,6 +122,37 @@ verify_bench_dir() {
     exit 1
   fi
   run mkdir -p "$PID_DIR" "$LOG_DIR"
+}
+
+# --- Bench port discovery ------------------------------------------------
+# Reads $BENCH_DIR/sites/common_site_config.json and sets WEB_PORT,
+# SOCKETIO_PORT, REDIS_CACHE_PORT, REDIS_QUEUE_PORT. Falls back to defaults
+# (8000/9000/13000/11000) if the file or a key is missing.
+discover_bench_ports() {
+  local cfg="$BENCH_DIR/sites/common_site_config.json"
+  if [[ ! -f "$cfg" ]]; then
+    info "common_site_config.json not found; using default ports (8000/9000/13000/11000)"
+    return
+  fi
+  local out
+  out="$(python3 - "$cfg" <<'PY'
+import json, re, sys
+cfg = json.load(open(sys.argv[1]))
+def port_of(url, default):
+    m = re.search(r':(\d+)', url or "")
+    return int(m.group(1)) if m else default
+print(cfg.get("webserver_port", 8000))
+print(cfg.get("socketio_port", 9000))
+print(port_of(cfg.get("redis_cache"), 13000))
+print(port_of(cfg.get("redis_queue"), 11000))
+PY
+)"
+  { read -r WEB_PORT
+    read -r SOCKETIO_PORT
+    read -r REDIS_CACHE_PORT
+    read -r REDIS_QUEUE_PORT
+  } <<<"$out"
+  info "bench ports: web=$WEB_PORT socketio=$SOCKETIO_PORT redis_cache=$REDIS_CACHE_PORT redis_queue=$REDIS_QUEUE_PORT"
 }
 
 # --- PID file helpers ----------------------------------------------------
@@ -214,9 +250,90 @@ start_bench() {
   )
   info "bench pid: $(cat "$BENCH_PID_FILE")"
 }
-start_vite()             { step "start_vite";             info "(not yet implemented)"; }
-wait_for_readiness()     { step "wait_for_readiness";     info "(not yet implemented)"; }
-print_summary()          { step "print_summary";          info "(not yet implemented)"; }
+start_vite() {
+  step "start_vite"
+  local fe="$MRVTOOLS_SRC/frontend"
+  if [[ ! -d "$fe" ]]; then
+    err "frontend dir not found at $fe (set MRVTOOLS_SRC to repo root)"
+    exit 1
+  fi
+  local status
+  status="$(check_or_clean_pid vite "$VITE_PID_FILE")"
+  case "$status" in
+    "alive "*)
+      skip "vite (already running, pid=${status#alive })"
+      return
+      ;;
+  esac
+  if [[ "$DRY_RUN" == "1" ]]; then
+    printf 'DRY_RUN: cd %q && nohup yarn dev >>%q 2>&1 &\n' "$fe" "$VITE_LOG"
+    printf 'DRY_RUN: echo $! > %q\n' "$VITE_PID_FILE"
+    return
+  fi
+  info "starting vite (logs: $VITE_LOG)"
+  (
+    cd "$fe"
+    nohup yarn dev >>"$VITE_LOG" 2>&1 &
+    echo $! >"$VITE_PID_FILE"
+  )
+  info "vite pid: $(cat "$VITE_PID_FILE")"
+}
+# wait_for_url URL TIMEOUT_SECONDS LABEL LOG_FILE
+#   Polls URL once per second up to TIMEOUT_SECONDS. On timeout, prints the
+#   last 20 lines of LOG_FILE and exits the script with status 1.
+wait_for_url() {
+  local url="$1" timeout="$2" label="$3" log="$4" elapsed=0
+  info "waiting for $label at $url (timeout ${timeout}s)"
+  while (( elapsed < timeout )); do
+    if curl -fsS -o /dev/null --max-time 2 "$url"; then
+      info "$label is up after ${elapsed}s"
+      return 0
+    fi
+    sleep 1
+    elapsed=$((elapsed + 1))
+  done
+  err "$label did not respond within ${timeout}s. Last 20 lines of $log:"
+  if [[ -f "$log" ]]; then
+    tail -20 "$log" >&2
+  else
+    err "(log file not found)"
+  fi
+  exit 1
+}
+
+wait_for_readiness() {
+  step "wait_for_readiness"
+  if [[ "$DRY_RUN" == "1" ]]; then
+    printf 'DRY_RUN: poll http://%s:%s/api/method/ping (60s)\n' "$SITE_NAME" "$WEB_PORT"
+    if [[ "$MODE" == "dev" ]]; then
+      printf 'DRY_RUN: poll http://127.0.0.1:8080 (30s)\n'
+    fi
+    return
+  fi
+  wait_for_url "http://$SITE_NAME:$WEB_PORT/api/method/ping" 60 "Frappe (bench)" "$BENCH_LOG"
+  if [[ "$MODE" == "dev" ]]; then
+    wait_for_url "http://127.0.0.1:8080" 30 "Vite" "$VITE_LOG"
+  fi
+}
+print_summary() {
+  step "print_summary"
+  local frappe_url="http://$SITE_NAME:$WEB_PORT"
+  cat >&2 <<EOF
+
+Stack is up.
+
+  Frappe:  $frappe_url   (logs: tail -f $BENCH_LOG)
+EOF
+  if [[ "$MODE" == "dev" ]]; then
+    cat >&2 <<EOF
+  Vite:    http://localhost:8080       (logs: tail -f $VITE_LOG)
+EOF
+  fi
+  cat >&2 <<EOF
+  Stop:    ./shutdown.sh
+
+EOF
+}
 
 # --- Arg parsing ---------------------------------------------------------
 parse_args() {
@@ -240,6 +357,7 @@ main() {
   detect_os
   init_state_paths
   verify_bench_dir
+  discover_bench_ports
 
   verify_system_services
   start_bench
