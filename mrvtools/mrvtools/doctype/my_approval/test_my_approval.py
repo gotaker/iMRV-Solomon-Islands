@@ -1,4 +1,4 @@
-# Copyright (c) 2024, tridotstech and Contributors
+# Copyright (c) 2024, NetZeroLabs and Contributors
 # See license.txt
 
 # import frappe

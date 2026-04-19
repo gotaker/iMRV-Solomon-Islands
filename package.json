@@ -10,10 +10,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/tridotstech2019/mrv-tool-custom-app.git"
+    "url": "git+https://github.com/gotaker/iMRV-Solomon-Islands.git"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "homepage": "https://bitbucket.org/tridotstech2019/mrv-tool-custom-app#readme"
+  "license": "MIT",
+  "homepage": "https://github.com/gotaker/iMRV-Solomon-Islands#readme"
 }

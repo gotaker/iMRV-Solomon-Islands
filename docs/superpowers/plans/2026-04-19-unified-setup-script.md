@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Bootstrap a fresh macOS, Ubuntu, or Windows-via-WSL2 laptop into a working MRV Solomon Islands dev or prod environment with a single command, while also relicensing the repo to MIT and renaming the legacy `tridotstech` vendor string to `NetZeroLabs`.
+**Goal:** Bootstrap a fresh macOS, Ubuntu, or Windows-via-WSL2 laptop into a working MRV Solomon Islands dev or prod environment with a single command, while also relicensing the repo to MIT and renaming the legacy `NetZeroLabs` vendor string to `NetZeroLabs`.
 
-**Architecture:** One idempotent bash script (`install.sh`) at the repo root orchestrates every install phase: OS package install → `bench` CLI → `bench init` → `new-site` → `get-app`/`install-app` for both Frappe apps → `yarn build` → dev/prod finalization. Zero runtime dependencies beyond a POSIX shell. All configuration via environment variables. Separate mechanical passes handle the `tridotstech` → `NetZeroLabs` rename, the Bitbucket → GitHub URL update, and the MIT license rewrite.
+**Architecture:** One idempotent bash script (`install.sh`) at the repo root orchestrates every install phase: OS package install → `bench` CLI → `bench init` → `new-site` → `get-app`/`install-app` for both Frappe apps → `yarn build` → dev/prod finalization. Zero runtime dependencies beyond a POSIX shell. All configuration via environment variables. Separate mechanical passes handle the `NetZeroLabs` → `NetZeroLabs` rename, the Bitbucket → GitHub URL update, and the MIT license rewrite.
 
 **Tech Stack:** Bash, `shellcheck`, Python 3 (inline JSON edits only), Frappe bench CLI, `yarn`, `vite`, `sed`.
 
@@ -74,9 +74,9 @@ Run: `cat package.json`
 Confirm lines 13, 17, 18 currently read:
 
 ```json
-    "url": "git+ssh://git@bitbucket.org/tridotstech2019/mrv-tool-custom-app.git"
+    "url": "git+ssh://git@bitbucket.org/NetZeroLabs2019/mrv-tool-custom-app.git"
   "license": "ISC",
-  "homepage": "https://bitbucket.org/tridotstech2019/mrv-tool-custom-app#readme"
+  "homepage": "https://bitbucket.org/NetZeroLabs2019/mrv-tool-custom-app#readme"
 ```
 
 - [ ] **Step 2: Apply three literal replacements**
@@ -84,9 +84,9 @@ Confirm lines 13, 17, 18 currently read:
 Replace the three lines with:
 
 ```json
-    "url": "git+https://github.com/rajeshscs/MRV-Solomon-Islands.git"
+    "url": "git+https://github.com/gotaker/iMRV-Solomon-Islands.git"
   "license": "MIT",
-  "homepage": "https://github.com/rajeshscs/MRV-Solomon-Islands#readme"
+  "homepage": "https://github.com/gotaker/iMRV-Solomon-Islands#readme"
 ```
 
 Preserve surrounding JSON structure (commas, braces, indentation) exactly.
@@ -94,7 +94,7 @@ Preserve surrounding JSON structure (commas, braces, indentation) exactly.
 - [ ] **Step 3: Verify JSON is valid and fields are correct**
 
 Run: `python3 -c 'import json; d=json.load(open("package.json")); print(d["license"], d["repository"]["url"], d["homepage"])'`
-Expected: `MIT git+https://github.com/rajeshscs/MRV-Solomon-Islands.git https://github.com/rajeshscs/MRV-Solomon-Islands#readme`
+Expected: `MIT git+https://github.com/gotaker/iMRV-Solomon-Islands.git https://github.com/gotaker/iMRV-Solomon-Islands#readme`
 
 - [ ] **Step 4: Verify no bitbucket references remain in package.json**
 
@@ -110,11 +110,11 @@ git commit -m "chore: update package.json to MIT license and current GitHub orig
 
 ---
 
-## Task 3: Rename `tridotstech` → `NetZeroLabs` across the repo
+## Task 3: Rename `NetZeroLabs` → `NetZeroLabs` across the repo
 
 **Files:**
 
-- Modify: every file (tracked or untracked) under the repo root that contains `tridotstech` (case-insensitive). Expected ~100 files. `package.json` is excluded — it was already handled in Task 2 and its `tridotstech2019` substring must not become `NetZeroLabs2019`.
+- Modify: every file (tracked or untracked) under the repo root that contains `NetZeroLabs` (case-insensitive). Expected ~100 files. `package.json` is excluded — it was already handled in Task 2 and its `NetZeroLabs2019` substring must not become `NetZeroLabs2019`.
 
 **Important:** the repo already has pre-existing uncommitted work (`CLAUDE.md`, `setup_sidebarmenu.py`, `frappe_side_menu/`, modified `.gitignore` / `MANIFEST.in` / `README.md`, and `requirements 2.txt`) that is NOT part of this plan. The commands below stage only files the rename actually touched, so that pre-existing dirty state is left exactly as it was.
 
@@ -123,20 +123,20 @@ git commit -m "chore: update package.json to MIT license and current GitHub orig
 Run, from the repo root:
 
 ```bash
-grep -r -l -i "tridotstech" . \
+grep -r -l -i "NetZeroLabs" . \
   --exclude-dir=.git \
   --exclude-dir=node_modules \
   --exclude-dir=__pycache__ \
   --exclude="package.json" \
-  > /tmp/tridotstech_files.txt
-wc -l /tmp/tridotstech_files.txt
+  > /tmp/NetZeroLabs_files.txt
+wc -l /tmp/NetZeroLabs_files.txt
 ```
 
 Expected: a positive count (~100). Save this list — the subsequent steps operate on exactly these files.
 
 - [ ] **Step 2: Verify `package.json` is already clean (from Task 2)**
 
-Run: `grep -c tridotstech package.json || true`
+Run: `grep -c NetZeroLabs package.json || true`
 Expected: `0`. If non-zero, Task 2 was not fully applied — fix before continuing.
 
 - [ ] **Step 3: First pass — rewrite email forms (fix `.om` typo, lowercase both variants)**
@@ -144,25 +144,25 @@ Expected: `0`. If non-zero, Task 2 was not fully applied — fix before continui
 Run:
 
 ```bash
-xargs -a /tmp/tridotstech_files.txt sed -i.bak -E 's/tridotstech\.om/netzerolabs.com/g; s/tridotstech\.com/netzerolabs.com/g'
+xargs -a /tmp/NetZeroLabs_files.txt sed -i.bak -E 's/NetZeroLabs\.om/netzerolabs.io/g; s/NetZeroLabs\.com/netzerolabs.io/g'
 ```
 
 Both GNU sed (Linux) and BSD sed (macOS) accept `-i.bak`; the `.bak` files are cleaned up in step 6.
 
-- [ ] **Step 4: Second pass — rewrite remaining bare `tridotstech` → `NetZeroLabs`**
+- [ ] **Step 4: Second pass — rewrite remaining bare `NetZeroLabs` → `NetZeroLabs`**
 
 Run:
 
 ```bash
-xargs -a /tmp/tridotstech_files.txt sed -i.bak 's/tridotstech/NetZeroLabs/g'
+xargs -a /tmp/NetZeroLabs_files.txt sed -i.bak 's/NetZeroLabs/NetZeroLabs/g'
 ```
 
-- [ ] **Step 5: Verify no `tridotstech` references remain**
+- [ ] **Step 5: Verify no `NetZeroLabs` references remain**
 
 Run:
 
 ```bash
-grep -r -i -l tridotstech . \
+grep -r -i -l NetZeroLabs . \
   --exclude-dir=.git \
   --exclude-dir=node_modules \
   --exclude-dir=__pycache__ \
@@ -181,11 +181,11 @@ Run: `head -1 mrvtools/mrvtools/doctype/my_approval/my_approval.py`
 Expected: `# Copyright (c) 2024, NetZeroLabs and contributors`
 
 Run: `grep -E '^(app_publisher|app_email)' mrvtools/hooks.py`
-Expected output contains `app_publisher = "NetZeroLabs"` and `app_email = "info@netzerolabs.com"`.
+Expected output contains `app_publisher = "NetZeroLabs"` and `app_email = "info@netzerolabs.io"`.
 
 - [ ] **Step 8: Stage only the files the rename touched**
 
-Run: `xargs -a /tmp/tridotstech_files.txt git add --`
+Run: `xargs -a /tmp/NetZeroLabs_files.txt git add --`
 
 This stages both previously-tracked-and-modified files and untracked files that the rename rewrote, while leaving all unrelated pre-existing uncommitted work alone. Do NOT use `git add -A`.
 
@@ -197,7 +197,7 @@ Expected: within a few of the line count from Step 1. If dramatically lower, inv
 - [ ] **Step 10: Commit**
 
 ```bash
-git commit -m "chore: rename tridotstech -> NetZeroLabs across the repo"
+git commit -m "chore: rename NetZeroLabs -> NetZeroLabs across the repo"
 ```
 
 ---
@@ -1098,7 +1098,7 @@ git commit -m "docs: point CLAUDE.md at install.sh for one-command bootstrap"
 ## Post-plan checklist
 
 - [ ] All 12 tasks committed; `git log --oneline` shows 12 new commits above the starting `master` HEAD.
-- [ ] `git grep -i tridotstech` returns zero matches (or exits 1 with no output).
+- [ ] `git grep -i NetZeroLabs` returns zero matches (or exits 1 with no output).
 - [ ] `grep -c bitbucket package.json || true` prints `0`.
 - [ ] `head -1 license.txt` prints `MIT License`.
 - [ ] `shellcheck install.sh` exits cleanly.
