@@ -68,6 +68,8 @@ Both new scripts source the same defaults block `install.sh` already uses, so a 
 
 `MYSQL_ROOT_PASSWORD` is **not** required by `start.sh` or `shutdown.sh` — bench reads its own credentials from `site_config.json`.
 
+**Bench port discovery.** Both scripts call a `discover_bench_ports` helper (after `verify_bench_dir`, before phases) that reads `$BENCH_DIR/sites/common_site_config.json` and sets four script-local variables: `WEB_PORT`, `SOCKETIO_PORT`, `REDIS_CACHE_PORT`, `REDIS_QUEUE_PORT`. Defaults are 8000/9000/13000/11000. The fallback applies when the file is missing or a key is absent. Vite stays hardcoded at 8080 (it's run by us, not bench). This lets the scripts work against benches with offset ports — e.g. `frappe-bench-mrv` running alongside `frappe-bench` will get 8001/9001/13001/11001.
+
 ## `start.sh`
 
 **Invocation:** `./start.sh --dev | --prod`
@@ -88,14 +90,14 @@ Both new scripts source the same defaults block `install.sh` already uses, so a 
    - `cd $MRVTOOLS_SRC/frontend && nohup yarn dev >>$BENCH_DIR/.mrv/logs/vite.log 2>&1 &`
    - `echo $! > $BENCH_DIR/.mrv/pids/vite.pid`
 5. **Wait for readiness.**
-   - Poll `curl -fsS http://127.0.0.1:8000/api/method/ping` every 1s, 60s timeout.
-   - Dev only: also poll `curl -fsS http://127.0.0.1:8080`, 30s timeout.
+   - Poll `curl -fsS http://$SITE_NAME:$WEB_PORT/api/method/ping` every 1s, 60s timeout. Use `$SITE_NAME` (not `127.0.0.1`) because Frappe matches the `Host` header against site names — a request to `127.0.0.1` wouldn't match any site and would return 404. `*.localhost` resolves to 127.0.0.1 via reserved-TLD behavior, so `mrv.localhost` works without /etc/hosts edits. `$WEB_PORT` comes from `webserver_port` in `$BENCH_DIR/sites/common_site_config.json` (default 8000) — bench uses offset ports when multiple benches coexist on one host (e.g. `frappe-bench-mrv` on a host that already has `frappe-bench` will get 8001).
+   - Dev only: also poll `curl -fsS http://127.0.0.1:8080`, 30s timeout. (Vite is not bench-managed and stays on 8080; it has no host-based routing so 127.0.0.1 is fine.)
    - On timeout → print last 20 lines of the relevant log + non-zero exit.
-6. **Print URLs and tail hints** on success:
+6. **Print URLs and tail hints** on success (URL uses `$WEB_PORT` discovered above):
 
    ```text
-   Frappe:  http://mrv.localhost:8000   (logs: tail -f $BENCH_DIR/.mrv/logs/bench.log)
-   Vite:    http://localhost:8080       (logs: tail -f $BENCH_DIR/.mrv/logs/vite.log)
+   Frappe:  http://mrv.localhost:$WEB_PORT   (logs: tail -f $BENCH_DIR/.mrv/logs/bench.log)
+   Vite:    http://localhost:8080            (logs: tail -f $BENCH_DIR/.mrv/logs/vite.log)
    Stop:    ./shutdown.sh
    ```
 
@@ -117,7 +119,7 @@ Both new scripts source the same defaults block `install.sh` already uses, so a 
 2. **Stop tracked processes** (Vite first, then bench — reverse start order, since Vite proxying to bench can throw noisy errors if bench dies first):
    - For each pid file: read pid; if alive → `kill -TERM <pid>`; wait up to 10s for exit; if still alive → `kill -KILL <pid>`; remove pid file.
    - If pid file missing or pid dead → log `not running`, continue (no error).
-3. **Orphan port sweep.** Scan `lsof -iTCP:8000,8080,9000,11000,13000 -sTCP:LISTEN`. For any listener whose pid is the user's own and whose command name is in `{bench, node, redis-server, gunicorn}`, log + SIGTERM (10s wait) → SIGKILL. (This catches the orphan-redis case where bench died without cleanup.)
+3. **Orphan port sweep.** Scan the bench's actual ports — `$WEB_PORT`, `$SOCKETIO_PORT`, `$REDIS_CACHE_PORT`, `$REDIS_QUEUE_PORT` (all read from `$BENCH_DIR/sites/common_site_config.json`, defaults 8000/9000/13000/11000), plus `8080` for Vite. For any listener whose pid is the user's own and whose command name is in `{bench, node, redis-server (or Linux-truncated redis-ser), gunicorn, honcho}`, log + SIGTERM (10s wait) → SIGKILL. (`honcho` is the supervisor bench uses to multiplex its subprocesses.) Reading ports from config is what makes the sweep work for benches with offset ports (e.g. `frappe-bench-mrv` on 8001/9001/13001/11001).
 4. **`--full` only:** stop MariaDB and Redis system services.
    - macOS: `brew services stop mariadb && brew services stop redis`.
    - Ubuntu native: `sudo systemctl stop mariadb redis-server`.
@@ -175,7 +177,7 @@ Edits, not a rewrite:
 3. **"Quick starts → Developer laptop"** — replace the two-terminal `bench start` / `yarn dev` instructions with: install completes → URL is live → `./shutdown.sh` when done.
 4. **"Uninstall"** — prepend `./shutdown.sh --full` before the `rm -rf` and `brew services stop` lines.
 5. **"Troubleshooting"** — new row:
-   - *Symptom:* `start.sh` reports "stale pid, removing" or port 13000/11000 bound by orphaned `redis-server`.
+   - *Symptom:* `start.sh` reports "stale pid, removing" or a bench-managed redis port (e.g. 13000/11000, or 13001/11001 on offset benches) is bound by an orphaned `redis-server`.
    - *Cause:* previous `bench start` killed without cleanup.
    - *Fix:* `./shutdown.sh` is safe to run any time — it sweeps orphan ports.
 6. **"See also"** — add `start.sh` and `shutdown.sh` lines.
