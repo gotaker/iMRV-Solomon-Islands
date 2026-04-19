@@ -10,7 +10,7 @@
 - Keep `MRVTOOLS_SRC` / `SIDE_MENU_SRC` defaulting to the local repo path for now. No new URL-override env vars.
 - DNS multitenant is **always on** in prod.
 - `github.com/rajeshscs/MRV-Solomon-Islands` is the canonical origin of record after this branch lands.
-- Production domain is `demo.imrv.netzerolabs.com` — hardcoded as the default value of `PROD_DOMAIN`, overridable via env var.
+- Production domain is `demo.imrv.netzerolabs.io` — hardcoded as the default value of `PROD_DOMAIN`, overridable via env var.
 - TLS path uses `bench setup lets-encrypt` (Frappe-blessed one-liner), not the manual's raw snap+certbot flow. Remains opt-in (`PROD_ENABLE_TLS=1`).
 
 **What's deliberately out of scope:** `MRVTOOLS_SOURCE` / `FRAPPE_SIDE_MENU_SOURCE` URL overrides; updating the manual PDF itself; wkhtmltopdf on macOS (brew ships the patched build).
@@ -184,7 +184,7 @@ Replace with:
 
 ```bash
 PROD_USER="${PROD_USER:-${USER:-root}}"
-PROD_DOMAIN="${PROD_DOMAIN:-demo.imrv.netzerolabs.com}"
+PROD_DOMAIN="${PROD_DOMAIN:-demo.imrv.netzerolabs.io}"
 PROD_ENABLE_TLS="${PROD_ENABLE_TLS:-0}"
 DRY_RUN="${DRY_RUN:-0}"
 ```
@@ -201,7 +201,7 @@ Insert two new lines immediately after it:
 
 ```text
   PROD_USER               ($USER)                       User for bench setup production
-  PROD_DOMAIN             (demo.imrv.netzerolabs.com)    In --prod, the FQDN attached via bench setup add-domain
+  PROD_DOMAIN             (demo.imrv.netzerolabs.io)    In --prod, the FQDN attached via bench setup add-domain
   PROD_ENABLE_TLS         (0)                            If 1 in --prod, run bench setup lets-encrypt (Ubuntu only)
 ```
 
@@ -269,14 +269,14 @@ bash -n install.sh && shellcheck install.sh
 
 Expected: both clean.
 
-- [ ] **Step 5: DRY_RUN verify — default prod (domain defaults to demo.imrv.netzerolabs.com, TLS off)**
+- [ ] **Step 5: DRY_RUN verify — default prod (domain defaults to demo.imrv.netzerolabs.io, TLS off)**
 
 ```bash
 DRY_RUN=1 MYSQL_ROOT_PASSWORD=test PROD_USER=ubuntu ./install.sh --prod 2>&1 \
   | sed -n '/==> configure_prod/,/install.sh finished/p'
 ```
 
-Expected output includes `DRY_RUN: bench config dns_multitenant on` before `DRY_RUN: sudo bench setup production ubuntu`, then `DRY_RUN: bench setup add-domain demo.imrv.netzerolabs.com --site mrv.localhost`, and NO `lets-encrypt` line (PROD_ENABLE_TLS defaults to 0).
+Expected output includes `DRY_RUN: bench config dns_multitenant on` before `DRY_RUN: sudo bench setup production ubuntu`, then `DRY_RUN: bench setup add-domain demo.imrv.netzerolabs.io --site mrv.localhost`, and NO `lets-encrypt` line (PROD_ENABLE_TLS defaults to 0).
 
 - [ ] **Step 6: DRY_RUN verify — prod with domain + TLS**
 
@@ -296,7 +296,7 @@ On Ubuntu: the final block includes `DRY_RUN: sudo -H bench setup lets-encrypt m
 DRY_RUN=1 MYSQL_ROOT_PASSWORD=test PROD_DOMAIN= PROD_ENABLE_TLS=1 ./install.sh --prod; echo exit=$?
 ```
 
-Expected: prints `ERR:  PROD_ENABLE_TLS=1 requires PROD_DOMAIN to be set`, then `exit=1`. (Passing an empty string explicitly overrides the `demo.imrv.netzerolabs.com` default.)
+Expected: prints `ERR:  PROD_ENABLE_TLS=1 requires PROD_DOMAIN to be set`, then `exit=1`. (Passing an empty string explicitly overrides the `demo.imrv.netzerolabs.io` default.)
 
 - [ ] **Step 8: Commit**
 
