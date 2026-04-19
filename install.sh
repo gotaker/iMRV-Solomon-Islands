@@ -292,13 +292,73 @@ create_site() {
 }
 get_and_install_apps() {
   step "get_and_install_apps"
+  _stage_frappe_side_menu
   _get_and_install_one mrvtools          "$MRVTOOLS_SRC"
   _get_and_install_one frappe_side_menu  "$SIDE_MENU_SRC"
+  _ensure_bench_redis
   info "running bench migrate"
   (
     [[ "$DRY_RUN" == "1" ]] || cd "$BENCH_DIR"
     run bench --site "$SITE_NAME" migrate
   )
+}
+
+_ensure_bench_redis() {
+  # bench migrate talks to redis_cache (port 13000) and redis_queue (port 11000),
+  # which bench manages separately from the system redis. These normally start
+  # with `bench start`, but we need them up now.
+  if [[ "$DRY_RUN" == "1" ]]; then
+    printf 'DRY_RUN: start bench redis_cache and redis_queue if not running\n'
+    return
+  fi
+  (
+    cd "$BENCH_DIR"
+    for name in redis_cache redis_queue; do
+      local conf="config/$name.conf"
+      local port
+      port="$(awk '/^port/ {print $2; exit}' "$conf" 2>/dev/null || true)"
+      if [[ -n "$port" ]] && lsof -iTCP:"$port" -sTCP:LISTEN &>/dev/null; then
+        skip "$name on :$port"
+      else
+        info "starting $name"
+        redis-server "$conf" --daemonize yes
+      fi
+    done
+  )
+}
+
+_stage_frappe_side_menu() {
+  # frappe_side_menu shares the repo root with mrvtools and has no standalone
+  # setup.py in its module dir — bench get-app can't install it directly.
+  # Build a pip-shaped staging dir with setup.py next to the module, and point
+  # SIDE_MENU_SRC at it. Skipped if SIDE_MENU_SRC already has a setup.py
+  # (user pointing at a pre-staged dir or a proper standalone clone).
+  if [[ -f "$SIDE_MENU_SRC/setup.py" ]]; then
+    skip "SIDE_MENU_SRC has setup.py (no staging needed)"
+    return
+  fi
+  local stage="$BENCH_DIR/.stage/frappe_side_menu"
+  if [[ "$DRY_RUN" == "1" ]]; then
+    printf 'DRY_RUN: stage %s as pip package at %s\n' "$SIDE_MENU_SRC" "$stage"
+    SIDE_MENU_SRC="$stage"
+    return
+  fi
+  info "staging frappe_side_menu at $stage"
+  rm -rf "$stage"
+  mkdir -p "$stage"
+  cp -R "$SIDE_MENU_SRC" "$stage/frappe_side_menu"
+  cp "$MRVTOOLS_SRC/setup_sidebarmenu.py" "$stage/setup.py"
+  cp "$MRVTOOLS_SRC/requirements.txt" "$stage/requirements.txt"
+  [[ -f "$MRVTOOLS_SRC/license.txt" ]] && cp "$MRVTOOLS_SRC/license.txt" "$stage/license.txt"
+  # bench get-app calls git.Repo(src) on local paths — stage must be a git
+  # repo or bench falls back to URL parsing and dies on missing org attribute.
+  (
+    cd "$stage"
+    git -c init.defaultBranch=master init -q
+    git add -A
+    git -c user.name=install.sh -c user.email=install@localhost commit -q -m "stage"
+  )
+  SIDE_MENU_SRC="$stage"
 }
 
 _get_and_install_one() {
