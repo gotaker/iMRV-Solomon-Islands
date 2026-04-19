@@ -134,7 +134,7 @@ _install_system_deps_macos() {
     err "Homebrew is required on macOS. Install from https://brew.sh and re-run."
     exit 1
   fi
-  local pkgs=(git python@3.11 node@18 yarn mariadb redis wkhtmltopdf pipx)
+  local pkgs=(git python@3.11 node@18 yarn mariadb redis pipx)
   local pkg
   for pkg in "${pkgs[@]}"; do
     if brew list "$pkg" &>/dev/null; then
@@ -143,8 +143,23 @@ _install_system_deps_macos() {
       run brew install "$pkg"
     fi
   done
+  _ensure_wkhtmltopdf_macos
   run brew services start mariadb
   run brew services start redis
+}
+
+_ensure_wkhtmltopdf_macos() {
+  # wkhtmltopdf was removed from Homebrew (upstream abandoned). Accept any
+  # existing patched-Qt binary on PATH; otherwise fail with a manual-install hint.
+  if command -v wkhtmltopdf &>/dev/null && \
+     wkhtmltopdf --version 2>&1 | grep -qi 'with patched qt'; then
+    skip "wkhtmltopdf (patched Qt build already on PATH)"
+    return
+  fi
+  err "wkhtmltopdf with patched Qt not found. Download the macOS pkg from"
+  err "  https://github.com/wkhtmltopdf/packaging/releases/tag/0.12.6-2"
+  err "install it, then re-run this script."
+  exit 1
 }
 
 _install_system_deps_ubuntu() {
@@ -184,17 +199,22 @@ _install_system_deps_ubuntu() {
 }
 
 _ensure_mariadb_root_password() {
+  # Frappe connects via TCP with a password, so we must verify TCP+password auth
+  # actually works — not just a socket ping. `mysqladmin ping` exits 0 even on
+  # auth failure (errors go to stderr), so use `mariadb -e 'SELECT 1'` instead,
+  # forcing TCP with -h 127.0.0.1 so socket `unix_socket` auth doesn't mask failure.
   if [[ "$DRY_RUN" == "1" ]]; then
     printf 'DRY_RUN: verify/set mariadb root password\n'
     return
   fi
-  if mysqladmin ping -u root -p"$MYSQL_ROOT_PASSWORD" &>/dev/null; then
+  if mariadb -u root -p"$MYSQL_ROOT_PASSWORD" -h 127.0.0.1 -e 'SELECT 1' &>/dev/null; then
     skip "mariadb root password already matches"
-  elif mysqladmin ping -u root &>/dev/null; then
-    info "setting mariadb root password"
-    mysqladmin -u root password "$MYSQL_ROOT_PASSWORD"
+  elif mariadb -u root -e 'SELECT 1' &>/dev/null; then
+    info "setting mariadb root password via socket login"
+    mariadb -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD'; FLUSH PRIVILEGES;"
   else
     err "mariadb root password is set to something different from \$MYSQL_ROOT_PASSWORD"
+    err "and socket login also failed. Reset root auth manually and re-run."
     exit 1
   fi
 }
@@ -289,7 +309,10 @@ _get_and_install_one() {
     if [[ -d "apps/$app" ]]; then
       skip "apps/$app already fetched"
     else
-      run bench get-app "$app" "$src"
+      # --skip-assets: frontend build happens later in build_frontend, and the
+      # mrvtools frontend needs `yarn install` in apps/mrvtools/frontend first
+      # or the auto-build fails with "vite: command not found".
+      run bench get-app --skip-assets "$app" "$src"
     fi
     if [[ "$DRY_RUN" == "1" ]]; then
       printf 'DRY_RUN: bench --site %s install-app %s (if not already installed)\n' \
@@ -334,9 +357,17 @@ PY
 }
 build_frontend() {
   step "build_frontend"
-  local fe="$MRVTOOLS_SRC/frontend"
+  # Build inside the bench's app clone, not the source repo — Frappe serves
+  # /assets/mrvtools/frontend/ from apps/mrvtools/mrvtools/public/ and the
+  # Vite build's outDir resolves relative to this frontend/ location.
+  local fe="$BENCH_DIR/apps/mrvtools/frontend"
+  if [[ "$DRY_RUN" == "1" ]]; then
+    printf 'DRY_RUN: yarn install --frozen-lockfile (in %s)\n' "$fe"
+    printf 'DRY_RUN: yarn build (in %s)\n' "$fe"
+    return
+  fi
   if [[ ! -d "$fe" ]]; then
-    err "frontend directory not found at $fe"
+    err "frontend directory not found at $fe (did bench get-app mrvtools run?)"
     exit 1
   fi
   (
