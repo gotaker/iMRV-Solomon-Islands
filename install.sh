@@ -193,9 +193,46 @@ _ensure_mariadb_root_password() {
     exit 1
   fi
 }
-install_bench_cli()    { step "install_bench_cli"; :; }
-init_bench()           { step "init_bench"; :; }
-create_site()          { step "create_site"; :; }
+install_bench_cli() {
+  step "install_bench_cli"
+  if command -v bench &>/dev/null; then
+    skip "bench CLI already on PATH"
+    return
+  fi
+  run pipx install frappe-bench
+  # pipx installs into ~/.local/bin which may not be on PATH in this shell.
+  if ! command -v bench &>/dev/null && [[ -x "$HOME/.local/bin/bench" ]]; then
+    export PATH="$HOME/.local/bin:$PATH"
+    info "prepended \$HOME/.local/bin to PATH for this session"
+  fi
+}
+
+init_bench() {
+  step "init_bench"
+  if [[ -d "$BENCH_DIR" ]]; then
+    skip "bench directory exists at $BENCH_DIR"
+    return
+  fi
+  run bench init \
+    --python "python$PYTHON_VERSION" \
+    --frappe-branch "$FRAPPE_BRANCH" \
+    "$BENCH_DIR"
+}
+
+create_site() {
+  step "create_site"
+  if [[ -d "$BENCH_DIR/sites/$SITE_NAME" ]]; then
+    skip "site $SITE_NAME already exists"
+    return
+  fi
+  (
+    cd "$BENCH_DIR"
+    run bench new-site \
+      --mariadb-root-password "$MYSQL_ROOT_PASSWORD" \
+      --admin-password "$ADMIN_PASSWORD" \
+      "$SITE_NAME"
+  )
+}
 get_and_install_apps() { step "get_and_install_apps"; :; }
 patch_site_config()    { step "patch_site_config"; :; }
 build_frontend()       { step "build_frontend"; :; }
