@@ -11,7 +11,7 @@ setup(
 	version=version,
 	description="Frappe Side Menu",
 	author="NetZeroLabs",
-	author_email="info@netzerolabs.com",
+	author_email="info@netzerolabs.io",
 	packages=find_packages(),
 	zip_safe=False,
 	include_package_data=True,

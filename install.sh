@@ -27,7 +27,7 @@ Environment variables (defaults in parens):
   SIDE_MENU_SRC           (auto)                Repo path for bench get-app frappe_side_menu
   SKIP_SYSTEM_DEPS        (0)                   Set to 1 to skip OS package install
   PROD_USER               ($USER)                       User for bench setup production
-  PROD_DOMAIN             (demo.imrv.netzerolabs.com)    In --prod, the FQDN attached via bench setup add-domain
+  PROD_DOMAIN             (demo.imrv.netzerolabs.io)    In --prod, the FQDN attached via bench setup add-domain
   PROD_ENABLE_TLS         (0)                            If 1 in --prod, run bench setup lets-encrypt (Ubuntu only)
   DRY_RUN                 (0)                   Set to 1 to echo commands instead of running
 EOF
@@ -46,7 +46,7 @@ MRVTOOLS_SRC="${MRVTOOLS_SRC:-$SCRIPT_DIR}"
 SIDE_MENU_SRC="${SIDE_MENU_SRC:-$MRVTOOLS_SRC/frappe_side_menu}"
 SKIP_SYSTEM_DEPS="${SKIP_SYSTEM_DEPS:-0}"
 PROD_USER="${PROD_USER:-${USER:-root}}"
-PROD_DOMAIN="${PROD_DOMAIN:-demo.imrv.netzerolabs.com}"
+PROD_DOMAIN="${PROD_DOMAIN:-demo.imrv.netzerolabs.io}"
 PROD_ENABLE_TLS="${PROD_ENABLE_TLS:-0}"
 DRY_RUN="${DRY_RUN:-0}"
 

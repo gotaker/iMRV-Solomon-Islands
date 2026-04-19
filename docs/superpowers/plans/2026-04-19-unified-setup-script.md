@@ -144,7 +144,7 @@ Expected: `0`. If non-zero, Task 2 was not fully applied — fix before continui
 Run:
 
 ```bash
-xargs -a /tmp/NetZeroLabs_files.txt sed -i.bak -E 's/NetZeroLabs\.om/netzerolabs.com/g; s/NetZeroLabs\.com/netzerolabs.com/g'
+xargs -a /tmp/NetZeroLabs_files.txt sed -i.bak -E 's/NetZeroLabs\.om/netzerolabs.io/g; s/NetZeroLabs\.com/netzerolabs.io/g'
 ```
 
 Both GNU sed (Linux) and BSD sed (macOS) accept `-i.bak`; the `.bak` files are cleaned up in step 6.
@@ -181,7 +181,7 @@ Run: `head -1 mrvtools/mrvtools/doctype/my_approval/my_approval.py`
 Expected: `# Copyright (c) 2024, NetZeroLabs and contributors`
 
 Run: `grep -E '^(app_publisher|app_email)' mrvtools/hooks.py`
-Expected output contains `app_publisher = "NetZeroLabs"` and `app_email = "info@netzerolabs.com"`.
+Expected output contains `app_publisher = "NetZeroLabs"` and `app_email = "info@netzerolabs.io"`.
 
 - [ ] **Step 8: Stage only the files the rename touched**
 

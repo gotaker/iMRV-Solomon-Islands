@@ -4,7 +4,7 @@ app_name = "frappe_side_menu"
 app_title = "Frappe Side Menu"
 app_publisher = "NetZeroLabs"
 app_description = "Frappe Side Menu"
-app_email = "info@netzerolabs.com"
+app_email = "info@netzerolabs.io"
 app_license = "MIT"
 
 # Includes in <head>

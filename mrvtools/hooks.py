@@ -6,7 +6,7 @@ app_name = "mrvtools"
 app_title = "Mrvtools"
 app_publisher = "NetZeroLabs"
 app_description = "mrvtools"
-app_email = "info@netzerolabs.com"
+app_email = "info@netzerolabs.io"
 app_license = "MIT"
 
 
