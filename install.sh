@@ -54,7 +54,7 @@ CURRENT_PHASE=""
 # --- Logging -------------------------------------------------------------
 step() { CURRENT_PHASE="$1"; printf '\n==> %s\n' "$1" >&2; }
 info() { printf '    %s\n' "$*" >&2; }
-skip() { printf '--> skipping %s: already done\n' "$*" >&2; }
+skip() { printf -- '--> skipping %s: already done\n' "$*" >&2; }
 warn() { printf 'WARN: %s\n' "$*" >&2; }
 err()  { printf 'ERR:  %s\n' "$*" >&2; }
 
@@ -111,7 +111,88 @@ detect_os() {
 }
 
 # --- Phase stubs (filled in by later tasks) ------------------------------
-install_system_deps()  { step "install_system_deps"; :; }
+install_system_deps() {
+  step "install_system_deps"
+  if [[ "$SKIP_SYSTEM_DEPS" == "1" ]]; then
+    skip "system deps: SKIP_SYSTEM_DEPS=1"
+    return
+  fi
+  if [[ "$OS" == "macos" ]]; then
+    _install_system_deps_macos
+  else
+    _install_system_deps_ubuntu
+  fi
+  _ensure_mariadb_root_password
+}
+
+_install_system_deps_macos() {
+  if ! command -v brew &>/dev/null; then
+    err "Homebrew is required on macOS. Install from https://brew.sh and re-run."
+    exit 1
+  fi
+  local pkgs=(python@3.11 node@18 yarn mariadb redis wkhtmltopdf pipx)
+  local pkg
+  for pkg in "${pkgs[@]}"; do
+    if brew list "$pkg" &>/dev/null; then
+      skip "brew $pkg"
+    else
+      run brew install "$pkg"
+    fi
+  done
+  run brew services start mariadb
+  run brew services start redis
+}
+
+_install_system_deps_ubuntu() {
+  run sudo apt-get update
+  local pkgs=(python3.11 python3.11-venv python3-dev mariadb-server redis-server
+              wkhtmltopdf build-essential libssl-dev libffi-dev xvfb libfontconfig pipx)
+  local pkg
+  for pkg in "${pkgs[@]}"; do
+    if dpkg -s "$pkg" &>/dev/null; then
+      skip "apt $pkg"
+    else
+      run sudo apt-get install -y "$pkg"
+    fi
+  done
+
+  # Node via NodeSource if missing or too old
+  local current_major=0
+  if command -v node &>/dev/null; then
+    current_major="$(node -v | sed -E 's/^v([0-9]+).*/\1/')"
+  fi
+  if [[ "$current_major" -lt "$NODE_VERSION" ]]; then
+    run_sh "curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | sudo -E bash -"
+    run sudo apt-get install -y nodejs
+  else
+    skip "node (current v$current_major >= v$NODE_VERSION)"
+  fi
+  run sudo corepack enable
+
+  if [[ "$IS_WSL" == "1" ]]; then
+    run sudo service mariadb start
+    run sudo service redis-server start
+  else
+    run sudo systemctl start mariadb
+    run sudo systemctl start redis-server
+  fi
+}
+
+_ensure_mariadb_root_password() {
+  if [[ "$DRY_RUN" == "1" ]]; then
+    printf 'DRY_RUN: verify/set mariadb root password\n'
+    return
+  fi
+  if mysqladmin ping -u root -p"$MYSQL_ROOT_PASSWORD" &>/dev/null; then
+    skip "mariadb root password already matches"
+  elif mysqladmin ping -u root &>/dev/null; then
+    info "setting mariadb root password"
+    mysqladmin -u root password "$MYSQL_ROOT_PASSWORD"
+  else
+    err "mariadb root password is set to something different from \$MYSQL_ROOT_PASSWORD"
+    exit 1
+  fi
+}
 install_bench_cli()    { step "install_bench_cli"; :; }
 init_bench()           { step "init_bench"; :; }
 create_site()          { step "create_site"; :; }
