@@ -21,12 +21,8 @@ ignore = [
     "E712",  # comparison to True/False — pre-existing in legacy controllers
     "E721",  # type comparison — pre-existing in legacy controllers
     "E722",  # bare except — pre-existing defensive `except:` in legacy controllers
-    "F401",  # unused import — pre-existing; per-file-ignore already covers __init__.py re-exports
     "F522",  # .format extra named arguments — pre-existing dead kwargs in two legacy SQL builders
-    "F541",  # f-string missing placeholders — pre-existing; harmless
-    "F811",  # redefined while unused — one pre-existing occurrence; revisit with a dedicated pass
     "F841",  # unused local variable — pre-existing throughout GHG inventory calc modules
-    "I001",  # unsorted imports — not enforced yet; re-enable after a repo-wide `ruff check --fix`
 ]
 
 [lint.per-file-ignores]
