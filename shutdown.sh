@@ -51,7 +51,8 @@ VITE_PORT=8080
 SWEEP_PORTS=()
 
 # Process names we are willing to kill during the orphan sweep.
-ORPHAN_COMMANDS_REGEX='^(bench|node|redis-ser|gunicorn|honcho)$'
+# Match either Linux's 15-char-truncated comm (e.g. "redis-ser") or full names.
+ORPHAN_COMMANDS_REGEX='^(bench|node|redis-server|redis-ser|gunicorn|honcho)$'
 
 # --- Logging -------------------------------------------------------------
 step() { CURRENT_PHASE="$1"; printf '\n==> %s\n' "$1" >&2; }
@@ -207,7 +208,10 @@ sweep_orphan_ports() {
         info "port $port held by pid $pid (user=$owner) — not ours, skipping"
         continue
       fi
-      cmd="$(ps -o comm= -p "$pid" 2>/dev/null | awk -F/ '{print $NF}' | tr -d '[:space:]')"
+      # `ps -o comm=` on macOS returns "/path/to/binary arg1 arg2"; on Linux it's
+      # often the truncated 15-char comm. `awk '{print $1}'` strips arguments;
+      # `awk -F/ '{print $NF}'` strips the path. Result is the bare binary name.
+      cmd="$(ps -o comm= -p "$pid" 2>/dev/null | awk '{print $1}' | awk -F/ '{print $NF}')"
       if [[ ! "$cmd" =~ $ORPHAN_COMMANDS_REGEX ]]; then
         info "port $port held by pid $pid (cmd=$cmd) — not in allowlist, skipping"
         continue
