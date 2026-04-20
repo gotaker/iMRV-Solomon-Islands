@@ -92,3 +92,44 @@ RUN bench init \
       frappe-bench
 
 WORKDIR /home/frappe/frappe-bench
+
+# ---------- Stage apps into the build context ----------
+USER root
+
+# Copy the whole repo into /src, owned by frappe. .dockerignore excludes .git,
+# so bench get-app (which calls git.Repo(src)) would fail on the bare tree —
+# we init a throwaway git repo in /src with a single commit.
+RUN mkdir -p /src && chown frappe:frappe /src
+COPY --chown=frappe:frappe . /src
+
+USER frappe
+WORKDIR /src
+RUN git -c init.defaultBranch=master init -q \
+ && git -c user.name=docker -c user.email=docker@local add -A \
+ && git -c user.name=docker -c user.email=docker@local commit -q -m "docker build snapshot"
+
+WORKDIR /home/frappe/frappe-bench
+
+# --- Stage mrvtools ---
+# The repo root IS the mrvtools Python package (setup.py at /src/setup.py
+# installs the mrvtools module at /src/mrvtools).
+RUN bench get-app --skip-assets mrvtools /src
+
+# --- Stage frappe_side_menu ---
+# frappe_side_menu's module lives at /src/frappe_side_menu/ but its setup file
+# is /src/setup_sidebarmenu.py. bench get-app can't handle that shape, so we
+# stage it into .stage/frappe_side_menu/ with setup.py copied in + git-init'd.
+RUN set -eux; \
+    STAGE=/home/frappe/frappe-bench/.stage/frappe_side_menu; \
+    rm -rf "$STAGE"; \
+    mkdir -p "$STAGE"; \
+    cp -R /src/frappe_side_menu "$STAGE/frappe_side_menu"; \
+    cp /src/setup_sidebarmenu.py "$STAGE/setup.py"; \
+    cp /src/requirements.txt "$STAGE/requirements.txt"; \
+    if [ -f /src/license.txt ]; then cp /src/license.txt "$STAGE/license.txt"; fi; \
+    cd "$STAGE"; \
+    git -c init.defaultBranch=master init -q; \
+    git -c user.name=docker -c user.email=docker@local add -A; \
+    git -c user.name=docker -c user.email=docker@local commit -q -m stage; \
+    cd /home/frappe/frappe-bench; \
+    bench get-app --skip-assets frappe_side_menu "$STAGE"
