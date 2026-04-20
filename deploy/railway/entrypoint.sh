@@ -66,20 +66,31 @@ print(f"[entrypoint] wrote {path}")
 PY
 
 # ---- 4. First-boot site creation OR routine migrate ----
+# Pass secrets and site name via the child process's environment (gosu -E
+# preserves them) so a single quote or other shell metacharacter in any value
+# cannot break out of the bash -c string.
 SITE_DIR="$SITES/$SITE_NAME"
 if [[ ! -f "$SITE_DIR/site_config.json" ]]; then
     echo "[entrypoint] first boot — creating site $SITE_NAME"
-    gosu frappe bash -c "cd $BENCH && bench new-site \
-        --mariadb-root-password '$DB_ROOT_PASSWORD' \
-        --admin-password '$ADMIN_PASSWORD' \
-        --no-mariadb-socket \
-        --install-app mrvtools \
-        --install-app frappe_side_menu \
-        '$SITE_NAME'"
+    gosu frappe env \
+        BENCH="$BENCH" \
+        SITE_NAME="$SITE_NAME" \
+        ADMIN_PASSWORD="$ADMIN_PASSWORD" \
+        DB_ROOT_PASSWORD="$DB_ROOT_PASSWORD" \
+        bash -c 'cd "$BENCH" && bench new-site \
+            --mariadb-root-password "$DB_ROOT_PASSWORD" \
+            --admin-password "$ADMIN_PASSWORD" \
+            --no-mariadb-socket \
+            --install-app mrvtools \
+            --install-app frappe_side_menu \
+            "$SITE_NAME"'
     echo "[entrypoint] site created and apps installed"
 else
     echo "[entrypoint] existing site — running migrate"
-    gosu frappe bash -c "cd $BENCH && bench --site '$SITE_NAME' migrate"
+    gosu frappe env \
+        BENCH="$BENCH" \
+        SITE_NAME="$SITE_NAME" \
+        bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" migrate'
 fi
 
 # ---- 5. Set current site ----

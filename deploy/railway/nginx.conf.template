@@ -1,5 +1,5 @@
 # Rendered at container start by entrypoint.sh:
-#   envsubst '$PORT' < nginx.conf.template > /etc/nginx/nginx.conf
+#   envsubst '${PORT} ${SITE_NAME}' < nginx.conf.template > /etc/nginx/nginx.conf
 
 worker_processes 1;
 error_log /dev/stderr warn;
