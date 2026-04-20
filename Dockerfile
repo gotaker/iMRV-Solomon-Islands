@@ -74,3 +74,21 @@ USER frappe
 WORKDIR /home/frappe
 RUN pip install --user --no-cache-dir "frappe-bench==5.22.6" "click<8.1"
 USER root
+
+# ---------- bench init ----------
+# Creates /home/frappe/frappe-bench with frappe framework checked out.
+# --skip-assets: we build assets explicitly later (needs apps installed first).
+# --skip-redis-config-generation: we point at Railway-managed Redis via
+# common_site_config.json at runtime, not the local redis configs bench
+# generates by default.
+USER frappe
+WORKDIR /home/frappe
+RUN bench init \
+      --python python3.11 \
+      --frappe-branch version-15 \
+      --skip-assets \
+      --skip-redis-config-generation \
+      --no-backups \
+      frappe-bench
+
+WORKDIR /home/frappe/frappe-bench
