@@ -32,7 +32,7 @@ chown -R frappe:frappe "$SITES"
 # ---- 2. Render nginx config ----
 # envsubst swaps $PORT from env; all other $vars in the template are nginx
 # variables (prefixed $http_*, $proxy_*, $uri, etc.) — we whitelist only PORT.
-envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
+envsubst '${PORT} ${SITE_NAME}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 echo "[entrypoint] nginx config rendered for PORT=$PORT"
 
 # ---- 3. Render common_site_config.json ----

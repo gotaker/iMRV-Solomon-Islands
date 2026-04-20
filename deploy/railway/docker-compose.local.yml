@@ -1,0 +1,54 @@
+# Local integration test only. Simulates the Railway service topology:
+#   app  <->  mariadb  <->  redis
+# Run:  docker compose -f deploy/railway/docker-compose.local.yml up --build
+# Then: open http://localhost:8080
+services:
+  mariadb:
+    image: mariadb:10.6
+    environment:
+      MYSQL_ROOT_PASSWORD: devrootpw
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --skip-character-set-client-handshake
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-proot", "-pdevrootpw"]
+      interval: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+
+  app:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SITE_NAME: mrv.local
+      ADMIN_PASSWORD: admin
+      DB_HOST: mariadb
+      DB_PORT: "3306"
+      DB_ROOT_PASSWORD: devrootpw
+      REDIS_CACHE_URL: redis://redis:6379/0
+      REDIS_QUEUE_URL: redis://redis:6379/1
+      REDIS_SOCKETIO_URL: redis://redis:6379/2
+      PORT: "8080"
+    ports:
+      - "8080:8080"
+    volumes:
+      - app-sites:/home/frappe/frappe-bench/sites
+
+volumes:
+  mariadb-data:
+  app-sites:
