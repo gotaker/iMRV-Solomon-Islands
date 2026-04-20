@@ -358,7 +358,7 @@ $(document).ready(function() {
 
 
 
-    searchInput.addEventListener('input', function() {
+    searchInput?.addEventListener('input', function() {
         const searchTerm = this.value.trim().toLowerCase();
         const recordList = document.getElementById('recordList');
         const listItems = recordList.getElementsByClassName('listItem');
