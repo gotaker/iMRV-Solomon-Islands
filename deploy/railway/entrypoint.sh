@@ -29,6 +29,15 @@ echo "[entrypoint] SITE_NAME=$SITE_NAME DB_HOST=$DB_HOST PORT=$PORT"
 # On first mount, the Railway volume is owned by root. bench runs as frappe.
 chown -R frappe:frappe "$SITES"
 
+# ---- 1a. Seed sites/ skeleton on first mount ----
+# A fresh Railway volume mount shadows the sites/ directory baked into the
+# image (apps.txt, assets/, etc.), so bench can't find its app list. Copy the
+# template in if the volume is empty.
+if [[ ! -f "$SITES/apps.txt" ]]; then
+    echo "[entrypoint] seeding empty sites volume from /home/frappe/sites-template"
+    gosu frappe cp -an /home/frappe/sites-template/. "$SITES/"
+fi
+
 # ---- 2. Render nginx config ----
 # envsubst swaps $PORT from env; all other $vars in the template are nginx
 # variables (prefixed $http_*, $proxy_*, $uri, etc.) — we whitelist only PORT.

@@ -171,6 +171,13 @@ RUN node -e " \
 RUN cd /home/frappe/frappe-bench \
  && bench build --apps frappe,mrvtools,frappe_side_menu
 
+# ---------- Snapshot the sites/ skeleton ----------
+# If the runtime mounts a persistent volume at /home/frappe/frappe-bench/sites,
+# the mount shadows the apps.txt, assets/, and other files bench init/build
+# wrote into sites/. The entrypoint seeds an empty volume from this snapshot.
+RUN cp -a /home/frappe/frappe-bench/sites /home/frappe/sites-template \
+ && chown -R frappe:frappe /home/frappe/sites-template
+
 # ---------- Configs + entrypoint ----------
 USER root
 
