@@ -531,6 +531,53 @@ configure_prod() {
   fi
 }
 
+ensure_asset_symlinks() {
+  step "ensure_asset_symlinks"
+  # bench get-app --skip-assets (used above to avoid yarn-install ordering
+  # issues) also skips the sites/assets/<app> symlinks that Frappe needs to
+  # serve /assets/<app>/* as static files. Without these, requests 404 and
+  # the browser reports 'Loading module ... was blocked because of a
+  # disallowed MIME type ("text/html")'. Create them explicitly.
+  if [[ "$DRY_RUN" == "1" ]]; then
+    printf 'DRY_RUN: symlink sites/assets/{mrvtools,frappe_side_menu} -> apps/<app>/<app>/public\n'
+    return
+  fi
+  local assets_dir="$BENCH_DIR/sites/assets"
+  run mkdir -p "$assets_dir"
+  local app link target
+  for app in mrvtools frappe_side_menu; do
+    link="$assets_dir/$app"
+    target="../../apps/$app/$app/public"
+    if [[ -L "$link" && "$(readlink "$link")" == "$target" ]]; then
+      skip "symlink sites/assets/$app"
+    else
+      run ln -sfn "$target" "$link"
+    fi
+  done
+}
+
+ensure_site_hostname() {
+  step "ensure_site_hostname"
+  # Linux's Node.js does not auto-resolve *.localhost per RFC 6761 — the
+  # socketio daemon fails with 'getaddrinfo ENOTFOUND <site>' even though the
+  # browser resolves it fine (Windows and macOS both handle .localhost via
+  # built-in resolvers). Ensure an /etc/hosts entry exists on Ubuntu/WSL.
+  if [[ "$OS" != "ubuntu" ]]; then
+    skip "hostname mapping (not needed on $OS)"
+    return
+  fi
+  if [[ "$DRY_RUN" == "1" ]]; then
+    printf 'DRY_RUN: ensure /etc/hosts maps %s to 127.0.0.1\n' "$SITE_NAME"
+    return
+  fi
+  if getent hosts "$SITE_NAME" &>/dev/null; then
+    skip "hostname $SITE_NAME already resolves"
+    return
+  fi
+  info "adding '127.0.0.1 $SITE_NAME' to /etc/hosts"
+  run_sh "echo '127.0.0.1 $SITE_NAME' | sudo tee -a /etc/hosts >/dev/null"
+}
+
 start_services() {
   step "start_services"
   run "$SCRIPT_DIR/start.sh" "--$MODE"
@@ -576,6 +623,8 @@ main() {
     configure_prod
   fi
 
+  ensure_asset_symlinks
+  ensure_site_hostname
   start_services
 
   printf '\n==> install.sh finished (mode=%s)\n' "$MODE" >&2
