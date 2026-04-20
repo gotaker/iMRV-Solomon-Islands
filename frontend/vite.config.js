@@ -12,9 +12,13 @@ export default defineConfig({
   server: {
     proxy: {
       '/api':       { target: 'http://mrv.localhost:8000', changeOrigin: true },
+      '/method':    { target: 'http://mrv.localhost:8000', changeOrigin: true },
       '/assets':    { target: 'http://mrv.localhost:8000', changeOrigin: true },
       '/files':     { target: 'http://mrv.localhost:8000', changeOrigin: true },
-      '/method':    { target: 'http://mrv.localhost:8000', changeOrigin: true },
+      '/private':   { target: 'http://mrv.localhost:8000', changeOrigin: true },
+      '/app':       { target: 'http://mrv.localhost:8000', changeOrigin: true },
+      '/login':     { target: 'http://mrv.localhost:8000', changeOrigin: true },
+      '/logout':    { target: 'http://mrv.localhost:8000', changeOrigin: true },
       '/socket.io': { target: 'http://mrv.localhost:9000', ws: true, changeOrigin: true },
     },
   },
