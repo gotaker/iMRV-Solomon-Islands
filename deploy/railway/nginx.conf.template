@@ -1,0 +1,69 @@
+# Rendered at container start by entrypoint.sh:
+#   envsubst '$PORT' < nginx.conf.template > /etc/nginx/nginx.conf
+
+worker_processes 1;
+error_log /dev/stderr warn;
+pid /run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    sendfile on;
+    keepalive_timeout 65;
+    client_max_body_size 25M;
+    access_log /dev/stdout;
+
+    # Long timeouts — Frappe reports/exports can take minutes
+    proxy_read_timeout 300s;
+    proxy_send_timeout 300s;
+    proxy_connect_timeout 10s;
+
+    upstream frappe_web { server 127.0.0.1:8000 fail_timeout=0; }
+    upstream frappe_socketio { server 127.0.0.1:9000 fail_timeout=0; }
+
+    server {
+        listen ${PORT} default_server;
+        server_name _;
+
+        # Static bench-built assets (JS/CSS bundles, Frappe desk assets)
+        location /assets/ {
+            alias /home/frappe/frappe-bench/sites/assets/;
+            try_files $uri =404;
+            expires 1h;
+        }
+
+        # User-uploaded files (served through Frappe so permissions apply)
+        location /files/ {
+            proxy_pass http://frappe_web;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        # Realtime websocket
+        location /socket.io/ {
+            proxy_pass http://frappe_socketio;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        # Everything else → gunicorn
+        location / {
+            proxy_pass http://frappe_web;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_redirect off;
+        }
+    }
+}
