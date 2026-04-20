@@ -37,12 +37,14 @@ http {
             expires 1h;
         }
 
-        # User-uploaded files (served through Frappe so permissions apply)
+        # Public site files (seed images + user uploads with is_private=0).
+        # Served directly from disk — matches the standard Frappe prod nginx
+        # pattern. Private files never reach this alias because Frappe stores
+        # them under sites/<site>/private/ and rewrites their URL.
         location /files/ {
-            proxy_pass http://frappe_web;
-            proxy_set_header Host $host;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
+            alias /home/frappe/frappe-bench/sites/${SITE_NAME}/public/files/;
+            try_files $uri =404;
+            expires 1h;
         }
 
         # Realtime websocket
