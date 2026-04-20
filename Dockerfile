@@ -170,3 +170,23 @@ RUN node -e " \
 
 RUN cd /home/frappe/frappe-bench \
  && bench build --apps frappe,mrvtools,frappe_side_menu
+
+# ---------- Configs + entrypoint ----------
+USER root
+
+COPY deploy/railway/supervisord.conf /etc/supervisor/supervisord.conf
+COPY deploy/railway/nginx.conf.template /etc/nginx/nginx.conf.template
+COPY deploy/railway/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Pre-create log + run dirs for supervisor/nginx
+RUN mkdir -p /var/log/supervisor /var/run \
+ && rm -f /etc/nginx/sites-enabled/default /etc/nginx/conf.d/default.conf 2>/dev/null || true
+
+# Railway injects $PORT. We expose a conventional value for documentation;
+# actual listen port is set by envsubst at entrypoint time.
+EXPOSE 8080
+
+WORKDIR /home/frappe/frappe-bench
+
+ENTRYPOINT ["/entrypoint.sh"]
