@@ -158,7 +158,19 @@ import ProjectComponent from '@/components/ProjectComponent.vue'
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
-const data = ref([])
+// Initial shape mirrors mrvfrontend.get_all()'s response so the template
+// can render safely before fetchData() resolves. Without this, v-for and
+// :src bindings dereference data.message.parent_data.* on an empty array
+// and the component crashes before the first paint.
+const data = ref({
+  message: {
+    parent_data: {},
+    child_table_data: [],
+    child_table_data2: [],
+    CCDImages: [],
+    add_new_content: [],
+  },
+})
 const isModalOpen = ref(false)
 
 const fetchData = async () => {
