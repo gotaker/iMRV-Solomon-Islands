@@ -133,3 +133,40 @@ RUN set -eux; \
     git -c user.name=docker -c user.email=docker@local commit -q -m stage; \
     cd /home/frappe/frappe-bench; \
     bench get-app --skip-assets frappe_side_menu "$STAGE"
+
+# ---------- Inject pre-built SPA from stage 1 ----------
+# The SPA was already built in the frontend-build stage. Copy it into the
+# mrvtools app inside the bench so /assets/mrvtools/frontend/ resolves.
+# Note: stage 1's WORKDIR is /build/mrvtools; vite.config.js resolves outDir
+# using basename(cwd-parent), so the artifacts end up at
+# /build/mrvtools/mrvtools/public/frontend and /build/mrvtools/mrvtools/www/frontend.html.
+COPY --from=frontend-build --chown=frappe:frappe \
+    /build/mrvtools/mrvtools/public/frontend \
+    /home/frappe/frappe-bench/apps/mrvtools/mrvtools/public/frontend
+
+COPY --from=frontend-build --chown=frappe:frappe \
+    /build/mrvtools/mrvtools/www/frontend.html \
+    /home/frappe/frappe-bench/apps/mrvtools/mrvtools/www/frontend.html
+
+# ---------- bench build ----------
+# Bundles Frappe's own JS/CSS + mrvtools + frappe_side_menu into
+# sites/assets/. Required for the Frappe desk to load.
+#
+# The root package.json for mrvtools has a `build` script that runs
+# `cd frontend && yarn build`. Frappe's esbuild pipeline passes
+# --run-build-command which triggers that script — but frontend/node_modules
+# does not exist in the bench (Vite is only in stage 1). Since the SPA is
+# already pre-built and copied above, we stub that script out with a no-op
+# before invoking bench build.
+RUN node -e " \
+    const fs = require('fs'); \
+    const p = '/home/frappe/frappe-bench/apps/mrvtools/package.json'; \
+    const pkg = JSON.parse(fs.readFileSync(p, 'utf8')); \
+    if (pkg.scripts && pkg.scripts.build) { \
+        pkg.scripts.build = 'echo SPA already built in stage 1, skipping'; \
+    } \
+    fs.writeFileSync(p, JSON.stringify(pkg, null, 2)); \
+"
+
+RUN cd /home/frappe/frappe-bench \
+ && bench build --apps frappe,mrvtools,frappe_side_menu
