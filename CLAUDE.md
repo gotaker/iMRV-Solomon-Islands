@@ -79,6 +79,8 @@ Secrets needed: `MARIADB_ROOT_PASSWORD` (any strong password — only used insid
 
 All three use `ignore_permissions=True` and swallow exceptions into `frappe.log_error`. When install appears to "silently succeed" but data is missing, check the Error Log doctype.
 
+`load_default_files` has a recovery trap: it skips extraction when a `File` DB record with the matching name already exists, **even if the physical file on disk is gone** (see [mrvtools/mrvtools/after_install.py:28](mrvtools/mrvtools/after_install.py#L28)). If seed images 404 after a volume wipe, re-running `load_default_files` is a no-op — you have to unzip `mrv_default_files.zip` directly into `sites/<site>/public/files/`. The Railway container ships without `unzip`, so use `python3 -c "import zipfile; …"` for any extraction work inside it.
+
 **Permission query conditions.** [mrvtools/hooks.py](mrvtools/hooks.py) wires `My Approval` and `Approved User` to `get_query_conditions` functions in their respective doctype modules — these filter list views server-side. Changes to approval visibility belong there, not in client-side JS.
 
 **Doctype conventions.** Doctypes ending in `_childtable` are Frappe child tables and must be embedded in a parent doctype; they are not independently listable. Doctypes ending in `_master_list` are reference/lookup tables seeded by `load_master_data`. The `edited_*` doctypes (e.g. `edited_project_details`, `edited_ghg_inventory_details`) appear to be revision/draft variants of their base doctypes — treat them as paired.
@@ -87,9 +89,15 @@ All three use `ignore_permissions=True` and swallow exceptions into `frappe.log_
 
 **Two hooks.py files.** `mrvtools/hooks.py` and `frappe_side_menu/hooks.py` are independent — each is read by Frappe for its own app. Don't consolidate.
 
-**Post-login redirect.** [frappe_side_menu/hooks.py](frappe_side_menu/hooks.py) sets `on_session_creation = "frappe_side_menu.frappe_side_menu.api.set_default_route"`, which reads `Side Menu Settings.route_logo` and sets the user's `home_page`. Login-redirect bugs usually originate here, not in `mrvtools/hooks.py`.
+**Post-login redirect.** [frappe_side_menu/hooks.py](frappe_side_menu/hooks.py) sets `on_session_creation = "frappe_side_menu.frappe_side_menu.api.set_default_route"`, which hardcodes `home_page = "/app/" + route_logo` (see [frappe_side_menu/frappe_side_menu/api.py:181](frappe_side_menu/frappe_side_menu/api.py#L181)). This means every logged-in user — including System Users like `Administrator` — lands on the Frappe desk, not the SPA. This is intentional; the SPA at `/frontend/home` is the public-facing site, reachable without login. Login-redirect bugs usually originate here, not in `mrvtools/hooks.py`.
 
 **Desk customisations are narrow.** `mrvtools/hooks.py` injects `doctype_js` / `doctype_list_js` only for the `User` doctype; `frappe_side_menu/hooks.py` injects `doctype_list_js` only for `Project`. Most `doc_events` / `scheduler_events` / `override_doctype_class` lines in both files are commented-out stubs — don't read them as active wiring.
+
+**Railway deployment.** Staging/demo runs on Railway using the image built from [Dockerfile](Dockerfile), launched by [deploy/railway/entrypoint.sh](deploy/railway/entrypoint.sh), fronted by [deploy/railway/nginx.conf.template](deploy/railway/nginx.conf.template). Operational runbook: [deploy/railway/README.md](deploy/railway/README.md). Three non-obvious invariants:
+
+1. **`/files/` must be an nginx `alias`, not a `proxy_pass` to gunicorn.** Frappe's WSGI handler returns 404 for public File URLs in this single-tenant setup — so proxying breaks every seed image on the SPA home page. Keep the alias block shape identical to the `/assets/` block above it. `${SITE_NAME}` is pre-approved in the `envsubst` allowlist at [entrypoint.sh:44](deploy/railway/entrypoint.sh#L44); adding any new variable there is a breaking change for the template.
+2. **Sites volume is seeded from a baked-in template only when empty.** The entrypoint copies `/home/frappe/sites-template` into `/home/frappe/frappe-bench/sites` only when `apps.txt` is missing. Once a site is created, a volume remount that loses `<site>/public/files/` will **not** re-trigger seeding, and `after_install`'s skip-guard (see seed-data note above) won't re-extract either. Manual recovery is the only path.
+3. **`ADMIN_PASSWORD` is read only on first boot.** [entrypoint.sh:87](deploy/railway/entrypoint.sh#L87) passes it to `bench new-site` once, then ignores the env var forever. To rotate, use `bench --site $SITE_NAME set-admin-password …` inside the container — not the Railway dashboard.
 
 ## Server-side entry points
 
