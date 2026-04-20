@@ -209,12 +209,15 @@ _ensure_mariadb_root_password() {
   fi
   if mariadb -u root -p"$MYSQL_ROOT_PASSWORD" -h 127.0.0.1 -e 'SELECT 1' &>/dev/null; then
     skip "mariadb root password already matches"
-  elif mariadb -u root -e 'SELECT 1' &>/dev/null; then
-    info "setting mariadb root password via socket login"
-    mariadb -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD'; FLUSH PRIVILEGES;"
+  elif sudo mariadb -u root -e 'SELECT 1' &>/dev/null; then
+    # On Ubuntu, root uses the unix_socket auth plugin by default — socket
+    # login only works as OS root, hence sudo. ALTER USER ... IDENTIFIED BY
+    # switches the plugin to mysql_native_password so TCP+password works.
+    info "setting mariadb root password via socket (sudo) login"
+    sudo mariadb -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD'; FLUSH PRIVILEGES;"
   else
     err "mariadb root password is set to something different from \$MYSQL_ROOT_PASSWORD"
-    err "and socket login also failed. Reset root auth manually and re-run."
+    err "and socket (sudo) login also failed. Reset root auth manually and re-run."
     exit 1
   fi
 }
@@ -237,6 +240,15 @@ _install_wkhtmltopdf_patched() {
     err "could not determine Ubuntu codename or architecture for wkhtmltopdf download"
     exit 1
   fi
+  # wkhtmltopdf upstream only publishes debs for jammy (22.04) and bullseye.
+  # Newer Ubuntu releases (noble and later) use the jammy build as fallback;
+  # it is binary-compatible aside from a libjpeg-turbo8 vs ...8t64 rename that
+  # the subsequent `apt-get install -f` fixup resolves.
+  case "$codename" in
+    jammy|bullseye) ;;
+    *) info "no wkhtmltopdf asset for '$codename'; using jammy build as fallback"
+       codename=jammy ;;
+  esac
   local deb_name="wkhtmltox_${version}.${codename}_${arch}.deb"
   local url="https://github.com/wkhtmltopdf/packaging/releases/download/${version}/${deb_name}"
   local tmp="/tmp/${deb_name}"
@@ -252,13 +264,19 @@ _install_wkhtmltopdf_patched() {
 
 install_bench_cli() {
   step "install_bench_cli"
+  # bench 5.29+ shells out to `uv` for venv creation, so install it alongside.
+  if command -v uv &>/dev/null; then
+    skip "uv already on PATH"
+  else
+    run pipx install uv
+  fi
   if command -v bench &>/dev/null; then
     skip "bench CLI already on PATH"
-    return
+  else
+    run pipx install frappe-bench
   fi
-  run pipx install frappe-bench
   # pipx installs into ~/.local/bin which may not be on PATH in this shell.
-  if ! command -v bench &>/dev/null && [[ -x "$HOME/.local/bin/bench" ]]; then
+  if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]] && [[ -d "$HOME/.local/bin" ]]; then
     export PATH="$HOME/.local/bin:$PATH"
     info "prepended \$HOME/.local/bin to PATH for this session"
   fi
