@@ -176,16 +176,6 @@ const fetchData = async () => {
   } catch (error) {
     console.error('Error:', error)
   }
-  var values = data._rawValue.message.parent_data
-  var field = values.heading
-  var childField = data._rawValue.message.child_table_data
-  for (var item of childField) {
-    if (item.image) {
-      console.log('item', item.image)
-    } else {
-      console.log('no item found')
-    }
-  }
 }
 
 const openModal = (src) => {
