@@ -38,6 +38,17 @@ if [[ ! -f "$SITES/apps.txt" ]]; then
     gosu frappe cp -an /home/frappe/sites-template/. "$SITES/"
 fi
 
+# ---- 1b. Refresh sites/assets/ from image template on every boot ----
+# sites/assets/ is build output (produced by `bench build` in the image),
+# not user data. Leaving the first-boot copy on the persistent volume causes
+# the asset manifest (assets.json) to drift out of sync with the bench code
+# baked into each new image, producing 404s on CSS/JS bundles.
+if [[ -d /home/frappe/sites-template/assets ]]; then
+    echo "[entrypoint] refreshing sites/assets/ from image template"
+    rm -rf "$SITES/assets"
+    gosu frappe cp -a /home/frappe/sites-template/assets "$SITES/assets"
+fi
+
 # ---- 2. Render nginx config ----
 # envsubst swaps $PORT from env; all other $vars in the template are nginx
 # variables (prefixed $http_*, $proxy_*, $uri, etc.) — we whitelist only PORT.
@@ -101,6 +112,17 @@ else
         SITE_NAME="$SITE_NAME" \
         bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" migrate'
 fi
+
+# ---- 4a. Set host_name so Frappe's realtime server accepts the public URL ----
+# Without this, socket.io rejects websocket connections from any domain other
+# than the bare SITE_NAME with "Invalid origin". Safe to run every boot — it
+# re-writes site_config.json idempotently. Protocol defaults to https (Railway
+# always serves TLS); override SITE_PROTOCOL=http for local/non-TLS setups.
+SITE_PROTOCOL="${SITE_PROTOCOL:-https}"
+HOST_NAME_URL="${SITE_PROTOCOL}://${SITE_NAME}"
+gosu frappe env BENCH="$BENCH" SITE_NAME="$SITE_NAME" HOST_NAME_URL="$HOST_NAME_URL" \
+    bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" set-config host_name "$HOST_NAME_URL"'
+echo "[entrypoint] host_name set to $HOST_NAME_URL"
 
 # ---- 5. Set current site ----
 echo "$SITE_NAME" > "$SITES/currentsite.txt"

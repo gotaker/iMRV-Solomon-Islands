@@ -215,9 +215,30 @@ Check MariaDB is healthy (green Active badge) and the app can resolve `${{mariad
 
 `yarn build` didn't run during the image build, or [mrvtools/www/frontend.html](../../mrvtools/www/frontend.html) isn't in the shipped image. Check build logs for the `--from=frontend-build` COPY step in the Dockerfile.
 
+### Desk CSS/JS bundle 404s (e.g. `desk.bundle.<hash>.css` not found)
+
+`sites/assets/` is build output, not user data, but lives inside the persistent volume. If you're on an image from before this was fixed, the asset manifest (`sites/assets/assets.json`) is frozen at first-boot state while the bench code is newer — hashes in the HTML reference CSS/JS that no longer exist on disk.
+
+Current [entrypoint.sh:46](entrypoint.sh#L46) refreshes `sites/assets/` from the image template on every boot, so a redeploy fixes it. If you need to force it in a running container:
+
+```bash
+rm -rf /home/frappe/frappe-bench/sites/assets
+cp -a /home/frappe/sites-template/assets /home/frappe/frappe-bench/sites/assets
+chown -R frappe:frappe /home/frappe/frappe-bench/sites/assets
+supervisorctl restart frappe-gunicorn frappe-socketio
+```
+
 ### `CSRFTokenError` on API calls from the SPA
 
 `ignore_csrf` should be `0` in prod. Only set it to `1` for local Vite dev on :8080.
+
+### Socket.io "Invalid origin" / `WebSocket connection … failed`
+
+The realtime server checks the browser's `Origin` header against `host_name` in `site_config.json`. [entrypoint.sh:116](entrypoint.sh#L116) sets `host_name` to `https://$SITE_NAME` on every boot, so as long as `SITE_NAME` matches the domain the browser is hitting, this works.
+
+If `SITE_NAME` and the public domain differ (e.g. Railway auto-generated domain still set, but users visit a custom CNAME), update `SITE_NAME` to the domain the browser actually uses, then redeploy.
+
+For non-TLS local testing, set `SITE_PROTOCOL=http` to override the https default.
 
 ## Operations
 
@@ -225,16 +246,9 @@ Check MariaDB is healthy (green Active badge) and the app can resolve `${{mariad
 
 1. Add the domain in Railway UI (app service → Settings → Domains). Follow Railway's DNS instructions.
 2. Update `SITE_NAME` env var to the new domain. This triggers a redeploy.
-3. Inside the container, register the host alias so Frappe recognises requests:
+3. Re-run the verification checklist — in particular the `/files/iMRV2.jpg` curl — because the nginx `alias` path is derived from `SITE_NAME`.
 
-   ```bash
-   railway ssh --service "iMRV-Solomon-Islands"
-   gosu frappe bash
-   cd /home/frappe/frappe-bench
-   bench --site "$SITE_NAME" set-config host_name "https://<new-domain>"
-   ```
-
-4. Re-run the verification checklist — in particular the `/files/iMRV2.jpg` curl — because the nginx `alias` path is derived from `SITE_NAME`.
+The entrypoint sets `host_name` (Frappe's canonical site URL, used for socket.io origin checks) to `https://$SITE_NAME` on every boot, so no manual `bench set-config` step is needed. If you need a non-https scheme (e.g. local testing), set `SITE_PROTOCOL=http` in Railway variables.
 
 ### Manual backups
 
