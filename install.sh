@@ -134,7 +134,7 @@ _install_system_deps_macos() {
     err "Homebrew is required on macOS. Install from https://brew.sh and re-run."
     exit 1
   fi
-  local pkgs=(git python@3.11 node@18 yarn mariadb redis pipx)
+  local pkgs=(git "python@${PYTHON_VERSION}" "node@${NODE_VERSION}" yarn mariadb redis pipx)
   local pkg
   for pkg in "${pkgs[@]}"; do
     if brew list "$pkg" &>/dev/null; then
@@ -164,7 +164,7 @@ _ensure_wkhtmltopdf_macos() {
 
 _install_system_deps_ubuntu() {
   run sudo apt-get update
-  local pkgs=(git cron python3.11 python3.11-venv python3-dev mariadb-server redis-server
+  local pkgs=(git cron "python${PYTHON_VERSION}" "python${PYTHON_VERSION}-venv" python3-dev mariadb-server redis-server
               build-essential libssl-dev libffi-dev xvfb libfontconfig pipx)
   local pkg
   for pkg in "${pkgs[@]}"; do
