@@ -9,3 +9,4 @@ node_modules/
 .worktrees/
 docs/frappe-admin-training.pptx
 .Sample DB/*
+!.Sample DB/.gitkeep

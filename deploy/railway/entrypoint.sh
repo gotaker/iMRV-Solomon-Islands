@@ -121,6 +121,20 @@ fi
 maybe_restore_sample_db() {
     local src_url="${SAMPLE_DB_URL:-}"
     local src_path="${SAMPLE_DB_PATH:-}"
+
+    # Fall back to a dump baked into the image at /home/frappe/sample-db/.
+    # Only used when neither env var is set. See Dockerfile "bake in a sample
+    # DB dump" step for how to include one.
+    if [[ -z "$src_url" && -z "$src_path" ]]; then
+        shopt -s nullglob
+        local baked=(/home/frappe/sample-db/*.sql.gz)
+        shopt -u nullglob
+        if [[ ${#baked[@]} -gt 0 ]]; then
+            src_path="${baked[0]}"
+            echo "[entrypoint] auto-using baked-in sample DB: $src_path"
+        fi
+    fi
+
     if [[ -z "$src_url" && -z "$src_path" ]]; then
         return 0
     fi

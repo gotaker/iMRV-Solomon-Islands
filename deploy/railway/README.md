@@ -66,8 +66,10 @@ If you want the Railway deploy to come up pre-populated (instead of the empty de
 | Variable | Value | Notes |
 | --- | --- | --- |
 | `SAMPLE_DB_URL` | `https://…/dump.sql.gz` | URL the container fetches with `curl -fsSL` on first boot. Must be reachable from Railway. Use a GitHub Release artifact, S3 signed URL, Railway volume URL, etc. |
-| `SAMPLE_DB_PATH` | `/path/in/container.sql.gz` | Alternative to URL — path inside the container. Useful if you pre-upload via `railway ssh` (`cat dump.sql.gz \| railway ssh … "cat > /tmp/dump.sql.gz"`) or bake the dump into the image with a `COPY` in the Dockerfile. |
+| `SAMPLE_DB_PATH` | `/path/in/container.sql.gz` | Alternative to URL — path inside the container. Useful if you pre-upload via `railway ssh` (`cat dump.sql.gz \| railway ssh … "cat > /tmp/dump.sql.gz"`). |
 | `SAMPLE_DB_FORCE_RESTORE` | `1` (default `0`) | Re-run the restore on the next boot even if a previous boot already did it. Leave unset in normal operation; set only to deliberately re-seed, then unset and redeploy. |
+
+**Third option — bake the dump into the image** (no env var needed): commit a `*.sql.gz` into [.Sample DB/](../../.Sample%20DB/) (temporarily un-ignore it by adding `!.Sample DB/your-file.sql.gz` to [.gitignore](../../.gitignore)), and the Dockerfile `COPY` step at [Dockerfile:179-182](../../Dockerfile#L179-L182) will bundle it at `/home/frappe/sample-db/`. The entrypoint's auto-detect picks the first `*.sql.gz` there when neither env var is set. Pros: zero external hosting, self-contained image. Cons: adds dump size (~3 MB per file) to every image layer + git history.
 
 Restore flow ([entrypoint.sh:117-165](entrypoint.sh#L117-L165)):
 
