@@ -19,23 +19,28 @@ Staging/demo deployment of the full MRV stack (Frappe + SPA + MariaDB + Redis) t
 
 2. **Add MariaDB as a second service:**
    - *New → Empty Service → Deploy from Docker Image*
-   - Image: `mariadb:10.6`
-   - Variables: `MYSQL_ROOT_PASSWORD` = *(strong random — save it; the app needs the same value)*
+   - Image: **`mariadb:10.6`** — pin this exactly. `mariadb:latest` now resolves to 12.x, which breaks Frappe's `install_app` with subtle SQL/caching failures. Frappe is tested against 10.6.
+   - *Settings → Service Name* → rename to lowercase **`mariadb`** so `${{mariadb.RAILWAY_PRIVATE_DOMAIN}}` resolves from the app service.
+   - Variables: `MYSQL_ROOT_PASSWORD` = *(strong random — save it; the app's `DB_ROOT_PASSWORD` must match)*
    - *Settings → Volumes* — mount `/var/lib/mysql`, size 5 GB.
    - Deploy.
 
 3. **Add Redis as a third service:**
    - *New → Database → Redis* (Railway's managed plugin).
-   - No configuration needed.
+   - *Settings → Service Name* → rename to lowercase **`redis`** if Railway gave it a different default.
+   - No variables to set — Railway provisions `REDIS_URL` / `REDIS_PASSWORD` automatically. You'll read those from the app side.
 
 4. **Attach a volume to the app service:**
    - App service → Settings → Volumes → Add Volume.
    - Mount path: `/home/frappe/frappe-bench/sites`, size 5 GB.
-   - This is where the site config, DB seeds, and uploaded files persist across deploys.
+   - **Required, not optional.** Without it, `sites/` is ephemeral — the site gets recreated from scratch on every redeploy and every user edit is lost.
+   - The image bakes a seed template at `/home/frappe/sites-template/`. [entrypoint.sh:33-40](entrypoint.sh#L33-L40) copies it into the volume on first mount so `apps.txt` / `assets/` / etc. aren't shadowed by the empty mount.
 
-5. **Set environment variables on the app service** (see table below).
+5. **Set environment variables on the app service** (see [Environment variables](#environment-variables) below). Read the formatting notes — several non-obvious gotchas.
 
-6. **Trigger a deploy.** Push to the tracked branch or click Deploy.
+6. **Set the custom-domain target port to 8080** if you add one. App service → Settings → Networking → ✏️ on the domain row → **Target Port: 8080** (matches `$PORT` injected by Railway, which nginx binds to in [nginx.conf.template](nginx.conf.template)). The default often comes up as 8000 and has to be changed by hand.
+
+7. **Trigger a deploy.** Push to the tracked branch or click Deploy.
 
 ## Environment variables
 
@@ -45,14 +50,24 @@ Set these on the **app** service. `PORT` is auto-injected by Railway — do not 
 | --- | --- | --- |
 | `SITE_NAME` | `${{RAILWAY_PUBLIC_DOMAIN}}` | Railway reference. Expands to the auto-generated `.up.railway.app` domain. If you add a custom domain later, see [Custom domain](#custom-domain). |
 | `ADMIN_PASSWORD` | *strong random string* | **Save this immediately.** Used only on first boot to create the `Administrator` account. Changing it in Railway after first boot does **not** rotate the DB password — use `bench … set-admin-password` (see [Troubleshooting](#cant-log-in-as-administrator)). |
-| `DB_HOST` | `${{mariadb.RAILWAY_PRIVATE_DOMAIN}}` | Railway reference to the MariaDB service's private hostname. |
+| `DB_HOST` | `${{mariadb.RAILWAY_PRIVATE_DOMAIN}}` | Railway reference to the MariaDB service's private hostname. Requires the MariaDB service to be named exactly `mariadb`. |
 | `DB_PORT` | `3306` | |
 | `DB_ROOT_PASSWORD` | *same value as MariaDB's `MYSQL_ROOT_PASSWORD`* | |
-| `REDIS_CACHE_URL` | `redis://${{redis.RAILWAY_PRIVATE_DOMAIN}}:6379/0` | |
-| `REDIS_QUEUE_URL` | `redis://${{redis.RAILWAY_PRIVATE_DOMAIN}}:6379/1` | |
-| `REDIS_SOCKETIO_URL` | `redis://${{redis.RAILWAY_PRIVATE_DOMAIN}}:6379/2` | |
+| `REDIS_CACHE_URL` | `redis://default:<REDIS_PASSWORD>@${{redis.RAILWAY_PRIVATE_DOMAIN}}:6379/0` | **Must include the password** — Railway's managed Redis requires AUTH. Grab `REDIS_PASSWORD` from the redis service's Variables tab. Unauthenticated connects fail with `redis.exceptions.ResponseError: Protocol error: unauthenticated bulk length`. |
+| `REDIS_QUEUE_URL` | `redis://default:<REDIS_PASSWORD>@${{redis.RAILWAY_PRIVATE_DOMAIN}}:6379/1` | Same password as above. |
+| `REDIS_SOCKETIO_URL` | `redis://default:<REDIS_PASSWORD>@${{redis.RAILWAY_PRIVATE_DOMAIN}}:6379/2` | Same password as above. |
 
 The [entrypoint.sh](entrypoint.sh) aborts immediately with a clear error if any of these are missing (`: "${VAR:?…}"` checks).
+
+### Raw Editor gotchas
+
+The Variables tab's Raw Editor is fussier than it looks. Every one of these has silently broken a deploy for us:
+
+- **No whitespace between the key and `=`.** `ADMIN_PASSWORD ="catch22"` (with a stray tab before `=`) stores the variable under key `ADMIN_PASSWORD\t` and the container sees it as unset. Type the line by hand if you pasted from elsewhere.
+- **Avoid wrapping references in quotes.** `DB_HOST="${{mariadb.RAILWAY_PRIVATE_DOMAIN}}"` sometimes stores the literal string and breaks expansion. Prefer unquoted: `DB_HOST=${{mariadb.RAILWAY_PRIVATE_DOMAIN}}`.
+- **References fail silently.** If the referenced service doesn't exist with that exact (case-sensitive) name, the reference expands to empty — and the entrypoint's `:?` check reports the var as "must be set" even though Railway's UI shows a value. Double-check the service name on the project canvas.
+- **Hardcoded alternative:** Railway's private DNS is always `<service-name>.railway.internal`. If a reference won't resolve, substitute the literal string — e.g. `DB_HOST=mariadb.railway.internal`. Bypasses reference-resolution bugs entirely.
+- **Stale deploys:** changing a variable doesn't always trigger a redeploy. If you just added/fixed a variable and logs still show the old value, manually click Deployments → ⋮ → Redeploy.
 
 ## What to expect on first deploy
 
@@ -205,11 +220,63 @@ bench --site "$SITE_NAME" execute mrvtools.mrvtools.after_install.load_single_do
 
 ### App service keeps restarting
 
-Railway dashboard → app → Deployments → latest → View Logs. Most common cause is a missing env var — the entrypoint's `: "${VAR:?}"` checks print exactly which one.
+Railway dashboard → app → Deployments → latest → View Logs. Most common cause is a missing env var — the entrypoint's `: "${VAR:?}"` checks print exactly which one. If the variable actually *is* set in the UI but the container reports it missing, see [Raw Editor gotchas](#raw-editor-gotchas) — it's almost always whitespace in the key, a failing reference expansion, or a stale deploy.
+
+### `DB_HOST must be set` even though it's set in the UI
+
+The reference `${{mariadb.RAILWAY_PRIVATE_DOMAIN}}` expanded to empty. Either:
+
+- The MariaDB service isn't named exactly `mariadb` (case-sensitive). Rename it, or update the reference to match.
+- MariaDB and app are in different Railway environments. References don't cross environments — check the environment selector at the top of the UI.
+- Private networking isn't enabled on the MariaDB service. Settings → Networking → toggle on.
+
+**Unblock immediately:** hardcode `DB_HOST=mariadb.railway.internal` (substitute the actual service name if different). Railway's private DNS is always `<service>.railway.internal`.
+
+### Redis `unauthenticated bulk length` / `Protocol error`
+
+Your Redis URLs don't include the password. Railway's managed Redis requires AUTH. Grab `REDIS_PASSWORD` from the redis service's Variables tab and use `redis://default:<password>@redis.railway.internal:6379/<db>` format. See the Environment variables table above.
+
+### `Exception: Database _xxx already exists` (first boot)
+
+A previous boot got partway through `bench new-site` — created the DB but crashed before writing `site_config.json`. On the next boot the entrypoint sees no config and takes the "first boot" path again, which tries `CREATE DATABASE` on a name that's already there.
+
+**Fix — wipe both volumes simultaneously:**
+
+1. `mariadb` service → Settings → Volumes → detach & delete. Re-add fresh at `/var/lib/mysql`.
+2. `app` service → Settings → Volumes → detach & delete. Re-add fresh at `/home/frappe/frappe-bench/sites`.
+3. Redeploy `mariadb`, wait Active, then redeploy `app`.
+
+Wiping just one leaves the other with orphan state and the loop continues.
+
+### `OSError: b'./apps.txt' Not Found`
+
+A persistent volume mounted at `/home/frappe/frappe-bench/sites` shadowed the `apps.txt` that `bench init` wrote during image build. [entrypoint.sh:33-40](entrypoint.sh#L33-L40) seeds the volume from `/home/frappe/sites-template/` if `apps.txt` is missing — if you see this error, either you're on an image predating commit `b968be2`, or the seed copy itself failed.
+
+Check `ls /home/frappe/sites-template/` inside the container — it should contain `apps.txt`, `common_site_config.json`, and `assets/`. If empty or missing, rebuild the image.
 
 ### First boot takes >5 min
 
 Check MariaDB is healthy (green Active badge) and the app can resolve `${{mariadb.RAILWAY_PRIVATE_DOMAIN}}` — if MariaDB was added after the app service, redeploy the app so Railway re-injects the reference.
+
+### "The train has not arrived at the station" when hitting the domain
+
+Railway's default 404 page, served when:
+
+- The custom domain isn't registered on any service. App service → Settings → Domains → + Custom Domain → enter the domain exactly.
+- The domain is registered but the **Target Port** is wrong (often defaults to 8000). Edit the domain row → set **Target Port to 8080** (matches `$PORT` in [nginx.conf.template](nginx.conf.template)).
+- DNS points somewhere other than Railway (verify with `dig <your-domain>` — the CNAME should resolve to a `.up.railway.app` target).
+
+### Cloudflare in front of Railway
+
+Railway supports Cloudflare proxying (orange cloud), but the default "Flexible" SSL mode causes redirect loops.
+
+**Easiest setup:** set the CNAME to **DNS only (grey cloud)**. Railway provisions TLS itself; Cloudflare just forwards DNS.
+
+**If you want Cloudflare CDN/WAF (orange cloud):**
+
+1. Cloudflare → SSL/TLS → Overview → mode **Full (strict)** (NOT Flexible).
+2. Don't use Cloudflare's "Custom Hostnames" / "SSL for SaaS" feature — that's for multi-tenant SaaS setups and doesn't apply here. Just the normal DNS CNAME.
+3. Add the domain in Railway's app service → Settings → Domains before expecting traffic to route.
 
 ### SPA routes 404 (anything under `/frontend/`)
 
