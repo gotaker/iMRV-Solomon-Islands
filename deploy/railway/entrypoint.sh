@@ -113,6 +113,54 @@ else
         bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" migrate'
 fi
 
+# ---- 4b. Optional: restore a sample DB ----
+# Runs iff SAMPLE_DB_URL or SAMPLE_DB_PATH is set. A marker file in the site
+# dir (.sample_db_restored) keeps this to once-per-site-lifetime unless
+# SAMPLE_DB_FORCE_RESTORE=1 is explicitly set — otherwise every redeploy
+# would wipe demo state. Mirrors install.sh :: load_sample_data() semantics.
+maybe_restore_sample_db() {
+    local src_url="${SAMPLE_DB_URL:-}"
+    local src_path="${SAMPLE_DB_PATH:-}"
+    if [[ -z "$src_url" && -z "$src_path" ]]; then
+        return 0
+    fi
+
+    local marker="$SITE_DIR/.sample_db_restored"
+    local force="${SAMPLE_DB_FORCE_RESTORE:-0}"
+    if [[ -f "$marker" && "$force" != "1" ]]; then
+        echo "[entrypoint] sample DB already restored (marker: $marker) — skipping"
+        echo "[entrypoint]   set SAMPLE_DB_FORCE_RESTORE=1 to re-run on next boot"
+        return 0
+    fi
+
+    local dump=/tmp/sample-db.sql.gz
+    if [[ -n "$src_url" ]]; then
+        echo "[entrypoint] fetching sample DB from \$SAMPLE_DB_URL"
+        curl -fsSL --output "$dump" "$src_url"
+    else
+        echo "[entrypoint] copying sample DB from \$SAMPLE_DB_PATH=$src_path"
+        if [[ ! -f "$src_path" ]]; then
+            echo "[entrypoint] FATAL: SAMPLE_DB_PATH file does not exist" >&2
+            exit 1
+        fi
+        cp "$src_path" "$dump"
+    fi
+    chown frappe:frappe "$dump"
+
+    echo "[entrypoint] restoring sample DB into $SITE_NAME (drops current DB)"
+    gosu frappe env BENCH="$BENCH" SITE_NAME="$SITE_NAME" \
+        DB_ROOT_PASSWORD="$DB_ROOT_PASSWORD" DUMP="$dump" \
+        bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" --force restore "$DUMP" \
+            --mariadb-root-password "$DB_ROOT_PASSWORD"'
+    gosu frappe env BENCH="$BENCH" SITE_NAME="$SITE_NAME" \
+        bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" migrate && bench --site "$SITE_NAME" clear-cache'
+
+    rm -f "$dump"
+    gosu frappe touch "$marker"
+    echo "[entrypoint] sample DB restore complete"
+}
+maybe_restore_sample_db
+
 # ---- 4a. Set host_name so Frappe's realtime server accepts the public URL ----
 # Without this, socket.io rejects websocket connections from any domain other
 # than the bare SITE_NAME with "Invalid origin". Safe to run every boot — it

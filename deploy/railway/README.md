@@ -59,6 +59,24 @@ Set these on the **app** service. `PORT` is auto-injected by Railway — do not 
 
 The [entrypoint.sh](entrypoint.sh) aborts immediately with a clear error if any of these are missing (`: "${VAR:?…}"` checks).
 
+### Optional: seed the site with a sample DB
+
+If you want the Railway deploy to come up pre-populated (instead of the empty default from `bench new-site` + `after_install`), set one of these on the app service:
+
+| Variable | Value | Notes |
+| --- | --- | --- |
+| `SAMPLE_DB_URL` | `https://…/dump.sql.gz` | URL the container fetches with `curl -fsSL` on first boot. Must be reachable from Railway. Use a GitHub Release artifact, S3 signed URL, Railway volume URL, etc. |
+| `SAMPLE_DB_PATH` | `/path/in/container.sql.gz` | Alternative to URL — path inside the container. Useful if you pre-upload via `railway ssh` (`cat dump.sql.gz \| railway ssh … "cat > /tmp/dump.sql.gz"`) or bake the dump into the image with a `COPY` in the Dockerfile. |
+| `SAMPLE_DB_FORCE_RESTORE` | `1` (default `0`) | Re-run the restore on the next boot even if a previous boot already did it. Leave unset in normal operation; set only to deliberately re-seed, then unset and redeploy. |
+
+Restore flow ([entrypoint.sh:117-165](entrypoint.sh#L117-L165)):
+
+1. On each boot, after the first-boot `bench new-site` or routine `bench migrate` step, the entrypoint checks for `SAMPLE_DB_URL` / `SAMPLE_DB_PATH`.
+2. If set AND a marker file at `sites/<site>/.sample_db_restored` is absent (or `SAMPLE_DB_FORCE_RESTORE=1`), it fetches/copies the dump to `/tmp/sample-db.sql.gz`, runs `bench --force restore` + `bench migrate` + `bench clear-cache`, then writes the marker.
+3. On subsequent boots the marker short-circuits the restore (so normal redeploys don't wipe accumulated changes).
+
+**This is destructive** — `bench --force restore` drops the current site DB and recreates it from the dump. The Administrator password in the dump becomes live; rotate with `bench --site $SITE_NAME set-admin-password …` afterwards if needed.
+
 ### Raw Editor gotchas
 
 The Variables tab's Raw Editor is fussier than it looks. Every one of these has silently broken a deploy for us:
