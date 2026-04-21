@@ -174,9 +174,11 @@
    "fieldtype": "Column Break"
   },
   {
+   "default": "main-dashboard",
+   "description": "Workspace slug logged-in users land on after login (e.g. <code>main-dashboard</code> resolves to <code>/app/main-dashboard</code>). Leave blank to fall back to <code>main-dashboard</code>.",
    "fieldname": "route_logo",
    "fieldtype": "Data",
-   "label": "Route Logo"
+   "label": "Post-Login Landing Route"
   },
   {
    "fieldname": "column_break_syomw",
@@ -186,7 +188,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-07-22 13:05:40.349281",
+ "modified": "2026-04-20 14:30:00.000000",
  "modified_by": "Administrator",
  "module": "Frappe Side Menu",
  "name": "Side Menu Settings",
