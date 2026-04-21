@@ -277,6 +277,41 @@ Railway supports Cloudflare proxying (orange cloud), but the default "Flexible" 
 1. Cloudflare → SSL/TLS → Overview → mode **Full (strict)** (NOT Flexible).
 2. Don't use Cloudflare's "Custom Hostnames" / "SSL for SaaS" feature — that's for multi-tenant SaaS setups and doesn't apply here. Just the normal DNS CNAME.
 3. Add the domain in Railway's app service → Settings → Domains before expecting traffic to route.
+4. **Keep the hostname one level deep from the zone apex.** Cloudflare's free Universal SSL cert covers only `<zone>` + `*.<zone>` — so inside zone `example.com`, `demo.example.com` works but `demo.foo.example.com` does not. See the handshake-failure entry below.
+
+### Cloudflare TLS `handshake_failure` on a deep subdomain
+
+Symptom: `curl` to the proxied hostname fails before any HTTP response, with something like:
+
+```text
+LibreSSL/3.3.6: error:1404B410:SSL routines:ST_CONNECT:sslv3 alert handshake failure
+curl: (35) ... sslv3 alert handshake failure
+```
+
+Cause: Cloudflare's free Universal SSL certificate on a zone `<zone>` covers `<zone>` and `*.<zone>` **only — a single level of wildcard.** A hostname like `demo.imrv.netzerolabs.io` inside zone `netzerolabs.io` is two levels deep and is not on the cert, so Cloudflare's edge has nothing to present for that SNI and aborts the handshake with alert 40.
+
+Confirm with SNI probes against the same IP (swap in your hostname / zone):
+
+```bash
+# Zone apex — presents the Cloudflare Universal cert
+echo | openssl s_client -connect demo.imrv.netzerolabs.io:443 \
+  -servername netzerolabs.io 2>&1 | grep -E "subject=|issuer="
+# → subject=CN=netzerolabs.io   issuer=... Let's Encrypt ...
+
+# Deep subdomain — alert 40, no cert
+echo | openssl s_client -connect demo.imrv.netzerolabs.io:443 \
+  -servername demo.imrv.netzerolabs.io 2>&1 | grep -E "alert|Cipher is"
+# → SSL alert number 40   Cipher is (NONE)
+```
+
+Also check `dig NS <parent-of-deep-subdomain>` — if it returns no records, there is no dedicated Cloudflare zone for that parent, which is the usual trigger.
+
+Fix (easiest first):
+
+1. **Switch the record to DNS-only (grey cloud).** Railway's own Let's Encrypt cert takes over and Cloudflare is no longer in the TLS path. Matches "Easiest setup" above.
+2. **Use a single-level host** (`demo.<zone>` instead of `demo.sub.<zone>`). Covered by the existing wildcard. Update Railway's custom domain and the `SITE_NAME` env var to match — see [Custom domain](#custom-domain).
+3. **Delegate the intermediate parent as its own Cloudflare zone** (e.g. add `imrv.netzerolabs.io` as a zone, then point the parent zone's `NS` records at the new zone's nameservers). Universal SSL on the new zone then covers `*.imrv.netzerolabs.io`. Keeps orange cloud, no paid plan.
+4. **Cloudflare Advanced Certificate Manager** (~$10/mo per zone). Lets you issue a cert that covers deeper wildcards on the existing zone.
 
 ### SPA routes 404 (anything under `/frontend/`)
 
