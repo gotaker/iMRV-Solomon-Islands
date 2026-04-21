@@ -1,4 +1,8 @@
 $(document).ready(function() {
+    // Frappe's first-run setup wizard is a full-width layout with no left
+    // margin; prepending the sidebar to <body> covers its form fields.
+    if (window.frappe?.boot?.setup_complete === 0) return;
+
     $('[class="app-logo"]').css({
         "display": "block"
     });
