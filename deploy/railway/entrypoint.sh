@@ -150,7 +150,20 @@ maybe_restore_sample_db() {
     local dump=/tmp/sample-db.sql.gz
     if [[ -n "$src_url" ]]; then
         echo "[entrypoint] fetching sample DB from \$SAMPLE_DB_URL"
-        curl -fsSL --output "$dump" "$src_url"
+        # Private-repo GitHub Release assets need a PAT; any other bespoke
+        # auth scheme can also be threaded through via SAMPLE_DB_AUTH_HEADER
+        # (full header line, e.g. "Authorization: Bearer ghp_xxx"). For
+        # GitHub Releases specifically, the asset returns octet-stream only
+        # when Accept is set — otherwise you get an HTML redirect that
+        # bench restore can't read.
+        local curl_args=(-fsSL --output "$dump")
+        if [[ -n "${SAMPLE_DB_AUTH_HEADER:-}" ]]; then
+            curl_args+=(-H "$SAMPLE_DB_AUTH_HEADER")
+        fi
+        if [[ "$src_url" == *"api.github.com"* ]]; then
+            curl_args+=(-H "Accept: application/octet-stream")
+        fi
+        curl "${curl_args[@]}" "$src_url"
     else
         echo "[entrypoint] copying sample DB from \$SAMPLE_DB_PATH=$src_path"
         if [[ ! -f "$src_path" ]]; then

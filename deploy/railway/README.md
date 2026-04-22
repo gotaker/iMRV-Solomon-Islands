@@ -65,7 +65,8 @@ If you want the Railway deploy to come up pre-populated (instead of the empty de
 
 | Variable | Value | Notes |
 | --- | --- | --- |
-| `SAMPLE_DB_URL` | `https://…/dump.sql.gz` | URL the container fetches with `curl -fsSL` on first boot. Must be reachable from Railway. Use a GitHub Release artifact, S3 signed URL, Railway volume URL, etc. |
+| `SAMPLE_DB_URL` | `https://…/dump.sql.gz` | URL the container fetches with `curl -fsSL` on first boot. Must be reachable from Railway. Use a GitHub Release artifact, S3 signed URL, Railway volume URL, etc. **Private GitHub repos:** the standard `/releases/download/…` URL returns 404 without auth — either use `SAMPLE_DB_AUTH_HEADER` below (combined with a token-prefixed URL) or a different host. |
+| `SAMPLE_DB_AUTH_HEADER` | `Authorization: Bearer ghp_…` | Optional raw header appended to the `curl` call. For a private GitHub repo, generate a fine-scoped PAT with `contents:read` on the repo and point `SAMPLE_DB_URL` at `https://api.github.com/repos/<owner>/<repo>/releases/assets/<asset_id>` (the entrypoint auto-adds `Accept: application/octet-stream` when it sees `api.github.com`). Find the asset id with `gh api repos/<owner>/<repo>/releases -q '.[].assets[] \| {id,name}'`. |
 | `SAMPLE_DB_PATH` | `/path/in/container.sql.gz` | Alternative to URL — path inside the container. Useful if you pre-upload via `railway ssh` (`cat dump.sql.gz \| railway ssh … "cat > /tmp/dump.sql.gz"`). |
 | `SAMPLE_DB_FORCE_RESTORE` | `1` (default `0`) | Re-run the restore on the next boot even if a previous boot already did it. Leave unset in normal operation; set only to deliberately re-seed, then unset and redeploy. |
 
