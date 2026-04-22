@@ -44,6 +44,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       build-essential \
       ca-certificates \
       curl \
+      file \
       gettext-base \
       git \
       gosu \
@@ -170,6 +171,25 @@ RUN node -e " \
 
 RUN cd /home/frappe/frappe-bench \
  && bench build --apps frappe,mrvtools,frappe_side_menu
+
+# ---------- Optional: bake in a sample DB dump ----------
+# Entrypoint.sh auto-uses /home/frappe/sample-db/*.sql.gz when present and
+# SAMPLE_DB_URL / SAMPLE_DB_PATH aren't set. `.Sample DB/` is gitignored by
+# default (see .gitignore — only .gitkeep is tracked), so Railway's git
+# checkout gives an empty dir and the COPY is a no-op. To bake a dump in:
+# either commit a *.sql.gz into .Sample DB/ (temporarily un-ignore it), or
+# `docker build` locally with the dump present in the build context.
+USER root
+RUN mkdir -p /home/frappe/sample-db && chown -R frappe:frappe /home/frappe/sample-db
+COPY --chown=frappe:frappe [".Sample DB", "/home/frappe/sample-db/"]
+USER frappe
+
+# ---------- Snapshot the sites/ skeleton ----------
+# If the runtime mounts a persistent volume at /home/frappe/frappe-bench/sites,
+# the mount shadows the apps.txt, assets/, and other files bench init/build
+# wrote into sites/. The entrypoint seeds an empty volume from this snapshot.
+RUN cp -a /home/frappe/frappe-bench/sites /home/frappe/sites-template \
+ && chown -R frappe:frappe /home/frappe/sites-template
 
 # ---------- Configs + entrypoint ----------
 USER root

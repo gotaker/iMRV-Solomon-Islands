@@ -29,6 +29,26 @@ echo "[entrypoint] SITE_NAME=$SITE_NAME DB_HOST=$DB_HOST PORT=$PORT"
 # On first mount, the Railway volume is owned by root. bench runs as frappe.
 chown -R frappe:frappe "$SITES"
 
+# ---- 1a. Seed sites/ skeleton on first mount ----
+# A fresh Railway volume mount shadows the sites/ directory baked into the
+# image (apps.txt, assets/, etc.), so bench can't find its app list. Copy the
+# template in if the volume is empty.
+if [[ ! -f "$SITES/apps.txt" ]]; then
+    echo "[entrypoint] seeding empty sites volume from /home/frappe/sites-template"
+    gosu frappe cp -an /home/frappe/sites-template/. "$SITES/"
+fi
+
+# ---- 1b. Refresh sites/assets/ from image template on every boot ----
+# sites/assets/ is build output (produced by `bench build` in the image),
+# not user data. Leaving the first-boot copy on the persistent volume causes
+# the asset manifest (assets.json) to drift out of sync with the bench code
+# baked into each new image, producing 404s on CSS/JS bundles.
+if [[ -d /home/frappe/sites-template/assets ]]; then
+    echo "[entrypoint] refreshing sites/assets/ from image template"
+    rm -rf "$SITES/assets"
+    gosu frappe cp -a /home/frappe/sites-template/assets "$SITES/assets"
+fi
+
 # ---- 2. Render nginx config ----
 # envsubst swaps $PORT from env; all other $vars in the template are nginx
 # variables (prefixed $http_*, $proxy_*, $uri, etc.) — we whitelist only PORT.
@@ -92,6 +112,79 @@ else
         SITE_NAME="$SITE_NAME" \
         bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" migrate'
 fi
+
+# ---- 4b. Optional: restore a sample DB ----
+# Runs iff SAMPLE_DB_URL or SAMPLE_DB_PATH is set. A marker file in the site
+# dir (.sample_db_restored) keeps this to once-per-site-lifetime unless
+# SAMPLE_DB_FORCE_RESTORE=1 is explicitly set — otherwise every redeploy
+# would wipe demo state. Mirrors install.sh :: load_sample_data() semantics.
+maybe_restore_sample_db() {
+    local src_url="${SAMPLE_DB_URL:-}"
+    local src_path="${SAMPLE_DB_PATH:-}"
+
+    # Fall back to a dump baked into the image at /home/frappe/sample-db/.
+    # Only used when neither env var is set. See Dockerfile "bake in a sample
+    # DB dump" step for how to include one.
+    if [[ -z "$src_url" && -z "$src_path" ]]; then
+        shopt -s nullglob
+        local baked=(/home/frappe/sample-db/*.sql.gz)
+        shopt -u nullglob
+        if [[ ${#baked[@]} -gt 0 ]]; then
+            src_path="${baked[0]}"
+            echo "[entrypoint] auto-using baked-in sample DB: $src_path"
+        fi
+    fi
+
+    if [[ -z "$src_url" && -z "$src_path" ]]; then
+        return 0
+    fi
+
+    local marker="$SITE_DIR/.sample_db_restored"
+    local force="${SAMPLE_DB_FORCE_RESTORE:-0}"
+    if [[ -f "$marker" && "$force" != "1" ]]; then
+        echo "[entrypoint] sample DB already restored (marker: $marker) — skipping"
+        echo "[entrypoint]   set SAMPLE_DB_FORCE_RESTORE=1 to re-run on next boot"
+        return 0
+    fi
+
+    local dump=/tmp/sample-db.sql.gz
+    if [[ -n "$src_url" ]]; then
+        echo "[entrypoint] fetching sample DB from \$SAMPLE_DB_URL"
+        curl -fsSL --output "$dump" "$src_url"
+    else
+        echo "[entrypoint] copying sample DB from \$SAMPLE_DB_PATH=$src_path"
+        if [[ ! -f "$src_path" ]]; then
+            echo "[entrypoint] FATAL: SAMPLE_DB_PATH file does not exist" >&2
+            exit 1
+        fi
+        cp "$src_path" "$dump"
+    fi
+    chown frappe:frappe "$dump"
+
+    echo "[entrypoint] restoring sample DB into $SITE_NAME (drops current DB)"
+    gosu frappe env BENCH="$BENCH" SITE_NAME="$SITE_NAME" \
+        DB_ROOT_PASSWORD="$DB_ROOT_PASSWORD" DUMP="$dump" \
+        bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" --force restore "$DUMP" \
+            --mariadb-root-password "$DB_ROOT_PASSWORD"'
+    gosu frappe env BENCH="$BENCH" SITE_NAME="$SITE_NAME" \
+        bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" migrate && bench --site "$SITE_NAME" clear-cache'
+
+    rm -f "$dump"
+    gosu frappe touch "$marker"
+    echo "[entrypoint] sample DB restore complete"
+}
+maybe_restore_sample_db
+
+# ---- 4a. Set host_name so Frappe's realtime server accepts the public URL ----
+# Without this, socket.io rejects websocket connections from any domain other
+# than the bare SITE_NAME with "Invalid origin". Safe to run every boot — it
+# re-writes site_config.json idempotently. Protocol defaults to https (Railway
+# always serves TLS); override SITE_PROTOCOL=http for local/non-TLS setups.
+SITE_PROTOCOL="${SITE_PROTOCOL:-https}"
+HOST_NAME_URL="${SITE_PROTOCOL}://${SITE_NAME}"
+gosu frappe env BENCH="$BENCH" SITE_NAME="$SITE_NAME" HOST_NAME_URL="$HOST_NAME_URL" \
+    bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" set-config host_name "$HOST_NAME_URL"'
+echo "[entrypoint] host_name set to $HOST_NAME_URL"
 
 # ---- 5. Set current site ----
 echo "$SITE_NAME" > "$SITES/currentsite.txt"

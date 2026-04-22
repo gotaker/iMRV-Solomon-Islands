@@ -12,7 +12,9 @@ This repo contains **two Frappe apps** side-by-side plus a **Vue 3 SPA**:
 
 When working on a change, first identify which of these three layers owns the behavior — they have different build/deploy paths and different entrypoints.
 
-Two pip entry points live at the repo root: [setup.py](setup.py) packages `mrvtools`, [setup_sidebarmenu.py](setup_sidebarmenu.py) packages `frappe_side_menu`. `requirements.txt` is the real dependency manifest; `requirements 2.txt` (note the space in the filename) is a stray duplicate — ignore it.
+Two pip entry points live at the repo root: [setup.py](setup.py) packages `mrvtools`, [setup_sidebarmenu.py](setup_sidebarmenu.py) packages `frappe_side_menu`. `requirements.txt` is the dependency manifest.
+
+The top-level [iMRV-Solomon-Islands/public/frontend/](iMRV-Solomon-Islands/public/frontend/) directory is a stray misplaced build artifact — the real Vite output lives at `mrvtools/public/frontend/`. Don't edit anything inside the top-level path; changes there are not served.
 
 ## Build and run
 
@@ -32,7 +34,11 @@ Dev-server requirement (from [frontend/README.md](frontend/README.md)): add `"ig
 
 There is no CI (`.github/workflows/` is absent) and no enforced linting — only [frontend/.prettierrc.json](frontend/.prettierrc.json) exists and nothing runs it automatically.
 
+Day-to-day stack lifecycle on an already-installed bench: [start.sh](start.sh) and [shutdown.sh](shutdown.sh) at the repo root. `./start.sh --dev` brings up MariaDB/Redis (if needed), `bench start` in the background, and Vite on :8080; `./start.sh --prod` skips Vite. `./shutdown.sh` stops bench + Vite (sweeps orphan listeners on the bench's actual ports, read from `common_site_config.json`); `./shutdown.sh --full` also stops MariaDB/Redis. Both honour `BENCH_DIR`, `SITE_NAME`, and `DRY_RUN=1`. Spec: [docs/superpowers/specs/2026-04-19-start-shutdown-scripts-design.md](docs/superpowers/specs/2026-04-19-start-shutdown-scripts-design.md).
+
 For a one-command bootstrap (fresh macOS, Ubuntu, or Windows/WSL2 laptop → working dev or prod install), run [install.sh](install.sh) at the repo root: `MYSQL_ROOT_PASSWORD=<pw> ./install.sh --dev` (or `--prod`). The script is idempotent — it automates exactly the `bench get-app` / `install-app` / `migrate` / `yarn build` sequence documented above, plus OS package install (Homebrew on macOS, apt on Ubuntu/WSL2), `bench init`, `new-site`, and the `ignore_csrf` / `developer_mode` flip for dev. Env vars (`BENCH_DIR`, `SITE_NAME`, `FRAPPE_BRANCH`, `PROD_DOMAIN`, `PROD_ENABLE_TLS`, etc.) override defaults; `DRY_RUN=1` prints what would run without executing it. Prod-only: set `PROD_DOMAIN=<fqdn>` to run `bench setup add-domain`, and `PROD_ENABLE_TLS=1` (Ubuntu only) to provision a Let's Encrypt cert via `bench setup lets-encrypt`. See [docs/superpowers/specs/2026-04-19-unified-setup-script-design.md](docs/superpowers/specs/2026-04-19-unified-setup-script-design.md) for the full spec.
+
+**Sample data on install.** `./install.sh --dev` force-restores the newest `*.sql.gz` from [.Sample DB/](.Sample%20DB/) (gitignored — drop a current dump there before running install on a fresh clone) and re-runs `bench migrate` after restore so the schema tracks the app code. `--prod` skips the restore by default. Override either way with `--with-sample-data` / `--no-sample-data` or `LOAD_SAMPLE_DATA=1/0`; `SAMPLE_DB_PATH=<file>` selects a specific dump. The restore step copies the file to `mktemp` first because Frappe's `bench restore` shells out to `zgrep`/`gunzip` without quoting the path and chokes on the space in `.Sample DB/`.
 
 Frappe app install (run from your bench root, not this directory):
 
@@ -64,6 +70,8 @@ Design spec: [docs/superpowers/specs/2026-04-19-ci-pipeline-design.md](docs/supe
 
 Version pins live in both workflow files and in [install.sh](install.sh) — keep them in sync. Bumping Python, Node, or the Frappe branch in `install.sh` requires a matching edit to `ci-frappe-tests.yml` in the same PR.
 
+[ruff.toml](ruff.toml) is intentionally conservative: only `E`/`F`/`I` are selected, and ~10 specific rules (`E501`, `E711`, `E712`, `E722`, `F841`, …) are explicitly ignored as "pre-existing legacy patterns" in Frappe controllers. The ignores are baseline, not aspirational — don't widen ruff's scope or "clean up" `== None` / bare `except:` / unused locals as a side-effect of unrelated work; that's a separate, opt-in cleanup.
+
 Branch protection on `master` requires these status checks (configure manually via repo Settings → Branches): `frontend-build`, `frontend-format`, `python-lint`, `frappe-tests`.
 
 Secrets needed: `MARIADB_ROOT_PASSWORD` (any strong password — only used inside the ephemeral MariaDB service container).
@@ -79,6 +87,8 @@ Secrets needed: `MARIADB_ROOT_PASSWORD` (any strong password — only used insid
 
 All three use `ignore_permissions=True` and swallow exceptions into `frappe.log_error`. When install appears to "silently succeed" but data is missing, check the Error Log doctype.
 
+`load_default_files` has a recovery trap: it skips extraction when a `File` DB record with the matching name already exists, **even if the physical file on disk is gone** (see [mrvtools/mrvtools/after_install.py:28](mrvtools/mrvtools/after_install.py#L28)). If seed images 404 after a volume wipe, re-running `load_default_files` is a no-op — you have to unzip `mrv_default_files.zip` directly into `sites/<site>/public/files/`. The Railway container ships without `unzip`, so use `python3 -c "import zipfile; …"` for any extraction work inside it.
+
 **Permission query conditions.** [mrvtools/hooks.py](mrvtools/hooks.py) wires `My Approval` and `Approved User` to `get_query_conditions` functions in their respective doctype modules — these filter list views server-side. Changes to approval visibility belong there, not in client-side JS.
 
 **Doctype conventions.** Doctypes ending in `_childtable` are Frappe child tables and must be embedded in a parent doctype; they are not independently listable. Doctypes ending in `_master_list` are reference/lookup tables seeded by `load_master_data`. The `edited_*` doctypes (e.g. `edited_project_details`, `edited_ghg_inventory_details`) appear to be revision/draft variants of their base doctypes — treat them as paired.
@@ -87,9 +97,15 @@ All three use `ignore_permissions=True` and swallow exceptions into `frappe.log_
 
 **Two hooks.py files.** `mrvtools/hooks.py` and `frappe_side_menu/hooks.py` are independent — each is read by Frappe for its own app. Don't consolidate.
 
-**Post-login redirect.** [frappe_side_menu/hooks.py](frappe_side_menu/hooks.py) sets `on_session_creation = "frappe_side_menu.frappe_side_menu.api.set_default_route"`, which reads `Side Menu Settings.route_logo` and sets the user's `home_page`. Login-redirect bugs usually originate here, not in `mrvtools/hooks.py`.
+**Post-login redirect.** [frappe_side_menu/hooks.py](frappe_side_menu/hooks.py) sets `on_session_creation = "frappe_side_menu.frappe_side_menu.api.set_default_route"`, which sends every logged-in user — including System Users like `Administrator` — to `/app/<route>` on the Frappe desk, not the SPA. The route comes from `Side Menu Settings → Post-Login Landing Route` (the underlying field is still `route_logo` for backwards compatibility), and falls back to `main-dashboard` when blank ([frappe_side_menu/frappe_side_menu/api.py:182](frappe_side_menu/frappe_side_menu/api.py#L182)). This split is intentional: the SPA at `/frontend/home` is the public-facing site, reachable without login. Login-redirect bugs usually originate here, not in `mrvtools/hooks.py`.
 
 **Desk customisations are narrow.** `mrvtools/hooks.py` injects `doctype_js` / `doctype_list_js` only for the `User` doctype; `frappe_side_menu/hooks.py` injects `doctype_list_js` only for `Project`. Most `doc_events` / `scheduler_events` / `override_doctype_class` lines in both files are commented-out stubs — don't read them as active wiring.
+
+**Railway deployment.** Staging/demo runs on Railway using the image built from [Dockerfile](Dockerfile), launched by [deploy/railway/entrypoint.sh](deploy/railway/entrypoint.sh), fronted by [deploy/railway/nginx.conf.template](deploy/railway/nginx.conf.template). Operational runbook: [deploy/railway/README.md](deploy/railway/README.md). Local integration test of the same image: `docker compose -f deploy/railway/docker-compose.local.yml up --build`. Three non-obvious invariants:
+
+1. **`/files/` must be an nginx `alias`, not a `proxy_pass` to gunicorn.** Frappe's WSGI handler returns 404 for public File URLs in this single-tenant setup — so proxying breaks every seed image on the SPA home page. Keep the alias block shape identical to the `/assets/` block above it. `${SITE_NAME}` is pre-approved in the `envsubst` allowlist at [entrypoint.sh:44](deploy/railway/entrypoint.sh#L44); adding any new variable there is a breaking change for the template.
+2. **Sites volume is seeded from a baked-in template only when empty.** The entrypoint copies `/home/frappe/sites-template` into `/home/frappe/frappe-bench/sites` only when `apps.txt` is missing. Once a site is created, a volume remount that loses `<site>/public/files/` will **not** re-trigger seeding, and `after_install`'s skip-guard (see seed-data note above) won't re-extract either. Manual recovery is the only path.
+3. **`ADMIN_PASSWORD` is read only on first boot.** [entrypoint.sh:87](deploy/railway/entrypoint.sh#L87) passes it to `bench new-site` once, then ignores the env var forever. To rotate, use `bench --site $SITE_NAME set-admin-password …` inside the container — not the Railway dashboard.
 
 ## Server-side entry points
 

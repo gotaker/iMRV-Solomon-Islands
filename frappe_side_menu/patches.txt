@@ -1,0 +1,1 @@
+frappe_side_menu.patches.v1_0.set_default_route_logo

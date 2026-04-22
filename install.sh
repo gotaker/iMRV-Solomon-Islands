@@ -6,14 +6,18 @@ set -euo pipefail
 # --- Usage ---------------------------------------------------------------
 usage() {
   cat <<'EOF'
-Usage: install.sh [--dev | --prod] [--help]
+Usage: install.sh [--dev | --prod] [--with-sample-data | --no-sample-data] [--help]
 
 Bootstraps a fresh macOS, Ubuntu, or Windows-via-WSL2 laptop into a working
 mrvtools + frappe_side_menu + frontend environment.
 
 Modes:
-  --dev    Local development environment (Vite dev server, ignore_csrf enabled)
-  --prod   Production environment (supervisor + nginx via bench setup production)
+  --dev              Local development environment (Vite dev server, ignore_csrf enabled)
+  --prod             Production environment (supervisor + nginx via bench setup production)
+
+Sample data:
+  --with-sample-data Force-restore the demo DB after install (default in --dev)
+  --no-sample-data   Skip demo-DB restore (default in --prod)
 
 Environment variables (defaults in parens):
   BENCH_DIR               ($HOME/frappe-bench)  Where bench init lives
@@ -26,6 +30,9 @@ Environment variables (defaults in parens):
   MRVTOOLS_SRC            (auto)                Repo path for bench get-app mrvtools
   SIDE_MENU_SRC           (auto)                Repo path for bench get-app frappe_side_menu
   SKIP_SYSTEM_DEPS        (0)                   Set to 1 to skip OS package install
+  LOAD_SAMPLE_DATA        (auto)                1/0 — overrides the mode-based default above
+  SAMPLE_DB_PATH          (auto)                Explicit path to the *.sql.gz to restore;
+                                                otherwise newest match in .Sample DB/ is used
   PROD_USER               ($USER)                       User for bench setup production
   PROD_DOMAIN             (demo.imrv.netzerolabs.io)    In --prod, the FQDN attached via bench setup add-domain
   PROD_ENABLE_TLS         (0)                            If 1 in --prod, run bench setup lets-encrypt (Ubuntu only)
@@ -49,6 +56,8 @@ PROD_USER="${PROD_USER:-${USER:-root}}"
 PROD_DOMAIN="${PROD_DOMAIN:-demo.imrv.netzerolabs.io}"
 PROD_ENABLE_TLS="${PROD_ENABLE_TLS:-0}"
 DRY_RUN="${DRY_RUN:-0}"
+LOAD_SAMPLE_DATA="${LOAD_SAMPLE_DATA:-}"
+SAMPLE_DB_PATH="${SAMPLE_DB_PATH:-}"
 
 MODE=""
 OS=""
@@ -428,6 +437,64 @@ _get_and_install_one() {
     fi
   )
 }
+load_sample_data() {
+  step "load_sample_data"
+  if [[ "$LOAD_SAMPLE_DATA" != "1" ]]; then
+    skip "load_sample_data: LOAD_SAMPLE_DATA=$LOAD_SAMPLE_DATA"
+    return
+  fi
+  _resolve_sample_db_path
+  if [[ -z "$SAMPLE_DB_PATH" ]]; then
+    warn "LOAD_SAMPLE_DATA=1 but no *.sql.gz found in .Sample DB/ — skipping"
+    return
+  fi
+  if [[ ! -f "$SAMPLE_DB_PATH" ]]; then
+    err "SAMPLE_DB_PATH does not exist: $SAMPLE_DB_PATH"
+    exit 1
+  fi
+  info "sample DB: $SAMPLE_DB_PATH"
+  # bench restore shells out to zgrep/gunzip without quoting the path — if
+  # SAMPLE_DB_PATH contains spaces (it does by default, sitting in ".Sample DB/"),
+  # the call falls apart with "No such file or directory". Copy to a clean temp.
+  local tmp_db
+  if [[ "$DRY_RUN" == "1" ]]; then
+    printf 'DRY_RUN: cp %q to temp dir and bench --site %s --force restore <tmp>\n' \
+      "$SAMPLE_DB_PATH" "$SITE_NAME"
+    printf 'DRY_RUN: bench --site %s migrate (post-restore)\n' "$SITE_NAME"
+    return
+  fi
+  tmp_db="$(mktemp -t mrv-sample-db.XXXXXX)" || { err "mktemp failed"; exit 1; }
+  tmp_db="${tmp_db}.sql.gz"
+  cp "$SAMPLE_DB_PATH" "$tmp_db"
+  # shellcheck disable=SC2064
+  trap "rm -f '$tmp_db'" RETURN
+  _ensure_bench_redis
+  (
+    cd "$BENCH_DIR"
+    run bench --site "$SITE_NAME" --force restore "$tmp_db" \
+      --mariadb-root-password "$MYSQL_ROOT_PASSWORD"
+    info "running bench migrate (post-restore)"
+    run bench --site "$SITE_NAME" migrate
+  )
+  _stop_bench_redis_daemons
+}
+
+_resolve_sample_db_path() {
+  # If caller set SAMPLE_DB_PATH explicitly, leave it alone.
+  if [[ -n "$SAMPLE_DB_PATH" ]]; then
+    return
+  fi
+  local dir="$SCRIPT_DIR/.Sample DB"
+  [[ -d "$dir" ]] || return
+  # Sample backups use ISO-ish timestamped names (YYYYMMDD_HHMMSS-...); sort
+  # lexicographically and take the last → newest.
+  local newest=""
+  while IFS= read -r -d '' f; do
+    [[ -z "$newest" || "$f" > "$newest" ]] && newest="$f"
+  done < <(find "$dir" -maxdepth 1 -type f -name '*.sql.gz' -print0 2>/dev/null)
+  SAMPLE_DB_PATH="$newest"
+}
+
 patch_site_config() {
   step "patch_site_config"
   local config_path="$BENCH_DIR/sites/$SITE_NAME/site_config.json"
@@ -588,14 +655,21 @@ parse_args() {
   if [[ $# -eq 0 ]]; then usage; exit 2; fi
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --dev)     MODE=dev;  shift ;;
-      --prod)    MODE=prod; shift ;;
-      --help|-h) usage; exit 0 ;;
-      *)         err "Unknown argument: $1"; usage; exit 2 ;;
+      --dev)               MODE=dev;  shift ;;
+      --prod)              MODE=prod; shift ;;
+      --with-sample-data)  LOAD_SAMPLE_DATA=1; shift ;;
+      --no-sample-data)    LOAD_SAMPLE_DATA=0; shift ;;
+      --help|-h)           usage; exit 0 ;;
+      *)                   err "Unknown argument: $1"; usage; exit 2 ;;
     esac
   done
   if [[ -z "$MODE" ]]; then
     err "One of --dev or --prod is required"; usage; exit 2
+  fi
+  # Default: dev loads sample data (if present), prod does not. Explicit flag
+  # or LOAD_SAMPLE_DATA env var wins over the mode-based default.
+  if [[ -z "$LOAD_SAMPLE_DATA" ]]; then
+    LOAD_SAMPLE_DATA=$([[ "$MODE" == "dev" ]] && echo 1 || echo 0)
   fi
 }
 
@@ -614,6 +688,7 @@ main() {
   init_bench
   create_site
   get_and_install_apps
+  load_sample_data
   build_frontend
 
   if [[ "$MODE" == "dev" ]]; then

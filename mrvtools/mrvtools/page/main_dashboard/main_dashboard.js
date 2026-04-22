@@ -365,8 +365,8 @@ class Dashboard {
 				
 				$('#project-count-title').html("Projects - Objective wise")
 				let colors_1 = ['#c6a7fe', '#ff8183', '#7feabf', '#cdcdcd','#70bcff']
-				if (project_count_value.reduce((accumulator, currentValue) => accumulator + currentValue) != 0){
-					$('#project-count-total').html(`<span class="span-1">Total :</span><span class="span-2"> ${project_count_value.reduce((accumulator, currentValue) => accumulator + currentValue)}</span>`)
+				if (project_count_value.reduce((accumulator, currentValue) => accumulator + currentValue, 0) != 0){
+					$('#project-count-total').html(`<span class="span-1">Total :</span><span class="span-2"> ${project_count_value.reduce((accumulator, currentValue) => accumulator + currentValue, 0)}</span>`)
 					const custom_options = {
 						type: "donut",
 						colors: colors_1,
@@ -425,8 +425,8 @@ class Dashboard {
 
 				$('#status-title').html("Projects - Status wise")
 				let colors_2 = ['#9a97ff', '#63e293', '#9eccee','#c6a7fe', '#ff8183', '#7feabf', '#cdcdcd','#70bcff']
-				if(project_status_value_list.reduce((accumulator, currentValue) => accumulator + currentValue) != 0){
-					$('#status-total').html(`<span class="span-1">Total :</span><span class="span-2"> ${project_status_value_list.reduce((accumulator, currentValue) => accumulator + currentValue)}</span>`)
+				if(project_status_value_list.reduce((accumulator, currentValue) => accumulator + currentValue, 0) != 0){
+					$('#status-total').html(`<span class="span-1">Total :</span><span class="span-2"> ${project_status_value_list.reduce((accumulator, currentValue) => accumulator + currentValue, 0)}</span>`)
 					const project_status_option = {
 						type: "donut",
 						colors: colors_2,
@@ -484,7 +484,7 @@ class Dashboard {
 				$('#mitigation-title').html("Mitigation Projects - Sector wise")
 				// colors: ['#6fdf96', '#ff8183', '#c6a7fe', '#e8e565',"#ff92e0","#77cce2","#f29b69","#8c88f7"],
 				if(mitigation_value_list.length != 0){
-					$('#mitigation-total').html(`<span class="span-1">Total :</span><span class="span-2"> ${mitigation_value_list.reduce((accumulator, currentValue) => accumulator + currentValue)}</span>`)
+					$('#mitigation-total').html(`<span class="span-1">Total :</span><span class="span-2"> ${mitigation_value_list.reduce((accumulator, currentValue) => accumulator + currentValue, 0)}</span>`)
 					const mitigation_option = {
 						type: "donut",
 						colors: colors_3,
@@ -545,7 +545,7 @@ class Dashboard {
 				$('#adaptation-title').html("Adaptation Projects - Sector wise")
 				let colors_4 = ["#2E8B57","#FF69B4","#6A5ACD","#FF4500","#20B2AA","#FF8C00","#9370DB","#FFDAB9","#8A2BE2","#FFA07A","#00CED1","#FF69B4","#7B68EE","#FF4500","#20B2AA","#FF8C00","#FFC5A6","#FDAC98","#DC8E90","#A97882","#58545F","#B3D9FF","#FFD700","#C7E5E8","#FF6347","#9370DB","#32CD32","#FF1493","#4682B4","#FFD700","#8B4513","#FF6347","#9932CC","#FFA500","#32CD32","#FF1493","#4682B4","#FFD700","#8B4513","#FF6347"]
 				if(adaptation_value_list.length != 0){
-					$('#adaptation-total').html(`<span class="span-1">Total :</span><span class="span-2"> ${adaptation_value_list.reduce((accumulator, currentValue) => accumulator + currentValue)}</span>`)
+					$('#adaptation-total').html(`<span class="span-1">Total :</span><span class="span-2"> ${adaptation_value_list.reduce((accumulator, currentValue) => accumulator + currentValue, 0)}</span>`)
 					const adaptation_option = {
 						type: "donut",
 						colors: colors_4,
@@ -624,7 +624,7 @@ class Dashboard {
 			$('#project_support_status-title').html("Support Status - Project wise")
 			// colors: ['#6fdf96', '#ff8183', '#c6a7fe', '#e8e565',"#ff92e0","#77cce2","#f29b69","#8c88f7"],
 			if(project_support_status_value.length != 0){
-				$('#project_support_status-total').html(`<span class="span-1">Total :</span><span class="span-2"> ${project_support_status_value.reduce((accumulator, currentValue) => accumulator + currentValue)}</span>`)
+				$('#project_support_status-total').html(`<span class="span-1">Total :</span><span class="span-2"> ${project_support_status_value.reduce((accumulator, currentValue) => accumulator + currentValue, 0)}</span>`)
 				const options = {
 					type: "donut",
 					colors: colors_8,
@@ -674,7 +674,7 @@ class Dashboard {
 
 			$('#usd_support_status-title').html("Support Status - USD")
 			if(usd_support_status_value.length != 0){
-				$('#usd_support_status-total').html(`<span class="span-1">Total :</span><span class="span-2"> ${usd_support_status_value.reduce((accumulator, currentValue) => accumulator + currentValue)}</span>`)
+				$('#usd_support_status-total').html(`<span class="span-1">Total :</span><span class="span-2"> ${usd_support_status_value.reduce((accumulator, currentValue) => accumulator + currentValue, 0)}</span>`)
 				const options = {
 					type: "donut",
 					colors: colors_8,
@@ -736,14 +736,14 @@ class Dashboard {
 					if (r.message.data.length != 0){
 						let expected = 0
 						if(r.message.expected.length != 0){
-							expected = r.message.expected.reduce((accumulator, currentValue) => accumulator + currentValue)
+							expected = r.message.expected.reduce((accumulator, currentValue) => accumulator + currentValue, 0)
 						}
 						else{
 							expected = 0
 						}
-						if(r.message.data.reduce((accumulator, currentValue) => accumulator + currentValue) != 0){
+						if(r.message.data.reduce((accumulator, currentValue) => accumulator + currentValue, 0) != 0){
 							$('#mitigation_till-date-label').html(`<span class="span-3">Total :</span><span class="span-3">Expected :</span>`)
-							$('#mitigation_till-date-value').html(`<span class="span-4"> ${r.message.data.reduce((accumulator, currentValue) => accumulator + currentValue)}</span><span class="span-4"> ${expected}</span>`)
+							$('#mitigation_till-date-value').html(`<span class="span-4"> ${r.message.data.reduce((accumulator, currentValue) => accumulator + currentValue, 0)}</span><span class="span-4"> ${expected}</span>`)
 							const mitigation_ghg_till_data = {
 								type: "donut",
 								colors: colors_5,
@@ -828,14 +828,14 @@ class Dashboard {
 					if(r.message.data.length != 0){
 						let expected = 0
 						if(r.message.expected.length != 0){
-							expected = r.message.expected.reduce((accumulator, currentValue) => accumulator + currentValue)
+							expected = r.message.expected.reduce((accumulator, currentValue) => accumulator + currentValue, 0)
 						}
 						else{
 							expected = 0
 						}
-						if(r.message.data.reduce((accumulator, currentValue) => accumulator + currentValue) != 0){
+						if(r.message.data.reduce((accumulator, currentValue) => accumulator + currentValue, 0) != 0){
 							$('#mitigation_last-year-label').html(`<span class="span-3">Total :</span><span class="span-3">Expected :</span>`)
-							$('#mitigation_last-year-value').html(`<span class="span-4"> ${r.message.data.reduce((accumulator, currentValue) => accumulator + currentValue)}</span><span class="span-4"> ${expected}</span>`)
+							$('#mitigation_last-year-value').html(`<span class="span-4"> ${r.message.data.reduce((accumulator, currentValue) => accumulator + currentValue, 0)}</span><span class="span-4"> ${expected}</span>`)
 							const mitigation_ghg_last_year = {
 								type: "donut",
 								colors: colors_6,
@@ -920,7 +920,7 @@ class Dashboard {
 				let results = r.message || [];
 				if (results != []){
 					if (results.data.length != 0){
-						if (r.message.data.reduce((accumulator, currentValue) => accumulator + currentValue) != 0){
+						if (r.message.data.reduce((accumulator, currentValue) => accumulator + currentValue, 0) != 0){
 							$('#co2_emission_latest-total').html(`<span class="span-1">Total :</span><span class="span-2"> ${r.message.data.reduce((accumulator, currentValue) => accumulator + currentValue[0], 0)}</span>`)
 							
 							const custom_options = {
@@ -1010,7 +1010,7 @@ class Dashboard {
 				let values = Object.values(r.message);
 				if (results != []){
 					if (values.length != 0){
-						if (values.reduce((accumulator, currentValue) => accumulator + currentValue) != 0){
+						if (values.reduce((accumulator, currentValue) => accumulator + currentValue, 0) != 0){
 							const custom_options = {
 								type: "bar",
 								colors: ["#03a9f4"],
@@ -1076,7 +1076,7 @@ class Dashboard {
 				$("#sdg_category-title").html("No of SDG Projects - SDG Categories")
 				let results = r.message || [];
 				if (results != []){
-					if(r.message.data.reduce((accumulator, currentValue) => accumulator + currentValue) != 0){
+					if(r.message.data.reduce((accumulator, currentValue) => accumulator + currentValue, 0) != 0){
 						const custom_options = {
 							type: "bar",
 							colors: ["#48bb74"],

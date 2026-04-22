@@ -1,4 +1,11 @@
 $(document).ready(function() {
+    // Frappe's first-run setup wizard is a full-width layout with no left
+    // margin; prepending the sidebar to <body> covers its form fields.
+    // Guard on the wizard route, not `setup_complete === 0`: this project's
+    // `on_session_creation` sends users to /app/main-dashboard and bypasses
+    // the wizard, so the flag can stay 0 on an otherwise-provisioned site.
+    if (window.location.pathname.startsWith('/app/setup-wizard')) return;
+
     $('[class="app-logo"]').css({
         "display": "block"
     });

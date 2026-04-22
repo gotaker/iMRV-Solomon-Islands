@@ -1,4 +1,4 @@
-.DS_Store
+.._.DS_Store
 *.pyc
 *.egg-info
 *.swp
@@ -7,3 +7,6 @@ mrvtools/docs/current
 node_modules/
 ._*
 .worktrees/
+docs/frappe-admin-training.pptx
+.Sample DB/*
+!.Sample DB/.gitkeep
