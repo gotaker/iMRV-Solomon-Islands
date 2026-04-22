@@ -182,3 +182,14 @@ def set_default_route():
 	route = frappe.db.get_single_value("Side Menu Settings", "route_logo") or "main-dashboard"
 	frappe.local.response['home_page'] = "/app/" + route
 
+	# Frappe v15's LoginManager.set_user_info() runs AFTER on_session_creation and
+	# unconditionally overwrites response['home_page'] with "/app/" + slug(info.default_workspace)
+	# or "/app" (frappe/auth.py:189-195). Mutate info.default_workspace so our route survives —
+	# slug() round-trips lower-kebab values, so "main-dashboard" stays "main-dashboard".
+	# Without this, Safari and Chrome diverge post-login because a client-side fallback in
+	# frappe_side_menu.js only wins the redirect race in Chrome.
+	login_manager = getattr(frappe.local, "login_manager", None)
+	info = getattr(login_manager, "info", None) if login_manager else None
+	if info is not None:
+		info.default_workspace = route
+
