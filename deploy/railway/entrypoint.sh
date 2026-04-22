@@ -196,6 +196,19 @@ maybe_restore_sample_db() {
 }
 maybe_restore_sample_db
 
+# ---- 4c. Optional: force-sync Administrator password to $ADMIN_PASSWORD ----
+# Use when a sample-DB restore left the site with a dev-laptop password and
+# you don't want to re-run the full restore just to rotate credentials.
+# Set ADMIN_PASSWORD_FORCE_SYNC=1 on Railway, redeploy, then unset and
+# redeploy again so subsequent boots don't keep rewriting (set-admin-password
+# invalidates existing sessions, so every boot with this on logs users out).
+if [[ "${ADMIN_PASSWORD_FORCE_SYNC:-0}" == "1" ]]; then
+    echo "[entrypoint] ADMIN_PASSWORD_FORCE_SYNC=1 — rotating Administrator password"
+    gosu frappe env BENCH="$BENCH" SITE_NAME="$SITE_NAME" ADMIN_PASSWORD="$ADMIN_PASSWORD" \
+        bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" set-admin-password "$ADMIN_PASSWORD" && bench --site "$SITE_NAME" clear-cache'
+    echo "[entrypoint] Administrator password rotated (unset ADMIN_PASSWORD_FORCE_SYNC for future boots)"
+fi
+
 # ---- 4a. Set host_name so Frappe's realtime server accepts the public URL ----
 # Without this, socket.io rejects websocket connections from any domain other
 # than the bare SITE_NAME with "Invalid origin". Safe to run every boot — it
