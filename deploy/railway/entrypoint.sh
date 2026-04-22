@@ -182,6 +182,14 @@ maybe_restore_sample_db() {
     gosu frappe env BENCH="$BENCH" SITE_NAME="$SITE_NAME" \
         bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" migrate && bench --site "$SITE_NAME" clear-cache'
 
+    # bench --force restore overwrites the Administrator password hash with
+    # whatever was in the dump (typically a dev-laptop password). Re-apply the
+    # env var so ADMIN_PASSWORD remains the source of truth and login works
+    # with the same credential users already have.
+    echo "[entrypoint] rotating Administrator password to \$ADMIN_PASSWORD"
+    gosu frappe env BENCH="$BENCH" SITE_NAME="$SITE_NAME" ADMIN_PASSWORD="$ADMIN_PASSWORD" \
+        bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" set-admin-password "$ADMIN_PASSWORD"'
+
     rm -f "$dump"
     gosu frappe touch "$marker"
     echo "[entrypoint] sample DB restore complete"

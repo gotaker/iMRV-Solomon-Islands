@@ -78,7 +78,7 @@ Restore flow ([entrypoint.sh:117-165](entrypoint.sh#L117-L165)):
 2. If set AND a marker file at `sites/<site>/.sample_db_restored` is absent (or `SAMPLE_DB_FORCE_RESTORE=1`), it fetches/copies the dump to `/tmp/sample-db.sql.gz`, runs `bench --force restore` + `bench migrate` + `bench clear-cache`, then writes the marker.
 3. On subsequent boots the marker short-circuits the restore (so normal redeploys don't wipe accumulated changes).
 
-**This is destructive** — `bench --force restore` drops the current site DB and recreates it from the dump. The Administrator password in the dump becomes live; rotate with `bench --site $SITE_NAME set-admin-password …` afterwards if needed.
+**This is destructive** — `bench --force restore` drops the current site DB and recreates it from the dump. The entrypoint auto-rotates the Administrator password back to `$ADMIN_PASSWORD` immediately after restore, so existing login credentials keep working. If you bypass the entrypoint (e.g. manual `bench restore` inside the container), you must also run `bench --site $SITE_NAME set-admin-password "$ADMIN_PASSWORD"` yourself.
 
 ### Raw Editor gotchas
 
