@@ -31,15 +31,30 @@ runs:
       with:
         node-version: ${{ inputs.node-version }}
 
-    - name: Bootstrap bench (install.sh --dev --no-sample-data)
+    # Install CLIENT-ONLY apt deps. The workflow's MariaDB/Redis service
+    # containers already provide the servers on 127.0.0.1:3306 / :6379 — if
+    # install.sh's SKIP_SYSTEM_DEPS=0 path runs, its `apt install mariadb-server`
+    # collides with the service container on :3306 and dpkg post-install fails.
+    # Matches the package list in ci-frappe-tests.yml.
+    - name: Install client-only apt deps
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          git \
+          mariadb-client \
+          build-essential libssl-dev libffi-dev \
+          xvfb libfontconfig
+
+    - name: Bootstrap bench (install.sh --dev --no-sample-data, SKIP_SYSTEM_DEPS=1)
       shell: bash
       env:
         MYSQL_ROOT_PASSWORD: ${{ inputs.mariadb-root-password }}
         BENCH_DIR: ${{ github.workspace }}/../frappe-bench
         SITE_NAME: test_mrv.localhost
         FRAPPE_BRANCH: ${{ inputs.frappe-branch }}
+        SKIP_SYSTEM_DEPS: '1'
       run: |
-        sudo apt-get update
         ./install.sh --dev --no-sample-data
 
     - name: Download sample DB from release asset
