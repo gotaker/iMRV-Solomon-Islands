@@ -10,47 +10,95 @@ pytestmark = pytest.mark.security
 
 def test_sql_injection_in_side_menu_interpolation(bench_server, frappe_site):
     """
-    frappe_side_menu/frappe_side_menu/api.py lines 52-74 build dynamic
-    CASE WHEN clauses via str.format() on role/doctype names. This test
-    calls get_menulist as an authed user whose roles / doctypes were
-    seeded with injection payloads — the request must either error cleanly
-    or return empty; the tabUser table must still exist afterward.
+    frappe_side_menu/api.py lines 52-74 build dynamic CASE WHEN clauses via
+    str.format() on ROLE NAMES returned by frappe.get_roles(user).
+
+    Attack vector: create a role whose name contains SQL metacharacters,
+    assign it to a user, log in as that user, call get_menulist. If the
+    .format() interpolation is vulnerable, the SQL executes.
+
+    We verify (a) the request doesn't 500 with a traceback, and (b) the
+    tabUser table is intact afterward — both are necessary safety invariants.
     """
+    import uuid
+
     import frappe
 
-    # Sanity: tabUser exists before.
+    # Sanity snapshot before.
     before = frappe.db.sql("SELECT COUNT(*) FROM `tabUser`")[0][0]
 
-    # Attempt injection via a URL param (safe: frappe.client.get_list strips
-    # most of these, but the get_menulist path interpolates role names).
-    payload = "Administrator'; DROP TABLE tabUser; --"
+    # Seed an attacker-named role and user. Use a benign-looking metacharacter
+    # combination that would break an unparameterized .format() if one existed.
+    # The single-quote and semicolon are the load-bearing characters.
+    role_name = f"rogue'; SELECT 1; -- {uuid.uuid4().hex[:6]}"
+    user_email = f"rogue-{uuid.uuid4().hex[:8]}@example.com"
+
+    try:
+        frappe.get_doc({"doctype": "Role", "role_name": role_name}).insert(ignore_permissions=True)
+    except Exception:
+        pytest.skip("Frappe rejected the rogue role name — interpolation surface not reachable via role names on this version")
+
+    user_doc = frappe.get_doc({
+        "doctype": "User",
+        "email": user_email,
+        "first_name": "Rogue",
+        "send_welcome_email": 0,
+        "new_password": "roguepass123",
+        "roles": [{"role": role_name}],
+    })
+    user_doc.insert(ignore_permissions=True)
+
+    # Log in as the rogue user via HTTP, then invoke get_menulist.
     s = requests.Session()
-    s.post(f"{bench_server}/api/method/login", data={"usr": "Administrator", "pwd": "admin"})
-    r = s.get(
-        f"{bench_server}/api/method/frappe_side_menu.frappe_side_menu.api.get_menulist",
-        params={"role": payload},
+    login = s.post(
+        f"{bench_server}/api/method/login",
+        data={"usr": user_email, "pwd": "roguepass123"},
         timeout=10,
     )
-    # Either 200 with empty/escaped result, or a 4xx. NOT 500 with a traceback.
-    assert r.status_code in (200, 400, 404, 417)
-    assert "Traceback" not in r.text
+    assert login.status_code == 200, f"rogue-user login failed: {login.status_code}"
 
+    r = s.get(
+        f"{bench_server}/api/method/frappe_side_menu.frappe_side_menu.api.get_menulist",
+        timeout=15,
+    )
+    # Not 500; no traceback leak.
+    assert r.status_code != 500, f"500 on menulist with rogue role — possible injection: {r.text[:300]}"
+    assert "Traceback" not in r.text, "stack trace leaked in response body"
+
+    # The critical invariant: tabUser is intact.
     after = frappe.db.sql("SELECT COUNT(*) FROM `tabUser`")[0][0]
-    assert after == before, "tabUser row count changed — injection payload may have executed"
+    assert after == before, (
+        "tabUser row count changed — rogue role interpolation may have executed SQL. "
+        f"before={before} after={after}"
+    )
 
 
 def test_xss_in_user_registration_fields(bench_server, frappe_site):
-    """Submit <script> in createUser name field; when rendered anywhere, assert escaped."""
-    import frappe
-    payload = "<script>alert('xss')</script>"
-    r = requests.post(
+    """Submit <script> in createUser first_name; verify escaped in HTML-rendered list view."""
+    import uuid
+
+    payload = "<script>alert('xss-probe')</script>"
+    probe_email = f"xss-{uuid.uuid4().hex[:8]}@example.com"
+
+    # Submit via the guest-callable createUser (factory would require auth).
+    requests.post(
         f"{bench_server}/api/method/mrvtools.mrvtools.doctype.user_registration.user_registration.createUser",
-        data={"email": "xss-probe@example.com", "first_name": payload, "last_name": "Probe"},
+        data={"email": probe_email, "first_name": payload, "last_name": "Probe"},
         timeout=10,
     )
-    # Regardless of whether creation succeeded, the raw payload must not appear
-    # unescaped in any endpoint that renders user-facing HTML.
-    listed = requests.get(f"{bench_server}/api/method/frappe.client.get_list",
-                         params={"doctype": "User Registration", "fields": '["*"]'},
-                         timeout=10)
-    assert "<script>alert" not in listed.text, "raw <script> echoed in response — XSS surface"
+
+    # Log in as Administrator and fetch the HTML list view (not JSON).
+    s = requests.Session()
+    s.post(f"{bench_server}/api/method/login", data={"usr": "Administrator", "pwd": "admin"}, timeout=10)
+    r = s.get(f"{bench_server}/app/user-registration", timeout=15)
+
+    # If desk returns HTML, raw unescaped <script> would be a real XSS.
+    # If the endpoint 404s or returns JSON (Frappe changed paths), skip rather than pass blindly.
+    ct = r.headers.get("Content-Type", "")
+    if "html" not in ct.lower():
+        pytest.skip(f"/app/user-registration did not return HTML (Content-Type={ct!r}) — surface moved or unauth'd")
+
+    # Must not contain the literal payload in executable form.
+    assert "<script>alert('xss-probe')" not in r.text, (
+        "raw <script> survived rendering — XSS surface in user-registration list view"
+    )

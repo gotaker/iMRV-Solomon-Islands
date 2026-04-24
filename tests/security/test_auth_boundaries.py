@@ -18,8 +18,10 @@ def test_guest_cannot_read_user_secrets(bench_server):
     # must not appear.
     if r.status_code == 200:
         body = r.text.lower()
-        for leak in ("password", "api_secret", "reset_password_key", "new_password"):
-            assert leak not in body, f"guest can see {leak!r} in /api/resource/User"
+        # Check for field-like patterns — `"<fieldname>": "<value>"` — not bare
+        # substrings (which false-positive on descriptions and metadata).
+        for leak in ('"password":', '"api_secret":', '"reset_password_key":', '"new_password":'):
+            assert leak not in body, f"guest can see leaked field {leak!r} in /api/resource/User"
     else:
         assert r.status_code in (401, 403)
 
@@ -56,8 +58,6 @@ def test_permission_query_cannot_be_bypassed(bench_server, frappe_site):
     `My Approval` via three different APIs — all must respect the
     permission_query_conditions hook defined in mrvtools/hooks.py.
     """
-    import frappe
-
     # Via /api/resource
     r_res = requests.get(
         f"{bench_server}/api/resource/My Approval",
@@ -95,8 +95,12 @@ def test_private_file_requires_auth(bench_server, frappe_site):
     url = rows[0].file_url
     assert url.startswith("/private/files/")
 
-    r_guest = requests.get(f"{bench_server}{url}", timeout=10)
-    assert r_guest.status_code in (401, 403), f"private file reachable by guest: {url}"
+    r_guest = requests.get(f"{bench_server}{url}", timeout=10, allow_redirects=False)
+    # 302 → /login is also access denial (redirect to sign-in). Accept it.
+    assert r_guest.status_code in (302, 401, 403), f"private file reachable by guest: {url} (status {r_guest.status_code})"
+    if r_guest.status_code == 302:
+        loc = r_guest.headers.get("Location", "")
+        assert "/login" in loc, f"302 but not to /login: {loc!r}"
 
     s = requests.Session()
     s.post(f"{bench_server}/api/method/login", data={"usr": "Administrator", "pwd": "admin"})
