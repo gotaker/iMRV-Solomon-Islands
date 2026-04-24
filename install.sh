@@ -30,6 +30,9 @@ Environment variables (defaults in parens):
   MRVTOOLS_SRC            (auto)                Repo path for bench get-app mrvtools
   SIDE_MENU_SRC           (auto)                Repo path for bench get-app frappe_side_menu
   SKIP_SYSTEM_DEPS        (0)                   Set to 1 to skip OS package install
+  SKIP_START_SERVICES     (0)                   Set to 1 to skip the final start.sh step
+                                                (useful in CI where services are provided
+                                                externally — e.g. docker service containers)
   LOAD_SAMPLE_DATA        (auto)                1/0 — overrides the mode-based default above
   SAMPLE_DB_PATH          (auto)                Explicit path to the *.sql.gz to restore;
                                                 otherwise newest match in .Sample DB/ is used
@@ -52,6 +55,7 @@ MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD:-}"
 MRVTOOLS_SRC="${MRVTOOLS_SRC:-$SCRIPT_DIR}"
 SIDE_MENU_SRC="${SIDE_MENU_SRC:-$MRVTOOLS_SRC/frappe_side_menu}"
 SKIP_SYSTEM_DEPS="${SKIP_SYSTEM_DEPS:-0}"
+SKIP_START_SERVICES="${SKIP_START_SERVICES:-0}"
 PROD_USER="${PROD_USER:-${USER:-root}}"
 PROD_DOMAIN="${PROD_DOMAIN:-demo.imrv.netzerolabs.io}"
 PROD_ENABLE_TLS="${PROD_ENABLE_TLS:-0}"
@@ -762,7 +766,11 @@ main() {
 
   ensure_asset_symlinks
   ensure_site_hostname
-  start_services
+  if [[ "$SKIP_START_SERVICES" == "1" ]]; then
+    skip "start_services (SKIP_START_SERVICES=1)"
+  else
+    start_services
+  fi
 
   printf '\n==> install.sh finished (mode=%s)\n' "$MODE" >&2
 }
