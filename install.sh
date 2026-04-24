@@ -461,6 +461,8 @@ load_sample_data() {
     printf 'DRY_RUN: cp %q to temp dir and bench --site %s --force restore <tmp>\n' \
       "$SAMPLE_DB_PATH" "$SITE_NAME"
     printf 'DRY_RUN: bench --site %s migrate (post-restore)\n' "$SITE_NAME"
+    printf 'DRY_RUN: bench --site %s execute mrvtools.mrvtools.after_install.load_single_doc (re-seed singles)\n' \
+      "$SITE_NAME"
     return
   fi
   tmp_db="$(mktemp -t mrv-sample-db.XXXXXX)" || { err "mktemp failed"; exit 1; }
@@ -475,6 +477,12 @@ load_sample_data() {
       --mariadb-root-password "$MYSQL_ROOT_PASSWORD"
     info "running bench migrate (post-restore)"
     run bench --site "$SITE_NAME" migrate
+    # A sample DB can land with NULL values for singles the app seeds on
+    # install (Side Menu Settings.application_logo is the common casualty —
+    # it makes the sidebar flag 404). load_single_doc() re-upserts the four
+    # seeded singles from master_data/*.json and is idempotent.
+    info "re-seeding singles from master_data (post-restore)"
+    run bench --site "$SITE_NAME" execute mrvtools.mrvtools.after_install.load_single_doc
   )
   _stop_bench_redis_daemons
 }
