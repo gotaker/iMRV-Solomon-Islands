@@ -25,13 +25,24 @@ def load_default_files():
                 continue
             origin = get_files_path()
             item_file_path = os.path.join(origin, file.filename)
-            if not os.path.exists(item_file_path) and not frappe.db.exists("File", {"file_name": filename}):
+            # Decouple the on-disk and DB checks. A Railway volume remount (or
+            # any other loss of sites/<site>/public/files/) can leave File DB
+            # records whose physical file is gone; previously the compound
+            # "skip if EITHER exists" guard turned this function into a no-op
+            # in exactly the case where recovery was needed.
+            payload = None
+            if not os.path.exists(item_file_path):
+                payload = file_data.read(file.filename)
+                os.makedirs(os.path.dirname(item_file_path) or origin, exist_ok=True)
+                with open(item_file_path, "wb") as fh:
+                    fh.write(payload)
+            if not frappe.db.exists("File", {"file_name": filename}):
                 file_doc = frappe.new_doc("File")
-                file_doc.content = file_data.read(file.filename)
+                file_doc.content = payload if payload is not None else file_data.read(file.filename)
                 file_doc.file_name = filename
                 file_doc.folder = "Home"
                 file_doc.is_private = 0
-                file_doc.save(ignore_permissions = True)
+                file_doc.save(ignore_permissions=True)
                 frappe.db.commit()
 
         return file_path

@@ -190,6 +190,15 @@ maybe_restore_sample_db() {
     gosu frappe env BENCH="$BENCH" SITE_NAME="$SITE_NAME" \
         bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" execute mrvtools.mrvtools.after_install.load_single_doc'
 
+    # Re-extract any seed files the singles above point at but whose physical
+    # file is missing from the volume. A Railway volume remount can drop
+    # sites/<site>/public/files/ while leaving File DB records intact; the
+    # patched load_default_files() decouples the disk and DB checks so
+    # missing files are always re-extracted from mrv_default_files.zip.
+    echo "[entrypoint] re-extracting seed files from zip (post-restore)"
+    gosu frappe env BENCH="$BENCH" SITE_NAME="$SITE_NAME" \
+        bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" execute mrvtools.mrvtools.after_install.load_default_files'
+
     # bench --force restore overwrites the Administrator password hash with
     # whatever was in the dump (typically a dev-laptop password). Re-apply the
     # env var so ADMIN_PASSWORD remains the source of truth and login works
@@ -219,16 +228,20 @@ fi
 
 # ---- 4d. Optional: force-reseed Frappe singles from master_data ----
 # Re-asserts seeded values on the four singles MRV owns (MrvFrontend,
-# Side Menu Settings, Website Settings, Navbar Settings) without re-running
-# a full sample-DB restore. Use when a restore (or a manual desk edit) cleared
-# a seed field like Side Menu Settings.application_logo and the sidebar flag
-# 404s. load_single_doc() is idempotent — safe to invoke repeatedly.
+# Side Menu Settings, Website Settings, Navbar Settings) AND re-extracts any
+# missing seed files from mrv_default_files.zip (the sidebar flag PNG, NDC
+# PDFs, etc.) — a volume remount can drop sites/<site>/public/files/ while
+# leaving File DB records intact, producing 404s that neither a restart nor a
+# DB reseed alone will fix. Both underlying functions are idempotent.
 # Set SINGLES_FORCE_SYNC=1 on Railway, redeploy, then unset and redeploy again.
 if [[ "${SINGLES_FORCE_SYNC:-0}" == "1" ]]; then
     echo "[entrypoint] SINGLES_FORCE_SYNC=1 — re-seeding singles from master_data"
     gosu frappe env BENCH="$BENCH" SITE_NAME="$SITE_NAME" \
-        bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" execute mrvtools.mrvtools.after_install.load_single_doc && bench --site "$SITE_NAME" clear-cache'
-    echo "[entrypoint] singles reseeded (unset SINGLES_FORCE_SYNC for future boots)"
+        bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" execute mrvtools.mrvtools.after_install.load_single_doc'
+    echo "[entrypoint] SINGLES_FORCE_SYNC=1 — re-extracting seed files from zip"
+    gosu frappe env BENCH="$BENCH" SITE_NAME="$SITE_NAME" \
+        bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" execute mrvtools.mrvtools.after_install.load_default_files && bench --site "$SITE_NAME" clear-cache'
+    echo "[entrypoint] singles + seed files reseeded (unset SINGLES_FORCE_SYNC for future boots)"
 fi
 
 # ---- 4a. Set host_name so Frappe's realtime server accepts the public URL ----

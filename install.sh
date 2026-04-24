@@ -463,6 +463,8 @@ load_sample_data() {
     printf 'DRY_RUN: bench --site %s migrate (post-restore)\n' "$SITE_NAME"
     printf 'DRY_RUN: bench --site %s execute mrvtools.mrvtools.after_install.load_single_doc (re-seed singles)\n' \
       "$SITE_NAME"
+    printf 'DRY_RUN: bench --site %s execute mrvtools.mrvtools.after_install.load_default_files (re-extract seed files)\n' \
+      "$SITE_NAME"
     return
   fi
   tmp_db="$(mktemp -t mrv-sample-db.XXXXXX)" || { err "mktemp failed"; exit 1; }
@@ -483,6 +485,11 @@ load_sample_data() {
     # seeded singles from master_data/*.json and is idempotent.
     info "re-seeding singles from master_data (post-restore)"
     run bench --site "$SITE_NAME" execute mrvtools.mrvtools.after_install.load_single_doc
+    # Re-extract seed files whose physical file is missing from the volume
+    # (the sidebar flag PNG, NDC PDFs). load_default_files() skips anything
+    # already on disk and is idempotent.
+    info "re-extracting seed files from zip (post-restore)"
+    run bench --site "$SITE_NAME" execute mrvtools.mrvtools.after_install.load_default_files
   )
   _stop_bench_redis_daemons
 }
