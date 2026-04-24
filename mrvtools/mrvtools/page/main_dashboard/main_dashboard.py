@@ -168,15 +168,15 @@ def get_document_count():
 	miti_count_list=[]
 	for i in miti_keySector:
 		if frappe.db.exists("Mitigations",{"key_sector":i.name}):
-			miti_count = frappe.db.get_all("Mitigations",fields=["key_sector","COUNT(name) count"],filters={'key_sector':i.name})
-			miti_count_list.append(miti_count[0])
-			
+			count = frappe.db.count("Mitigations", filters={'key_sector': i.name})
+			miti_count_list.append({"key_sector": i.name, "count": count})
+
 	adapt_keySector = frappe.db.sql('''SELECT name from `tabProject Key Sector` WHERE objective in ("Adaptation","Cross-Cutting")''',as_dict=1)
 	adapt_count_list=[]
 	for i in adapt_keySector:
 		if frappe.db.exists("Adaptation",{"key_sector":i.name}):
-			adapt_count = frappe.db.get_all("Adaptation",fields=["key_sector","COUNT(name) count"],filters={'key_sector':i.name})
-			adapt_count_list.append(adapt_count[0])
+			count = frappe.db.count("Adaptation", filters={'key_sector': i.name})
+			adapt_count_list.append({"key_sector": i.name, "count": count})
 			
 	# project_planned = frappe.db.count("Project",{"status":["in",["Planned","Planning"]]})
 	# project_ongoing = frappe.db.count("Project",{"status":["in",["Adopted","Under Implementation","Implemented","Operational"]]})
@@ -215,15 +215,18 @@ def get_commulative_mitigation_till_date():
 	actual_reduction_list=[]
 	expected_annual_ghg_list=[]
 	for i in result:
-		tillDateActual = frappe.db.get_all('Mitigation Monitoring Information',
-			filters={"key_sector":f"{i.key_sector}"},
-			fields = ["sum(actual_annual_ghg) as till_date_actual_ghg","expected_annual_ghg"])
+		tillDateActual = frappe.db.sql(
+			"""SELECT SUM(actual_annual_ghg) AS till_date_actual_ghg,
+			          MAX(expected_annual_ghg) AS expected_annual_ghg
+			   FROM `tabMitigation Monitoring Information`
+			   WHERE key_sector = %s""",
+			(i.key_sector,), as_dict=True)
 		if tillDateActual[0].till_date_actual_ghg != None and tillDateActual[0].till_date_actual_ghg != 0.0:
 			actual_reduction_list.append(tillDateActual[0].till_date_actual_ghg)
 			sector_label_list.append(i.key_sector)
 			if tillDateActual[0].expected_annual_ghg != None and tillDateActual[0].expected_annual_ghg != 0.0:
 				expected_annual_ghg_list.append(tillDateActual[0].expected_annual_ghg)
-   
+
 	return {"data":actual_reduction_list,"labels":sector_label_list,"expected":expected_annual_ghg_list}
 
 @frappe.whitelist()
@@ -251,9 +254,14 @@ def get_commulative_mitigation_last_year():
 	last_from_year_date_str = last_from_year_date.strftime('%Y-%m-%d')
 	last_to_year_date_str = last_to_year_date.strftime('%Y-%m-%d')
 	for i in result:
-		tillDateActual = frappe.db.get_all('Mitigation Monitoring Information',
-			filters={"key_sector":f"{i.key_sector}","start_date":["between",[f"{last_from_year_date_str}",f"{last_to_year_date_str}"]]},
-			fields = ["sum(actual_annual_ghg) as till_date_actual_ghg","expected_annual_ghg"])
+		tillDateActual = frappe.db.sql(
+			"""SELECT SUM(actual_annual_ghg) AS till_date_actual_ghg,
+			          MAX(expected_annual_ghg) AS expected_annual_ghg
+			   FROM `tabMitigation Monitoring Information`
+			   WHERE key_sector = %s
+			     AND start_date BETWEEN %s AND %s""",
+			(i.key_sector, last_from_year_date_str, last_to_year_date_str),
+			as_dict=True)
 		
 		if tillDateActual[0].till_date_actual_ghg != None and tillDateActual[0].till_date_actual_ghg != 0.0:
 			actual_reduction_list.append(tillDateActual[0].till_date_actual_ghg)
@@ -417,9 +425,16 @@ def total_co2_emission_last_five_years():
 
 @frappe.whitelist()
 def get_finance_support():
-	support_needed_sum=frappe.db.get_all("Climate Finance",fields=["SUM(others) as 'Support Needed'"],filters={"others":[">",0]})
-	support_received_sum=frappe.db.get_all("Climate Finance",fields=["SUM(total_sources_of_finance) as 'Support Received'"],filters={"total_sources_of_finance":[">",0]})
-	support_needed_count=frappe.db.get_all("Climate Finance",fields=["COUNT(name) as 'Support Needed'"],filters={"others":[">",0]})
-	support_received_count=frappe.db.get_all("Climate Finance",fields=["COUNT(name) as 'Support Received'"],filters={"total_sources_of_finance":[">",0]})
-	
-	return [support_needed_count[0],support_received_count[0],support_needed_sum[0],support_received_sum[0]]
+	needed_sum = frappe.db.sql(
+		"SELECT COALESCE(SUM(others), 0) FROM `tabClimate Finance` WHERE others > 0")[0][0]
+	received_sum = frappe.db.sql(
+		"SELECT COALESCE(SUM(total_sources_of_finance), 0) FROM `tabClimate Finance` WHERE total_sources_of_finance > 0")[0][0]
+	needed_count = frappe.db.count("Climate Finance", filters={"others": [">", 0]})
+	received_count = frappe.db.count("Climate Finance", filters={"total_sources_of_finance": [">", 0]})
+
+	return [
+		{"Support Needed": needed_count},
+		{"Support Received": received_count},
+		{"Support Needed": needed_sum},
+		{"Support Received": received_sum},
+	]
