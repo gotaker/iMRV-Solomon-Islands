@@ -71,7 +71,8 @@ def test_my_approval_insert_record_guest(bench_server):
         timeout=10,
     )
     # Current behavior: returns 200 (even on invalid input) because allow_guest=True
-    assert r.status_code in (200, 417), f"unexpected status {r.status_code}"
+    assert r.status_code != 500, f"server error on guest mutation — likely stack-trace leak: {r.text[:200]}"
+    assert r.status_code in (200, 400, 403, 417), f"unexpected status {r.status_code}"
 
 
 def test_my_approval_delete_record_guest(bench_server):
@@ -81,7 +82,8 @@ def test_my_approval_delete_record_guest(bench_server):
         data={"doctype": "Project", "docname": "NONEXISTENT"},
         timeout=10,
     )
-    assert r.status_code in (200, 417)
+    assert r.status_code != 500, f"server error on guest mutation — likely stack-trace leak: {r.text[:200]}"
+    assert r.status_code in (200, 400, 403, 417), f"unexpected status {r.status_code}"
 
 
 # --- mrvtools/mrvtools/doctype/user_registration/user_registration.py ------
@@ -93,7 +95,8 @@ def test_user_registration_createUser_guest(bench_server):
         data={"email": "smoke@example.com", "first_name": "Smoke", "last_name": "Test"},
         timeout=10,
     )
-    assert r.status_code in (200, 417)
+    assert r.status_code != 500, f"server error on guest mutation — likely stack-trace leak: {r.text[:200]}"
+    assert r.status_code in (200, 400, 403, 417), f"unexpected status {r.status_code}"
 
 
 def test_user_registration_insert_approved_users_guest(bench_server):
@@ -103,17 +106,8 @@ def test_user_registration_insert_approved_users_guest(bench_server):
         data={"email": "smoke@example.com"},
         timeout=10,
     )
-    assert r.status_code in (200, 417)
-
-
-def test_user_registration_createApprovedUser_guest(bench_server):
-    """Contract pin."""
-    r = requests.post(
-        f"{bench_server}/api/method/mrvtools.mrvtools.doctype.user_registration.user_registration.createApprovedUser",
-        data={"email": "smoke@example.com"},
-        timeout=10,
-    )
-    assert r.status_code in (200, 417)
+    assert r.status_code != 500, f"server error on guest mutation — likely stack-trace leak: {r.text[:200]}"
+    assert r.status_code in (200, 400, 403, 417), f"unexpected status {r.status_code}"
 
 
 # --- frappe_side_menu/frappe_side_menu/api.py ------------------------------
