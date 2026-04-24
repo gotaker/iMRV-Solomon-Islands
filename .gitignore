@@ -23,3 +23,10 @@ package-lock.json
 !mrvtools/public/mrv_default_files.zip
 *.tar
 *.7z
+
+# Test harness artifacts
+tests/.pytest_cache/
+tests/**/__pycache__/
+tests/playwright-report/
+tests/playwright-traces/
+tests/.screenshots/
