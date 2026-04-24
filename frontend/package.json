@@ -4,9 +4,8 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vite build --base=/assets/mrvtools/frontend/ && yarn copy-html-entry",
-    "preview": "vite preview",
-    "copy-html-entry": "cp ../mrvtools/public/frontend/index.html ../mrvtools/www/frontend.html"
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "aos": "^2.3.4",
@@ -14,20 +13,20 @@
     "feather-icons": "^4.28.0",
     "frappe-ui": "^0.1.277",
     "lightgallery": "^2.7.2",
-    "vue": "^3.2.25",
+    "vue": "^3.5.13",
     "vue-meta": "^2.4.0",
     "vue-motion": "^0.2.3",
-    "vue-router": "^4.0.12",
+    "vue-router": "^4.2.2",
     "vue3-bootstrap": "^1.0.0",
     "wow": "^0.0.3"
   },
   "devDependencies": {
     "@types/node": "^20.8.8",
-    "@vitejs/plugin-vue": "^2.0.0",
-    "autoprefixer": "^10.4.2",
-    "postcss": "^8.4.31",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.5",
     "prettier": "3.3.3",
-    "tailwindcss": "^3.0.15",
-    "vite": "^2.9.16"
+    "tailwindcss": "^3.4.15",
+    "vite": "^5.4.21"
   }
 }

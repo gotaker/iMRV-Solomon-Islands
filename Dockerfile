@@ -3,11 +3,11 @@
 # ---------- Stage 1: Build Vue SPA ----------
 FROM node:24-alpine AS frontend-build
 
-# Mirror the bench directory layout so vite.config.js's dynamic outDir resolves
-# correctly:  outDir = `../${basename(resolve('..'))}/public/frontend`
-# With CWD at /build/mrvtools/frontend/, resolve('..') = /build/mrvtools and
-# basename = 'mrvtools', so outDir becomes ../mrvtools/public/frontend which
-# resolves to /build/mrvtools/mrvtools/public/frontend — matching the COPY targets.
+# vite.config.mjs pins outDir to '../mrvtools/public/frontend' (relative to the
+# frontend/ dir), so we need a parent dir named anything that contains a
+# sibling 'mrvtools' where the build can land. We use /build/mrvtools as the
+# parent (frontend/ is copied under it), which makes outDir resolve to
+# /build/mrvtools/mrvtools/public/frontend — matching the COPY targets below.
 WORKDIR /build/mrvtools
 
 # Copy only what Vite needs (avoids invalidating cache on unrelated changes)
@@ -138,9 +138,10 @@ RUN set -eux; \
 # ---------- Inject pre-built SPA from stage 1 ----------
 # The SPA was already built in the frontend-build stage. Copy it into the
 # mrvtools app inside the bench so /assets/mrvtools/frontend/ resolves.
-# Note: stage 1's WORKDIR is /build/mrvtools; vite.config.js resolves outDir
-# using basename(cwd-parent), so the artifacts end up at
-# /build/mrvtools/mrvtools/public/frontend and /build/mrvtools/mrvtools/www/frontend.html.
+# Stage 1 pins outDir to '../mrvtools/public/frontend' and indexHtmlPath to
+# '../mrvtools/www/frontend.html' (via frappe-ui/vite buildConfig), which under
+# WORKDIR /build/mrvtools lands at /build/mrvtools/mrvtools/public/frontend
+# and /build/mrvtools/mrvtools/www/frontend.html.
 COPY --from=frontend-build --chown=frappe:frappe \
     /build/mrvtools/mrvtools/public/frontend \
     /home/frappe/frappe-bench/apps/mrvtools/mrvtools/public/frontend
