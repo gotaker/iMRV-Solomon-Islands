@@ -9,7 +9,7 @@
     display: none !important;
 }
 
-.col-lg-2.layout-side-section,.page-title .sidebar-toggle-btn{  
+.layout-side-section,.page-title .sidebar-toggle-btn{
     display: none;
 }
 .container-xl, .container-lg, .container-md, .container-sm, .container {
