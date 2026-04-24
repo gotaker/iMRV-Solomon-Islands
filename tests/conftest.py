@@ -13,12 +13,14 @@ Env vars (all optional, sensible defaults):
 - BENCH_DIR (default `../frappe-bench`)
 - SAMPLE_DB_URL (fallback when no local dump)
 - TESTS_SKIP_UI (skip Playwright cleanly)
+- TEST_SERVER_TIMEOUT (seconds bench serve has to become ready, default 60)
 """
 
 from __future__ import annotations
 
 import os
 import shutil
+import signal
 import socket
 import subprocess
 import tempfile
@@ -34,6 +36,10 @@ BENCH_DIR = Path(os.environ.get("BENCH_DIR", REPO_ROOT.parent / "frappe-bench"))
 TEST_SITE = os.environ.get("TEST_SITE", "test_mrv.localhost")
 TEST_PORT = int(os.environ.get("TEST_PORT", "8001"))
 SAMPLE_DB_URL = os.environ.get("SAMPLE_DB_URL")
+
+# Module-level flags / accumulators used across fixtures.
+_FRAPPE_CONNECTED: bool = False
+_TEMP_DIRS: list[Path] = []
 
 
 def _find_local_sample_db() -> Path | None:
@@ -57,11 +63,15 @@ def _resolve_sample_db() -> Path:
     local = _find_local_sample_db()
     if local is not None:
         # Copy to mktemp to sidestep the `.Sample DB/` space-in-path zgrep bug.
-        tmp = Path(tempfile.mkdtemp(prefix="mrv-sampledb-")) / "sample.sql.gz"
+        parent = Path(tempfile.mkdtemp(prefix="mrv-sampledb-"))
+        _TEMP_DIRS.append(parent)
+        tmp = parent / "sample.sql.gz"
         shutil.copy2(local, tmp)
         return tmp
     if SAMPLE_DB_URL:
-        tmp = Path(tempfile.mkdtemp(prefix="mrv-sampledb-")) / "sample.sql.gz"
+        parent = Path(tempfile.mkdtemp(prefix="mrv-sampledb-"))
+        _TEMP_DIRS.append(parent)
+        tmp = parent / "sample.sql.gz"
         _download_sample_db(SAMPLE_DB_URL, tmp)
         return tmp
     pytest.fail(
@@ -100,51 +110,91 @@ def _wait_for_port(port: int, timeout: float = 30.0) -> None:
 @pytest.fixture(scope="session")
 def frappe_site():
     """Restore sample DB, migrate, connect frappe. Yields site name."""
+    global _FRAPPE_CONNECTED
+
     if not BENCH_DIR.is_dir():
         pytest.fail(f"BENCH_DIR {BENCH_DIR} not found. Run ./install.sh --dev.", pytrace=False)
 
     dump = _resolve_sample_db()
 
-    # Create site if missing (idempotent via --force on restore)
     sites_dir = BENCH_DIR / "sites" / TEST_SITE
-    if not sites_dir.is_dir():
-        _bench("new-site", TEST_SITE,
-               "--admin-password", "admin",
-               "--mariadb-root-password", os.environ.get("MARIADB_ROOT_PASSWORD", "admin"),
-               "--install-app", "mrvtools",
-               "--install-app", "frappe_side_menu")
+    try:
+        if not sites_dir.is_dir():
+            _bench("new-site", TEST_SITE,
+                   "--admin-password", "admin",
+                   "--mariadb-root-password", os.environ.get("MARIADB_ROOT_PASSWORD", "admin"),
+                   "--install-app", "mrvtools",
+                   "--install-app", "frappe_side_menu")
 
-    _bench("--site", TEST_SITE, "--force", "restore", str(dump))
-    _bench("--site", TEST_SITE, "migrate")  # <-- THE v16 gate
+        _bench("--site", TEST_SITE, "--force", "restore", str(dump))
+        _bench("--site", TEST_SITE, "migrate")  # <-- THE v16 gate
+    except subprocess.CalledProcessError as e:
+        pytest.fail(
+            f"bench setup failed: `{' '.join(e.cmd)}` exited {e.returncode}. "
+            f"Inspect `{BENCH_DIR}/logs/` for details.",
+            pytrace=False,
+        )
 
     # Connect frappe in this process for tests that use the python API directly.
     import frappe
     frappe.init(site=TEST_SITE, sites_path=str(BENCH_DIR / "sites"))
     frappe.connect()
+    _FRAPPE_CONNECTED = True
 
     yield TEST_SITE
 
-    frappe.destroy()
+    _FRAPPE_CONNECTED = False
+    try:
+        frappe.destroy()
+    finally:
+        for parent in _TEMP_DIRS:
+            shutil.rmtree(parent, ignore_errors=True)
+        _TEMP_DIRS.clear()
 
 
 @pytest.fixture(scope="session")
 def bench_server(frappe_site):
     """Start `bench serve --port $TEST_PORT`. Yields base URL."""
+    import tempfile as _tempfile
+
+    stderr_log = _tempfile.NamedTemporaryFile(prefix="bench-serve-stderr-", suffix=".log", delete=False)
     proc = subprocess.Popen(
         ["bench", "serve", "--port", str(TEST_PORT)],
         cwd=BENCH_DIR,
         stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stderr=stderr_log,
+        start_new_session=True,   # isolate process group so we can SIGTERM workers too
     )
+    stderr_log.close()
     try:
-        _wait_for_port(TEST_PORT)
+        try:
+            _wait_for_port(TEST_PORT, timeout=float(os.environ.get("TEST_SERVER_TIMEOUT", "60")))
+        except RuntimeError as e:
+            # Surface bench-serve errors instead of leaving the reader guessing.
+            try:
+                with open(stderr_log.name) as f:
+                    tail = f.read()[-4000:]
+            except OSError:
+                tail = "<could not read stderr log>"
+            raise RuntimeError(f"{e}\n--- bench serve stderr ---\n{tail}") from e
         yield f"http://127.0.0.1:{TEST_PORT}"
     finally:
-        proc.terminate()
+        try:
+            os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+        except (ProcessLookupError, PermissionError):
+            pass
         try:
             proc.wait(timeout=10)
         except subprocess.TimeoutExpired:
-            proc.kill()
+            try:
+                os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+            except (ProcessLookupError, PermissionError):
+                pass
+            proc.wait(timeout=5)
+        try:
+            os.unlink(stderr_log.name)
+        except OSError:
+            pass
 
 
 @pytest.fixture(scope="session")
@@ -166,6 +216,9 @@ def browser():
 def rollback_after_test(request, frappe_site):
     """Wrap each test in a Frappe savepoint so mutations don't leak across tests."""
     import frappe
+    if not _FRAPPE_CONNECTED or not getattr(frappe, "local", None) or not getattr(frappe.local, "db", None):
+        yield
+        return
     savepoint = f"testsave_{uuid.uuid4().hex[:12]}"
     frappe.db.savepoint(savepoint)
     try:
