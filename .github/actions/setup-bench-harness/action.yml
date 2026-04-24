@@ -1,0 +1,55 @@
+name: "Setup bench harness"
+description: "Install system deps, bootstrap bench via install.sh, download sample DB, install pytest+playwright"
+
+inputs:
+  mariadb-root-password:
+    description: "MariaDB root password"
+    required: true
+  sample-db-url:
+    description: "URL to sample DB release asset"
+    required: true
+  python-version:
+    description: "Python version to install"
+    default: "3.14"
+  node-version:
+    description: "Node.js version to install"
+    default: "24"
+  frappe-branch:
+    description: "Frappe branch to check out"
+    default: "version-16"
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Bootstrap bench (install.sh --dev --no-sample-data)
+      shell: bash
+      env:
+        MYSQL_ROOT_PASSWORD: ${{ inputs.mariadb-root-password }}
+        BENCH_DIR: ${{ github.workspace }}/../frappe-bench
+        SITE_NAME: test_mrv.localhost
+        FRAPPE_BRANCH: ${{ inputs.frappe-branch }}
+      run: |
+        sudo apt-get update
+        ./install.sh --dev --no-sample-data
+
+    - name: Download sample DB from release asset
+      shell: bash
+      run: |
+        mkdir -p ".Sample DB"
+        curl -fsSL "${{ inputs.sample-db-url }}" -o ".Sample DB/ci-sample.sql.gz"
+
+    - name: Install harness Python deps
+      shell: bash
+      run: |
+        pip install pytest pytest-timeout playwright requests httpx
+        playwright install --with-deps chromium
