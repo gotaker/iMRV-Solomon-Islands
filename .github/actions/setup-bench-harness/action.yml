@@ -72,6 +72,7 @@ runs:
         SITE_NAME: test_mrv.localhost
         FRAPPE_BRANCH: ${{ inputs.frappe-branch }}
         SKIP_SYSTEM_DEPS: '1'
+        SKIP_START_SERVICES: '1'
       run: |
         ./install.sh --dev --no-sample-data
 
