@@ -2,7 +2,7 @@ name: CI (fast checks)
 
 on:
   push:
-    branches: [master]
+    branches: [Main]
   pull_request:
 
 jobs:

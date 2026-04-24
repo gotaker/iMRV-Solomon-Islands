@@ -2,7 +2,7 @@ name: ci-test-harness
 
 on:
   pull_request:
-    branches: [master]
+    branches: [Main]
   schedule:
     - cron: "0 3 * * *"  # nightly 03:00 UTC (1h after ci-frappe-tests)
 

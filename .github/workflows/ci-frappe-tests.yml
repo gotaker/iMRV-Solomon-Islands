@@ -2,11 +2,11 @@ name: CI (Frappe tests)
 
 on:
   pull_request:
-    branches: [master]
+    branches: [Main]
   schedule:
     - cron: '0 2 * * *'
 
-# To require this check on master, configure branch protection
+# To require this check on Main, configure branch protection
 # manually via repo Settings -> Branches. This cannot be encoded
 # in the workflow itself.
 

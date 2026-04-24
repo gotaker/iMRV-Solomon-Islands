@@ -65,8 +65,8 @@ There is no standalone Python test harness in this repo — every `test_*.py` li
 
 CI runs via GitHub Actions. Two workflows:
 
-- [.github/workflows/ci-fast.yml](.github/workflows/ci-fast.yml) — runs on every PR and on pushes to `master`. Three parallel jobs: `frontend-build` (Vite build), `frontend-format` (Prettier `--check` against `frontend/src/**/*.{js,vue,css}`), `python-lint` (ruff on both Frappe apps). Target <2 min.
-- [.github/workflows/ci-frappe-tests.yml](.github/workflows/ci-frappe-tests.yml) — runs on PRs targeting `master` and nightly at 02:00 UTC. Spins up MariaDB 10.6 + Redis 7 service containers, runs `bench init`, installs both apps into a fresh `test_site`, then `bench run-tests --app mrvtools` and `--app frappe_side_menu`. On failure, uploads `frappe-bench/logs/` as an artifact; nightly failures also auto-open a GitHub issue labelled `ci-nightly-failure` (the label must exist in the repo).
+- [.github/workflows/ci-fast.yml](.github/workflows/ci-fast.yml) — runs on every PR and on pushes to `Main`. Three parallel jobs: `frontend-build` (Vite build), `frontend-format` (Prettier `--check` against `frontend/src/**/*.{js,vue,css}`), `python-lint` (ruff on both Frappe apps). Target <2 min.
+- [.github/workflows/ci-frappe-tests.yml](.github/workflows/ci-frappe-tests.yml) — runs on PRs targeting `Main` and nightly at 02:00 UTC. Spins up MariaDB 10.6 + Redis 7 service containers, runs `bench init`, installs both apps into a fresh `test_site`, then `bench run-tests --app mrvtools` and `--app frappe_side_menu`. On failure, uploads `frappe-bench/logs/` as an artifact; nightly failures also auto-open a GitHub issue labelled `ci-nightly-failure` (the label must exist in the repo).
 
 Design spec: [docs/superpowers/specs/2026-04-19-ci-pipeline-design.md](docs/superpowers/specs/2026-04-19-ci-pipeline-design.md).
 
@@ -74,7 +74,7 @@ Version pins live in both workflow files and in [install.sh](install.sh) — kee
 
 [ruff.toml](ruff.toml) is intentionally conservative: only `E`/`F`/`I` are selected, and ~10 specific rules (`E501`, `E711`, `E712`, `E722`, `F841`, …) are explicitly ignored as "pre-existing legacy patterns" in Frappe controllers. The ignores are baseline, not aspirational — don't widen ruff's scope or "clean up" `== None` / bare `except:` / unused locals as a side-effect of unrelated work; that's a separate, opt-in cleanup.
 
-Branch protection on `master` requires these status checks (configure manually via repo Settings → Branches): `frontend-build`, `frontend-format`, `python-lint`, `frappe-tests`.
+Branch protection on `Main` requires these status checks (configure manually via repo Settings → Branches): `frontend-build`, `frontend-format`, `python-lint`, `frappe-tests`.
 
 The test harness adds three more required checks: `harness-data-integration`, `harness-ui`, `harness-security`. `harness-regression` is advisory for the first two weeks, then flipped to blocking in [ci-test-harness.yml](.github/workflows/ci-test-harness.yml).
 
