@@ -143,6 +143,26 @@ PY
     echo "[entrypoint] DB_USER_FORCE_SYNC complete (unset DB_USER_FORCE_SYNC for future boots)"
 fi
 
+# Predicate: will the maybe_restore_sample_db step (section 4b) actually
+# restore? Mirrors its own guard so the migrate branch below can skip the
+# pre-restore migrate — on a DB_USER_FORCE_SYNC recovery the sync creates
+# an empty DB and `bench migrate` then crashes with "Table tabDefaultValue
+# doesn't exist" before the restore has a chance to import schema. The
+# restore block runs its own post-import migrate, so skipping here is safe.
+will_restore_sample_db() {
+    local src_url="${SAMPLE_DB_URL:-}"
+    local src_path="${SAMPLE_DB_PATH:-}"
+    if [[ -z "$src_url" && -z "$src_path" ]]; then
+        shopt -s nullglob
+        local baked=(/home/frappe/sample-db/*.sql.gz)
+        shopt -u nullglob
+        [[ ${#baked[@]} -gt 0 ]] && src_path="${baked[0]}"
+    fi
+    [[ -z "$src_url" && -z "$src_path" ]] && return 1
+    [[ -f "$SITE_DIR/.sample_db_restored" && "${SAMPLE_DB_FORCE_RESTORE:-0}" != "1" ]] && return 1
+    return 0
+}
+
 # ---- 4. First-boot site creation OR routine migrate ----
 # Pass secrets and site name via the child process's environment (gosu -E
 # preserves them) so a single quote or other shell metacharacter in any value
@@ -162,6 +182,8 @@ if [[ ! -f "$SITE_DIR/site_config.json" ]]; then
             --install-app frappe_side_menu \
             "$SITE_NAME"'
     echo "[entrypoint] site created and apps installed"
+elif will_restore_sample_db; then
+    echo "[entrypoint] existing site — sample DB restore pending, skipping pre-restore migrate"
 else
     echo "[entrypoint] existing site — running migrate"
     gosu frappe env \
