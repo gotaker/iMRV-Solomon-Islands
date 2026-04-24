@@ -206,33 +206,13 @@ maybe_restore_sample_db() {
 
     local dump=/tmp/sample-db.sql.gz
 
-    # ---- DIAG (REMOVE AFTER NEXT GREEN DEPLOY) ----
-    # Curl writes were failing on Railway with "curl: (23) Failure writing
-    # output to destination". Gather filesystem state so we can tell whether
-    # /tmp is small-tmpfs, read-only, or something else entirely.
-    echo "[diag] id: $(id)"
-    echo "[diag] df -h for candidate dump paths:"
-    df -h /tmp /home/frappe /var/tmp 2>&1 || true
-    echo "[diag] mount info for those paths:"
-    mount 2>/dev/null | grep -E ' on /tmp| on /home| on /var/tmp' || echo "  (none matched)"
-    echo "[diag] stat:"
-    stat -c '  %n: mode=%a owner=%U:%G type=%F' /tmp /home/frappe /var/tmp 2>&1 || true
-    echo "[diag] write probes:"
-    if ( : >/tmp/.probe_$$ ) 2>/tmp/.probe_err; then
-        echo "  /tmp: writable"; rm -f /tmp/.probe_$$
-    else
-        echo "  /tmp: FAILED — $(cat /tmp/.probe_err 2>/dev/null || echo '(no errno captured)')"
-    fi
-    rm -f /tmp/.probe_err
-    if ( : >/home/frappe/.probe_$$ ) 2>/home/frappe/.probe_err; then
-        echo "  /home/frappe: writable"; rm -f /home/frappe/.probe_$$
-    else
-        echo "  /home/frappe: FAILED — $(cat /home/frappe/.probe_err 2>/dev/null || echo '(no errno captured)')"
-    fi
-    rm -f /home/frappe/.probe_err
-    echo "[diag] /tmp contents (top 20):"
-    ls -la /tmp 2>&1 | head -20 || true
-    # ---- END DIAG ----
+    # Wipe any stale /tmp/sample-db.sql.gz from a previous (failed) deploy.
+    # Railway appears to run the container with a user-namespace mapping where
+    # in-container root lacks CAP_DAC_OVERRIDE against files owned by other
+    # in-container UIDs — so curl's fopen("wb") on a frappe-owned leftover
+    # fails with EACCES. Removing first lets curl create the file fresh
+    # (sticky-bit on /tmp permits root unlink).
+    rm -f "$dump" 2>/dev/null || true
 
     if [[ -n "$src_url" ]]; then
         echo "[entrypoint] fetching sample DB from \$SAMPLE_DB_URL"
@@ -242,7 +222,7 @@ maybe_restore_sample_db() {
         # GitHub Releases specifically, the asset returns octet-stream only
         # when Accept is set — otherwise you get an HTML redirect that
         # bench restore can't read.
-        local curl_args=(-fvSL --output "$dump")
+        local curl_args=(-fsSL --output "$dump")
         if [[ -n "${SAMPLE_DB_AUTH_HEADER:-}" ]]; then
             curl_args+=(-H "$SAMPLE_DB_AUTH_HEADER")
         fi
