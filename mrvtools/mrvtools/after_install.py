@@ -97,7 +97,10 @@ def load_single_doc():
             file_path = os.path.join(source_path, "master_data", f"{file_name}.json")
             data = json.load(open(file_path,"r"))
             for j in data:
-                doc = frappe.get_doc(j.get("doctype"))
+                # get_single() is the v16-safe way to load a Single doctype.
+                # v15 tolerated frappe.get_doc(doctype) with only the doctype
+                # arg; v16 tightens the signature and expects an explicit name.
+                doc = frappe.get_single(j.get("doctype"))
                 doc.update(j)
                 doc.save(ignore_permissions=True)
                 frappe.db.commit()

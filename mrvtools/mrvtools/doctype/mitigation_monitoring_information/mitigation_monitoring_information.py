@@ -86,19 +86,29 @@ class MitigationMonitoringInformation(Document):
 	
 	@frappe.whitelist()
 	def get_value1(self):
-		get_doc=frappe.db.sql(f"""SELECT MTC.non_ghg_mitigation_benefits FROM `tabMitigation Non GHG in  ChildTable` MTC INNER JOIN `tabMitigations` MT on MT.name = MTC.parent WHERE MT.name ='{self.project_id}'""")
+		get_doc=frappe.db.sql(
+			"""SELECT MTC.non_ghg_mitigation_benefits FROM `tabMitigation Non GHG in  ChildTable` MTC INNER JOIN `tabMitigations` MT on MT.name = MTC.parent WHERE MT.name = %s""",
+			(self.project_id,),
+		)
 		return get_doc
-	
+
 	@frappe.whitelist()
 	def get_value2(self):
-		get_doc=frappe.db.sql(f"""SELECT target_ghgs FROM `tabMitigation Target GHGs in  ChildTable` MTC INNER JOIN `tabMitigations` MT on MT.name = MTC.parent WHERE MT.name ='{self.project_id}'""")
+		get_doc=frappe.db.sql(
+			"""SELECT target_ghgs FROM `tabMitigation Target GHGs in  ChildTable` MTC INNER JOIN `tabMitigations` MT on MT.name = MTC.parent WHERE MT.name = %s""",
+			(self.project_id,),
+		)
 		return get_doc
-	
-	
-	
+
+
+
 	@frappe.whitelist()
 	def get_child(self):
-		get_column=frappe.db.sql(f"""SELECT * FROM `tabMitigation Performance Indicator ChildTable` MPIC INNER JOIN `tabMitigations` MT on MT.name = MPIC.parent WHERE MT.name ='{self.project_id}'""",as_dict=1)
+		get_column=frappe.db.sql(
+			"""SELECT * FROM `tabMitigation Performance Indicator ChildTable` MPIC INNER JOIN `tabMitigations` MT on MT.name = MPIC.parent WHERE MT.name = %s""",
+			(self.project_id,),
+			as_dict=1,
+		)
 		return get_column
 	
 	@frappe.whitelist()

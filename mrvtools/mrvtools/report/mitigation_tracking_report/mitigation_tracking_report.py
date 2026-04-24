@@ -175,21 +175,31 @@ def getData(filters):
 
 
 def get_chart(filters):
+	# User-supplied values are bound via %s placeholders in `params`; the NDC
+	# branches contribute literal LIKE patterns, doubled (%%NDC%%) because
+	# frappe.db.sql runs the SQL through %-format parameter binding, where
+	# a single % gets consumed as a format escape.
 	conditions = ""
+	params = []
 	if filters.get("monitoring_year"):
-		conditions += f"AND YEAR(start_date) <= '{filters.get('monitoring_year')}'"
+		conditions += " AND YEAR(start_date) <= %s"
+		params.append(filters.get("monitoring_year"))
 	if filters.get("ndc") == 'Yes':
-		conditions += " AND included_in like '%NDC%' "
+		conditions += " AND included_in like '%%NDC%%' "
 	if filters.get("ndc") == 'No':
-		conditions += " AND included_in not like '%NDC%' "
-		
-	project = frappe.db.sql(f"""
+		conditions += " AND included_in not like '%%NDC%%' "
+
+	project = frappe.db.sql(
+		f"""
         SELECT project_name
         FROM `tabMitigations`
         WHERE docstatus != 2
         {conditions}
 		ORDER BY project_id
-    """, as_dict=True)
+    """,
+		tuple(params),
+		as_dict=True,
+	)
 
 	project_names = [entry.project_name for entry in project]
 	

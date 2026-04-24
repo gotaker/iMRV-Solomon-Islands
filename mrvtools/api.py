@@ -3,11 +3,15 @@ import frappe
 
 @frappe.whitelist()
 def get_approvers():
+    # Explicit order_by — v16 flipped the default from `modified DESC` to
+    # `creation DESC`; we pin alphabetical here so the UI's approver dropdown
+    # stays deterministic across framework upgrades.
     doc= frappe.db.get_list("Role",
         fields=['name'],
         filters={
             "name":["Like","%Approver%"]
         },
+        order_by="name asc",
         pluck="name",
         ignore_permissions=True)
     return doc
@@ -19,7 +23,10 @@ def route_user():
 
 @frappe.whitelist(allow_guest = True)
 def get_data(doctype):
-    doc = frappe.db.get_all(doctype,fields = ["*"])
+    # order_by pinned to `modified desc` to preserve v15 behavior — v16 changed
+    # the default sort for get_all()/get_list()/get_value() from `modified`
+    # to `creation`, which silently changes this guest endpoint's output.
+    doc = frappe.db.get_all(doctype, fields=["*"], order_by="modified desc")
     return doc if doc else []
 
 
