@@ -35,6 +35,8 @@ jobs:
     if: needs.check-secret.outputs.has-secret == 'true'
     runs-on: ubuntu-22.04
     timeout-minutes: 25
+    env:
+      MARIADB_ROOT_PASSWORD: ${{ secrets.MARIADB_ROOT_PASSWORD }}
     services:
       mariadb:
         image: mariadb:12.2.2
@@ -81,6 +83,8 @@ jobs:
     if: needs.check-secret.outputs.has-secret == 'true'
     runs-on: ubuntu-22.04
     timeout-minutes: 30
+    env:
+      MARIADB_ROOT_PASSWORD: ${{ secrets.MARIADB_ROOT_PASSWORD }}
     services:
       mariadb:
         image: mariadb:12.2.2
@@ -129,6 +133,8 @@ jobs:
     if: needs.check-secret.outputs.has-secret == 'true'
     runs-on: ubuntu-22.04
     timeout-minutes: 25
+    env:
+      MARIADB_ROOT_PASSWORD: ${{ secrets.MARIADB_ROOT_PASSWORD }}
     services:
       mariadb:
         image: mariadb:12.2.2
@@ -176,6 +182,8 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 25
     continue-on-error: true  # advisory for 2 weeks — flip to false once stable
+    env:
+      MARIADB_ROOT_PASSWORD: ${{ secrets.MARIADB_ROOT_PASSWORD }}
     services:
       mariadb:
         image: mariadb:12.2.2
