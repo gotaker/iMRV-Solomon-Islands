@@ -74,6 +74,16 @@ If you want the Railway deploy to come up pre-populated (instead of the empty de
 
 **Third option — bake the dump into the image** (no env var needed): commit a `*.sql.gz` into [.Sample DB/](../../.Sample%20DB/) (temporarily un-ignore it by adding `!.Sample DB/your-file.sql.gz` to [.gitignore](../../.gitignore)), and the Dockerfile `COPY` step at [Dockerfile:179-182](../../Dockerfile#L179-L182) will bundle it at `/home/frappe/sample-db/`. The entrypoint's auto-detect picks the first `*.sql.gz` there when neither env var is set. Pros: zero external hosting, self-contained image. Cons: adds dump size (~3 MB per file) to every image layer + git history.
 
+**Publishing a new sample DB release.** `SAMPLE_DB_URL` typically points at a GitHub Release asset in this repo. To cut a new one from the latest dump in [.Sample DB/](../../.Sample%20DB/):
+
+```bash
+TAG="sample-db-$(date +%Y%m%d)"
+DUMP=$(ls -t ".Sample DB/"*.sql.gz | head -1)
+gh release create "$TAG" --title "Sample DB" --notes "demo seed" "$DUMP"
+```
+
+Convention: tag `sample-db-YYYYMMDD`, title `Sample DB`, a single `.sql.gz` asset. The dump ships as-is — no PII scrub, because the source is demo data, not production; if that assumption ever changes, add a scrub step before `gh release create`. After publishing, update `SAMPLE_DB_URL` on the Railway service to the new asset URL (public-repo shape: `https://github.com/<owner>/<repo>/releases/download/<tag>/<asset>`) and redeploy; existing sites need `SAMPLE_DB_FORCE_RESTORE=1` for the new dump to overwrite, since the `.sample_db_restored` marker otherwise short-circuits.
+
 Restore flow ([entrypoint.sh:117-165](entrypoint.sh#L117-L165)):
 
 1. On each boot, after the first-boot `bench new-site` or routine `bench migrate` step, the entrypoint checks for `SAMPLE_DB_URL` / `SAMPLE_DB_PATH`.

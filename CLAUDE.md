@@ -40,6 +40,8 @@ For a one-command bootstrap (fresh macOS, Ubuntu, or Windows/WSL2 laptop → wor
 
 **Sample data on install.** `./install.sh --dev` force-restores the newest `*.sql.gz` from [.Sample DB/](.Sample%20DB/) (gitignored — drop a current dump there before running install on a fresh clone) and re-runs `bench migrate` after restore so the schema tracks the app code. `--prod` skips the restore by default. Override either way with `--with-sample-data` / `--no-sample-data` or `LOAD_SAMPLE_DATA=1/0`; `SAMPLE_DB_PATH=<file>` selects a specific dump. The restore step copies the file to `mktemp` first because Frappe's `bench restore` shells out to `zgrep`/`gunzip` without quoting the path and chokes on the space in `.Sample DB/`.
 
+**Publishing a new sample DB release.** Railway consumes sample DBs via `SAMPLE_DB_URL` pointing at a GitHub Release asset; cut a new release from the latest `.Sample DB/*.sql.gz` using the `gh release create` recipe in [deploy/railway/README.md](deploy/railway/README.md) (tag format `sample-db-YYYYMMDD`, no PII scrub — demo data only).
+
 Frappe app install (run from your bench root, not this directory):
 
 ```bash
