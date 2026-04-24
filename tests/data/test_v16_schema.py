@@ -8,7 +8,7 @@ pytestmark = pytest.mark.data
 def test_no_legacy_desktop_icon_table(frappe_site):
     import frappe
     rows = frappe.db.sql("SHOW TABLES LIKE 'tabDesktop Icon'")
-    assert rows == (), "Legacy `tabDesktop Icon` table still present after v16 migrate"
+    assert not rows, "Legacy `tabDesktop Icon` table still present after v16 migrate"
 
 
 def test_workspace_records_v16_shape(frappe_site):

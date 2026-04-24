@@ -1,27 +1,39 @@
-"""Layer 1 — every master-data doctype listed in after_install.py has >=1 row after restore+migrate."""
+"""Layer 1 — every master-data doctype listed in after_install.py has >=1 row after restore+migrate.
+
+The doctype list is NOT hand-copied — it's parsed directly from after_install.py
+at import time via `ast`, so it stays in sync automatically.
+"""
+
+import ast
+from pathlib import Path
 
 import pytest
 
 pytestmark = pytest.mark.data
 
-# Copied from mrvtools/mrvtools/after_install.py `doctype_list`.
-# If that list changes, update this one — it's an intentional tripwire.
-MASTER_DATA_DOCTYPES = [
-    "Adaptation Category", "Adaptation Objective", "Disbursement Category",
-    "Ministry", "Project Included In", "Project Key Sector", "Project Key Sub Sector",
-    "Project Programme", "Project Objective", "Project Actions",
-    "NDP Objective Coverage", "SDG Assessment",
-    "GHG Sector", "GHG Sub Sector", "GHG Category", "GHG Sub Category",
-    "Energy Fuel Master List", "Livestock Population Master List",
-    "Livestock Emission Factor Master List", "IPPU Emission Factors Master List",
-    "IPPU GWP Master List", "Forest Category Master List",
-    "Direct and Indirect Managed Soils Master List",
-    "Waste Population Master List", "Parameter Master List",
-    "GHG Inventory Table Name Master List",
-    "GHG Inventory Report Categories", "GHG Inventory Report Formulas",
-    "Mitigation Non GHG Mitigation Benefits",
-    "Climate Finance Monitoring Information",
-]
+
+def _extract_doctype_list() -> list[str]:
+    """Parse mrvtools/mrvtools/after_install.py and return the `doctype_list` literal."""
+    repo_root = Path(__file__).resolve().parents[2]
+    source = (repo_root / "mrvtools" / "mrvtools" / "after_install.py").read_text()
+    tree = ast.parse(source)
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name) and target.id == "doctype_list":
+                    if isinstance(node.value, ast.List):
+                        return [
+                            elt.value for elt in node.value.elts
+                            if isinstance(elt, ast.Constant) and isinstance(elt.value, str)
+                        ]
+    raise RuntimeError(
+        "Could not find `doctype_list = [...]` in mrvtools/mrvtools/after_install.py — "
+        "the tripwire source changed; update this parser."
+    )
+
+
+MASTER_DATA_DOCTYPES = _extract_doctype_list()
 
 
 @pytest.mark.parametrize("doctype", MASTER_DATA_DOCTYPES)

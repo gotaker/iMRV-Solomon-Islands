@@ -23,21 +23,30 @@ def test_default_files_extracted(frappe_site):
     base = _files_base_path(frappe_site)
 
     missing = []
-    for child_field in ["knowledge_resource_details", "knowledge_resource_details2",
-                        "climate_change_division_images", "add_new_content"]:
+    frontend_meta = frappe.get_meta("MrvFrontend")
+    child_fields = [f for f in frontend_meta.fields if f.fieldtype == "Table"]
+
+    for child_fieldmeta in child_fields:
+        child_field = child_fieldmeta.fieldname
         rows = getattr(frontend, child_field, None) or []
+        if not rows:
+            continue
+        child_doctype = child_fieldmeta.options
+        child_meta = frappe.get_meta(child_doctype)
+        attach_fields = [f.fieldname for f in child_meta.fields if f.fieldtype in ("Attach", "Attach Image")]
         for row in rows:
-            for attr in dir(row):
-                val = getattr(row, attr, None)
-                if isinstance(val, str) and val.startswith("/files/"):
-                    # public file URL
+            for fname in attach_fields:
+                val = getattr(row, fname, None) or ""
+                if not isinstance(val, str) or not val:
+                    continue
+                if val.startswith("/files/"):
                     disk_path = base / "public" / val.lstrip("/")
-                    if not disk_path.exists():
-                        missing.append(str(disk_path))
-                elif isinstance(val, str) and val.startswith("/private/files/"):
+                elif val.startswith("/private/files/"):
                     disk_path = base / val.lstrip("/")
-                    if not disk_path.exists():
-                        missing.append(str(disk_path))
+                else:
+                    continue
+                if not disk_path.exists():
+                    missing.append(str(disk_path))
 
     assert missing == [], (
         f"{len(missing)} File records point at missing on-disk files. "
