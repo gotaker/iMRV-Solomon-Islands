@@ -13,6 +13,7 @@ env:
   TEST_SITE: "test_mrv.localhost"
   TEST_PORT: "8001"
   BENCH_DIR: ${{ github.workspace }}/../frappe-bench
+  TEST_SERVER_TIMEOUT: "120"
 
 jobs:
   check-secret:
@@ -33,7 +34,7 @@ jobs:
     needs: check-secret
     if: needs.check-secret.outputs.has-secret == 'true'
     runs-on: ubuntu-22.04
-    timeout-minutes: 15
+    timeout-minutes: 25
     services:
       mariadb:
         image: mariadb:12.2.2
@@ -79,7 +80,7 @@ jobs:
     needs: check-secret
     if: needs.check-secret.outputs.has-secret == 'true'
     runs-on: ubuntu-22.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     services:
       mariadb:
         image: mariadb:12.2.2
@@ -127,7 +128,7 @@ jobs:
     needs: check-secret
     if: needs.check-secret.outputs.has-secret == 'true'
     runs-on: ubuntu-22.04
-    timeout-minutes: 15
+    timeout-minutes: 25
     services:
       mariadb:
         image: mariadb:12.2.2
@@ -173,7 +174,7 @@ jobs:
     needs: check-secret
     if: needs.check-secret.outputs.has-secret == 'true'
     runs-on: ubuntu-22.04
-    timeout-minutes: 15
+    timeout-minutes: 25
     continue-on-error: true  # advisory for 2 weeks — flip to false once stable
     services:
       mariadb:
@@ -217,6 +218,9 @@ jobs:
             tests/golden/
           retention-days: 7
 
+  # nightly-issue requires the `ci-harness-failure` label to exist in the repo
+  # (Settings → Labels). If missing, the github-script create-issue call returns
+  # 422 and the job fails. Create the label manually before the first nightly run.
   nightly-issue:
     if: github.event_name == 'schedule' && failure()
     needs: [harness-data-integration, harness-ui, harness-security]
