@@ -76,6 +76,10 @@ Version pins live in both workflow files and in [install.sh](install.sh) — kee
 
 Branch protection on `master` requires these status checks (configure manually via repo Settings → Branches): `frontend-build`, `frontend-format`, `python-lint`, `frappe-tests`.
 
+The test harness adds three more required checks: `harness-data-integration`, `harness-ui`, `harness-security`. `harness-regression` is advisory for the first two weeks, then flipped to blocking in [ci-test-harness.yml](.github/workflows/ci-test-harness.yml).
+
+Secrets needed: `SAMPLE_DB_URL` (URL to a `sample-db-YYYYMMDD` GitHub release asset, per [deploy/railway/README.md](deploy/railway/README.md)).
+
 Secrets needed: `MARIADB_ROOT_PASSWORD` (any strong password — only used inside the ephemeral MariaDB service container).
 
 ## Architecture notes worth knowing before editing
