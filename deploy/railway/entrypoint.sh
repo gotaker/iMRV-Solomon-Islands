@@ -79,6 +79,12 @@ existing.update({
     "serve_default_site": True,
     "auto_update": False,
     "restart_supervisor_on_update": False,
+    # Frappe v16's default max_queued_jobs (550) is too low for this site's
+    # initial migrate: Property Setter cleanup enqueues delete_dynamic_links
+    # jobs per-row, and no worker is running yet during entrypoint to drain
+    # them. Bumping the threshold lets migrate finish; supervisord's workers
+    # consume the backlog as soon as the stack is up.
+    "max_queued_jobs": 10000,
 })
 with open(path, "w") as f:
     json.dump(existing, f, indent=1, sort_keys=True)
