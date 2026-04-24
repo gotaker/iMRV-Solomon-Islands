@@ -16,7 +16,7 @@
 - Not a coverage-chasing pyramid. No unit tests for every doctype controller.
 - Not a replacement for `bench run-tests`. The existing [.github/workflows/ci-frappe-tests.yml](../../.github/workflows/ci-frappe-tests.yml) fresh-install path keeps running alongside.
 - Not filling the 40 empty `test_*.py` doctype stubs.
-- Not a Playwright per-route sweep — only 4 critical user journeys.
+- Not a Playwright per-route sweep — only 4 critical user journeys plus 5 objective design-system audits.
 
 ## Architecture
 
@@ -80,7 +80,11 @@ HTTP against `http://localhost:$TEST_PORT`. Each whitelisted endpoint exercised 
 
 Tests flagged **Contract pin** intentionally record the flagged BREAKING guest-access behavior. Their docstrings link to the hardening follow-up; when the endpoints are locked down, these tests flip from asserting 200 to asserting 403. They exist so we notice if v16 already changed the behavior silently.
 
-### Layer 3 — UI (4 Playwright journeys, `tests/ui/`)
+### Layer 3 — UI (9 Playwright tests, `tests/ui/`)
+
+Split into two concerns: **journeys** (end-to-end user flows) and **design-system compliance** (objective WCAG / accessibility / touch-target audits).
+
+**Journeys** (4 tests):
 
 | Test | Journey |
 |---|---|
@@ -90,6 +94,25 @@ Tests flagged **Contract pin** intentionally record the flagged BREAKING guest-a
 | `test_main_dashboard_tiles_render` | All 8 previously-fixed dashboard tiles show numeric values (not `None`, not error cards) |
 
 Playwright runs headless chromium; screenshot + trace captured on failure. Each journey asserts both final state and the absence of console errors / failed network requests during navigation.
+
+**Design-system compliance** (5 tests, `tests/ui/test_design_system.py`):
+
+Product type is government climate/environment portal; the ui-ux-pro-max skill recommends the "Accessible & Ethical / WCAG AAA" style for this category. These tests pin the *objective* rules from that style — contrast, touch targets, alt text, no-emoji-icons, responsive. Subjective rules (palette, typography pairing) are deferred to a separate design-system PR since enforcing them would require redesigning the existing SPA, not just testing it.
+
+| Test | What it asserts | Threshold |
+|---|---|---|
+| `test_ds_color_contrast` | axe-core scan of `/frontend/home` + `/app/main-dashboard` | Zero `color-contrast` violations (WCAG AA 4.5:1) |
+| `test_ds_touch_targets` | At 375px viewport, all `<a>` / `<button>` / `[role=button]` on `/frontend/home` | Bounding box ≥ 44×44px |
+| `test_ds_alt_text` | All `<img>` on Home, About, Projects, Reports | Non-empty `alt` OR explicit `role="presentation"` |
+| `test_ds_no_emoji_icons` | Scan DOM for emoji codepoints inside `<button>`, `<a>`, `[role=menuitem]` | Zero hits (SVG icons only) |
+| `test_ds_responsive_no_overflow` | Viewport at 375 / 768 / 1440px on `/frontend/home` | `scrollWidth ≤ innerWidth` (no horizontal scroll) |
+
+Implementation note: axe-core is injected as a script at test time from a pinned CDN URL (or vendored to `tests/ui/vendor/axe.min.js` if CI can't reach the CDN); no npm install needed. A shared `axe_scan(page, url)` helper lives in `tests/ui/_axe.py`.
+
+**Deferred to a separate design-system PR** (not this harness):
+- `design-system/MASTER.md` as the project's single source of truth (via ui-ux-pro-max `--persist`).
+- Enforcing the recommended palette (Accessible & Ethical greens) — current SPA uses Frappe UI defaults; changing requires redesign.
+- Typography pairing (Fira Code / Fira Sans) — same reason.
 
 ### Layer 4 — Regression (10 tests, `tests/regression/`)
 
@@ -197,7 +220,7 @@ def rollback_after_test(frappe_site):
   | Job | Duration | Status |
   |---|---|---|
   | `harness-data-integration` | ~90s | Blocking |
-  | `harness-ui` | ~120s | Blocking |
+  | `harness-ui` | ~150s | Blocking |
   | `harness-security` | ~45s | Blocking |
   | `harness-regression` | ~60s | **Advisory for 2 weeks**, then blocking |
 - **On failure**: upload `frappe-bench/logs/`, Playwright traces, and failure screenshots as artifacts. Nightly failures auto-open a GitHub issue labelled `ci-harness-failure` (reuse existing label machinery from ci-frappe-tests.yml).
@@ -208,7 +231,7 @@ def rollback_after_test(frappe_site):
 ## Scope boundaries
 
 **In scope for v1:**
-- 45 tests enumerated above (6 data + 15 integration + 4 UI + 10 regression + 10 security).
+- 50 tests enumerated above (6 data + 15 integration + 9 UI + 10 regression + 10 security).
 - Fixture infrastructure (conftest, factories, run.sh).
 - New CI workflow with blocking/advisory split.
 - Documentation in `tests/README.md` covering local setup, env vars, common failures.
