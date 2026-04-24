@@ -49,6 +49,21 @@ if [[ -d /home/frappe/sites-template/assets ]]; then
     gosu frappe cp -a /home/frappe/sites-template/assets "$SITES/assets"
 fi
 
+# ---- 1c. Invalidate the cached asset manifest in Redis ----
+# Frappe v16 caches the build's output filename hashes in a single Redis key
+# (assets_json). Redis persists across image rebuilds, so a new image's fresh
+# CSS/JS bundle names can drift out of sync with the hashes Frappe renders in
+# HTML — producing 404s on every CSS/JS include until the cache is manually
+# invalidated AND gunicorn is bounced. DEL the key here so gunicorn repopulates
+# it from the on-disk manifest on first request. Site-scoped `bench clear-cache`
+# doesn't touch this key. Non-fatal: if redis-cli fails (auth drift, transient
+# connect error), we still boot — worst case is one stale-manifest cycle.
+if redis-cli -u "$REDIS_CACHE_URL" DEL assets_json assets_json_rtl >/dev/null 2>&1; then
+    echo "[entrypoint] invalidated cached asset manifest in redis_cache"
+else
+    echo "[entrypoint] warn: could not invalidate cached asset manifest (non-fatal)"
+fi
+
 # ---- 2. Render nginx config ----
 # envsubst swaps $PORT from env; all other $vars in the template are nginx
 # variables (prefixed $http_*, $proxy_*, $uri, etc.) — we whitelist only PORT.
