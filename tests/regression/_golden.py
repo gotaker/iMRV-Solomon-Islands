@@ -17,19 +17,32 @@ def _path(name: str) -> Path:
 
 def assert_golden(name: str, actual: Any) -> None:
     """
-    On first run (or with TESTS_UPDATE_GOLDEN=1): write `actual` to tests/golden/<name>.
-    On subsequent runs: assert deep-equality against the stored snapshot.
+    Snapshot assert with three modes:
+
+    1. TESTS_UPDATE_GOLDEN=1 set → overwrite existing snapshot silently, pass.
+    2. Snapshot file missing AND no env var → write, then FAIL the test with a
+       clear message so the developer inspects the file before trusting it.
+       This prevents "silently green on first run" — the whole point of a
+       snapshot is that a human has signed off on the expected shape.
+    3. Snapshot file exists AND no env var → compare for deep equality.
     """
+    import pytest
+
     path = _path(name)
     actual_norm = json.loads(json.dumps(actual, sort_keys=True, default=str))
 
-    if os.environ.get("TESTS_UPDATE_GOLDEN") == "1" or not path.exists():
+    if os.environ.get("TESTS_UPDATE_GOLDEN") == "1":
         GOLDEN_DIR.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(actual_norm, indent=2, sort_keys=True) + "\n")
-        if not os.environ.get("TESTS_UPDATE_GOLDEN"):
-            # First-write path — pass, but log so the dev knows to commit.
-            print(f"[golden] wrote new snapshot: {path}")
         return
+
+    if not path.exists():
+        GOLDEN_DIR.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(actual_norm, indent=2, sort_keys=True) + "\n")
+        pytest.fail(
+            f"[golden] wrote NEW snapshot {path} — INSPECT it and commit, then "
+            f"re-run to confirm. First-run writes are not auto-trusted."
+        )
 
     expected = json.loads(path.read_text())
     assert actual_norm == expected, (
