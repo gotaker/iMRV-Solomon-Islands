@@ -5,6 +5,8 @@
 tags
 mrvtools/docs/current
 node_modules/
+frontend/auto-imports.d.ts
+frontend/components.d.ts
 ._*
 .worktrees/
 docs/frappe-admin-training.pptx
