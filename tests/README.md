@@ -8,7 +8,7 @@ for architecture and intent.
 
 1. Working bench at `$BENCH_DIR` (default `../frappe-bench`) with both apps installed.
 2. A `.sql.gz` in `.Sample DB/` or `$SAMPLE_DB_URL` set.
-3. `pip install pytest pytest-timeout playwright axe-selenium-python requests httpx`
+3. `pip install pytest pytest-timeout playwright requests httpx` (axe-core is injected via Playwright at test time — no Python dep needed)
 4. `playwright install chromium`
 5. `./tests/run.sh`
 
