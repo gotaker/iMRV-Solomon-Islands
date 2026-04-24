@@ -20,5 +20,6 @@ package-lock.json
 *.sqlite3
 *.tar.gz
 *.zip
+!mrvtools/public/mrv_default_files.zip
 *.tar
 *.7z
