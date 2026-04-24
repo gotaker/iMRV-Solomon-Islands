@@ -85,11 +85,62 @@ with open(path, "w") as f:
 print(f"[entrypoint] wrote {path}")
 PY
 
+SITE_DIR="$SITES/$SITE_NAME"
+
+# ---- 3a. Optional: one-shot DB user force-sync ----
+# Recover from a DB-was-wiped-but-sites-volume-survived state: read
+# db_name/db_password from sites/<site>/site_config.json (the values bench
+# new-site generated on original first boot) and re-assert the MariaDB user
+# + database + grants so the migrate step below can connect. Idempotent —
+# set DB_USER_FORCE_SYNC=1 on Railway, redeploy, then unset. No-op on first
+# boot (site_config.json doesn't exist yet). This fixes user/password drift,
+# NOT a full DB wipe — if the site's tables are also gone you still need to
+# wipe sites/<site>/ and let first-boot recreate (or pair with SAMPLE_DB_*).
+if [[ "${DB_USER_FORCE_SYNC:-0}" == "1" && -f "$SITE_DIR/site_config.json" ]]; then
+    echo "[entrypoint] DB_USER_FORCE_SYNC=1 — reconciling MariaDB user/db/grants with site_config.json"
+    python3 - "$SITE_DIR/site_config.json" <<'PY'
+import json, os, re, subprocess, sys
+with open(sys.argv[1]) as f:
+    cfg = json.load(f)
+db_name = cfg.get("db_name")
+db_pw = cfg.get("db_password")
+if not db_name or not db_pw:
+    sys.exit("site_config.json missing db_name or db_password — cannot sync")
+if not re.fullmatch(r"_[A-Za-z0-9_]+", db_name):
+    sys.exit(f"refusing to use unsafe db_name identifier: {db_name!r}")
+def qstr(s):
+    return "'" + s.replace("\\", "\\\\").replace("'", "\\'") + "'"
+sql = "\n".join([
+    f"CREATE USER IF NOT EXISTS {qstr(db_name)}@'%' IDENTIFIED BY {qstr(db_pw)};",
+    f"ALTER USER {qstr(db_name)}@'%' IDENTIFIED BY {qstr(db_pw)};",
+    f"CREATE DATABASE IF NOT EXISTS `{db_name}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",
+    f"GRANT ALL PRIVILEGES ON `{db_name}`.* TO {qstr(db_name)}@'%';",
+    "FLUSH PRIVILEGES;",
+])
+p = subprocess.run(
+    ["mysql",
+     f"-h{os.environ['DB_HOST']}",
+     f"-P{os.environ['DB_PORT']}",
+     "--protocol=TCP",
+     "-uroot",
+     f"-p{os.environ['DB_ROOT_PASSWORD']}"],
+    input=sql, text=True, capture_output=True,
+)
+# Drop the "Using a password on the command line" warning; surface everything else.
+leaks = [ln for ln in p.stderr.splitlines() if "Using a password on the command line" not in ln]
+if leaks:
+    sys.stderr.write("\n".join(leaks) + "\n")
+if p.returncode != 0:
+    sys.exit(p.returncode)
+print(f"[entrypoint] synced user {db_name}@% and database {db_name}")
+PY
+    echo "[entrypoint] DB_USER_FORCE_SYNC complete (unset DB_USER_FORCE_SYNC for future boots)"
+fi
+
 # ---- 4. First-boot site creation OR routine migrate ----
 # Pass secrets and site name via the child process's environment (gosu -E
 # preserves them) so a single quote or other shell metacharacter in any value
 # cannot break out of the bash -c string.
-SITE_DIR="$SITES/$SITE_NAME"
 if [[ ! -f "$SITE_DIR/site_config.json" ]]; then
     echo "[entrypoint] first boot — creating site $SITE_NAME"
     gosu frappe env \

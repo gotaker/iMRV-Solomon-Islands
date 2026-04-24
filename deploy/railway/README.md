@@ -70,6 +70,7 @@ If you want the Railway deploy to come up pre-populated (instead of the empty de
 | `SAMPLE_DB_PATH` | `/path/in/container.sql.gz` | Alternative to URL — path inside the container. Useful if you pre-upload via `railway ssh` (`cat dump.sql.gz \| railway ssh … "cat > /tmp/dump.sql.gz"`). |
 | `SAMPLE_DB_FORCE_RESTORE` | `1` (default `0`) | Re-run the restore on the next boot even if a previous boot already did it. Leave unset in normal operation; set only to deliberately re-seed, then unset and redeploy. |
 | `ADMIN_PASSWORD_FORCE_SYNC` | `1` (default `0`) | Rotate the Administrator password to `$ADMIN_PASSWORD` on boot, independent of the restore pipeline. Use this when a previous restore left the wrong password and you don't want to re-run the full restore. Toggle-off after the next successful boot — every boot with this on logs users out (set-admin-password invalidates sessions). |
+| `DB_USER_FORCE_SYNC` | `1` (default `0`) | Re-assert the MariaDB per-site user/password/grants using the values in `sites/<site>/site_config.json`, as root (via `DB_ROOT_PASSWORD`). Use when migrate fails with `1045 Access denied for user '_…'` because the DB still has the site's tables but the user was dropped or its password drifted from what's on the sites volume. Idempotent — toggle off after the next successful boot. **Does not** recover a fully-wiped DB; see [DB volume was recreated but sites volume survived](#db-volume-was-recreated-but-sites-volume-survived) for that case. |
 
 **Third option — bake the dump into the image** (no env var needed): commit a `*.sql.gz` into [.Sample DB/](../../.Sample%20DB/) (temporarily un-ignore it by adding `!.Sample DB/your-file.sql.gz` to [.gitignore](../../.gitignore)), and the Dockerfile `COPY` step at [Dockerfile:179-182](../../Dockerfile#L179-L182) will bundle it at `/home/frappe/sample-db/`. The entrypoint's auto-detect picks the first `*.sql.gz` there when neither env var is set. Pros: zero external hosting, self-contained image. Cons: adds dump size (~3 MB per file) to every image layer + git history.
 
@@ -257,6 +258,38 @@ The reference `${{mariadb.RAILWAY_PRIVATE_DOMAIN}}` expanded to empty. Either:
 ### Redis `unauthenticated bulk length` / `Protocol error`
 
 Your Redis URLs don't include the password. Railway's managed Redis requires AUTH. Grab `REDIS_PASSWORD` from the redis service's Variables tab and use `redis://default:<password>@redis.railway.internal:6379/<db>` format. See the Environment variables table above.
+
+### DB volume was recreated but sites volume survived
+
+Symptom on redeploy:
+
+```text
+[entrypoint] existing site — running migrate
+pymysql.err.OperationalError: (1045, "Access denied for user '_xxxxxxxxxxxxxxxx'@'…' (using password: YES)")
+```
+
+Cause: `sites/<site>/site_config.json` still stores the per-site DB user/password that `bench new-site` generated on original first boot, but the MariaDB service no longer has that user. Happens when the MariaDB volume is reset (or the service is replaced) without a matching wipe of the app's sites volume. The entrypoint sees `site_config.json` exists and takes the `bench migrate` path — which immediately fails on auth.
+
+**Distinguish the two sub-cases first** — they need different fixes:
+
+```bash
+railway ssh --service mariadb
+mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "SHOW DATABASES LIKE '\_%';"
+mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "SELECT User,Host FROM mysql.user WHERE User LIKE '\_%';"
+```
+
+- **Neither the `_…` database nor the user exists** → DB is fully blank. There's no data to preserve. Wipe the app's sites volume and let first-boot rebuild:
+
+  ```bash
+  railway ssh --service "iMRV-Solomon-Islands"
+  rm -rf /home/frappe/frappe-bench/sites/$SITE_NAME
+  exit
+  # Then redeploy from the Railway UI (or `railway redeploy`).
+  ```
+
+  Pair with `SAMPLE_DB_PATH` / `SAMPLE_DB_URL` if you want the fresh site populated from a backup rather than empty.
+
+- **The `_…` database exists but the user is missing (or the password drifted)** → data is still there, just the grant is broken. Set `DB_USER_FORCE_SYNC=1` on the app service and redeploy. The entrypoint reads `db_name` + `db_password` from `site_config.json` and re-runs `CREATE USER … IDENTIFIED BY …` / `GRANT ALL PRIVILEGES …` as `root` before the migrate step. Unset the variable after the next successful boot.
 
 ### `Exception: Database _xxx already exists` (first boot)
 
