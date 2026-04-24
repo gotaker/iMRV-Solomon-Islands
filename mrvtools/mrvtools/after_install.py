@@ -49,24 +49,27 @@ def load_default_files():
     
 @frappe.whitelist(allow_guest = True)
 def load_master_data():
-    try:
-        source_path = frappe.get_app_path("mrvtools")
-        doctype_list = [    "Project Objective","Project Key Sector","Project Key Sub Sector",
-                            "Project Included In","Project Tracking Master","Mitigation Target GHGs",
-                            "NDP Objective Coverage","NDP Coverage","User Permissions",
-                            "Mitigation Non GHG mitigation benefits","Master Data Test","Master Data",
-                            "SDG Category","Adaptation Category","Disbursement Category","GHG Sector",
-                            "GHG Category","GHG Sub Sector","GHG Sub Category",
-                            "Energy Fuel Master List","IPPU GWP Master List",
-                            "Livestock Emission Factor Master List","Waste Population Master List",
-                            "Livestock Population Master List",
-                            "Direct and Indirect Managed Soils Master List",
-                            "Forest Category Master List","IPPU Emission Factors Master List",
-                            "GHG Inventory Report Categories","GHG Inventory Table Name Master List",
-                            "GHG Inventory Report Formulas","Role","Custom DocPerm","Web Page",
-                            "Notification","Sub Menu Group","Side Menu"
-                        ]
-        for i in doctype_list:
+    source_path = frappe.get_app_path("mrvtools")
+    doctype_list = [    "Project Objective","Project Key Sector","Project Key Sub Sector",
+                        "Project Included In","Project Tracking Master","Mitigation Target GHGs",
+                        "NDP Objective Coverage","NDP Coverage","User Permissions",
+                        "Mitigation Non GHG mitigation benefits","Master Data Test","Master Data",
+                        "SDG Category","Adaptation Category","Disbursement Category","GHG Sector",
+                        "GHG Category","GHG Sub Sector","GHG Sub Category",
+                        "Energy Fuel Master List","IPPU GWP Master List",
+                        "Livestock Emission Factor Master List","Waste Population Master List",
+                        "Livestock Population Master List",
+                        "Direct and Indirect Managed Soils Master List",
+                        "Forest Category Master List","IPPU Emission Factors Master List",
+                        "GHG Inventory Report Categories","GHG Inventory Table Name Master List",
+                        "GHG Inventory Report Formulas","Role","Custom DocPerm","Web Page",
+                        "Notification","Sub Menu Group","Side Menu"
+                    ]
+    # Per-doctype try/except — a failure on one master must not abort the rest.
+    # Previously a single try wrapped the loop and the first throw silently
+    # short-circuited every later doctype.
+    for i in doctype_list:
+        try:
             file_name = i.lower().replace(" ", "_")
             file_path = os.path.join(source_path, "master_data", f"{file_name}.json")
             data = json.load(open(file_path,"r"))
@@ -75,17 +78,21 @@ def load_master_data():
                     doc = frappe.new_doc(j.get("doctype"))
                     doc.update(j)
                     doc.insert(ignore_permissions=True)
-                    
                     frappe.db.commit()
-    except:
-        frappe.log_error("Error While insterting Data",frappe.get_traceback())
+        except Exception:
+            frappe.db.rollback()
+            frappe.log_error(f"load_master_data: {i}", frappe.get_traceback())
 
 @frappe.whitelist(allow_guest = True)
 def load_single_doc():
-    try:
-        source_path = frappe.get_app_path("mrvtools")
-        doctype_list = ["MrvFrontend","Side Menu Settings","Website Settings","Navbar Settings"]
-        for i in doctype_list:
+    source_path = frappe.get_app_path("mrvtools")
+    doctype_list = ["MrvFrontend","Side Menu Settings","Website Settings","Navbar Settings"]
+    # Per-doctype try/except — a failure on one single must not abort the rest.
+    # Previously a single try wrapped the loop and a MrvFrontend save failure
+    # silently skipped every other reseed (Side Menu Settings, Website
+    # Settings, Navbar Settings stayed at their stale sample-DB values).
+    for i in doctype_list:
+        try:
             file_name = i.lower().replace(" ", "_")
             file_path = os.path.join(source_path, "master_data", f"{file_name}.json")
             data = json.load(open(file_path,"r"))
@@ -94,5 +101,6 @@ def load_single_doc():
                 doc.update(j)
                 doc.save(ignore_permissions=True)
                 frappe.db.commit()
-    except:
-        frappe.log_error("Error While insterting Data",frappe.get_traceback())
+        except Exception:
+            frappe.db.rollback()
+            frappe.log_error(f"load_single_doc: {i}", frappe.get_traceback())
