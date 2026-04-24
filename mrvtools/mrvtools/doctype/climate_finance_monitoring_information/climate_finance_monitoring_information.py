@@ -22,7 +22,11 @@ class ClimateFinanceMonitoringInformation(Document):
 		
 	@frappe.whitelist()
 	def get_rows(self):
-		doc = frappe.db.sql(f""" SELECT CFCT.parent, CFCT.creation as creation, CFMI.name,CFMI.project_id, CFCT.financial_year, CFCT.q1,  CFCT.q2,  CFCT.q3,  CFCT.q4,  CFCT.total_disbursement_usd FROM `tabClimate Finance Total Budget Disbursement ChildTable` CFCT inner join `tabClimate Finance Monitoring Information` CFMI on CFCT.parent= CFMI.name where CFMI.project_id='{self.project_id}' and CFCT.parent = (select CFCT.parent from `tabClimate Finance Total Budget Disbursement ChildTable` CFCT  inner join `tabClimate Finance Monitoring Information` CFMI on CFCT.parent = CFMI.name where CFMI.project_id = '{self.project_id}' order by CFMI.creation DESC limit 1) group by CFCT.financial_year ASC""",as_dict=1)
+		doc = frappe.db.sql(
+			""" SELECT CFCT.parent, CFCT.creation as creation, CFMI.name,CFMI.project_id, CFCT.financial_year, CFCT.q1,  CFCT.q2,  CFCT.q3,  CFCT.q4,  CFCT.total_disbursement_usd FROM `tabClimate Finance Total Budget Disbursement ChildTable` CFCT inner join `tabClimate Finance Monitoring Information` CFMI on CFCT.parent= CFMI.name where CFMI.project_id=%s and CFCT.parent = (select CFCT.parent from `tabClimate Finance Total Budget Disbursement ChildTable` CFCT  inner join `tabClimate Finance Monitoring Information` CFMI on CFCT.parent = CFMI.name where CFMI.project_id = %s order by CFMI.creation DESC limit 1) group by CFCT.financial_year ASC""",
+			(self.project_id, self.project_id),
+			as_dict=1,
+		)
 		return doc
 
 	@frappe.whitelist()

@@ -45,7 +45,10 @@ class SDGMonitoringInformation(Document):
 
 	@frappe.whitelist()
 	def get_json(self):
-		get_json_field=frappe.db.sql(f"""SELECT json from `tabSDG Assessment` WHERE name ='{self.project_id}'""")
+		get_json_field=frappe.db.sql(
+			"""SELECT json from `tabSDG Assessment` WHERE name = %s""",
+			(self.project_id,),
+		)
 		return get_json_field
 		
 	@frappe.whitelist()

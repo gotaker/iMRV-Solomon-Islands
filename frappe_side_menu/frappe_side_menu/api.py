@@ -157,8 +157,10 @@ def get_permitted_pages_reports(role, parenttype):
 # Kishore
 @frappe.whitelist(allow_guest=True)
 def get_all_records(doctype, limit_start=0, limit_page_length=10):
+	# order_by pinned to `modified desc` to preserve v15 ordering — v16 changed
+	# the get_list() default from `modified` to `creation`.
 	try:
-		data = frappe.get_list(doctype, fields=["*"], start=limit_start, page_length=limit_page_length)
+		data = frappe.get_list(doctype, fields=["*"], start=limit_start, page_length=limit_page_length, order_by="modified desc")
 		return data
 	except Exception as e:
 		# frappe.log_error(f"Error in get_all_records for {doctype}", e)
@@ -166,7 +168,8 @@ def get_all_records(doctype, limit_start=0, limit_page_length=10):
 
 @frappe.whitelist(allow_guest=True)
 def get_list():
-	data = frappe.get_list('Project', fields=["*"])
+	# order_by pinned for the same v16 default-sort reason as get_all_records above.
+	data = frappe.get_list('Project', fields=["*"], order_by="modified desc")
 	for i in data:
 		x = i.columns
 		return x
