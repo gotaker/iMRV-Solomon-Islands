@@ -33,8 +33,12 @@ def test_golden_side_menu_menulist_structure(frappe_site):
     import frappe
 
     fn = frappe.get_attr("frappe_side_menu.frappe_side_menu.api.get_menulist")
-    frappe.set_user("Administrator")
-    result = fn()
+    original_user = frappe.session.user
+    try:
+        frappe.set_user("Administrator")
+        result = fn()
+    finally:
+        frappe.set_user(original_user)
     # result may contain HTML — snapshot structural keys only.
     shape = _shape(result) if not isinstance(result, str) else "str"
     assert_golden("side_menu_menulist.json", shape)
