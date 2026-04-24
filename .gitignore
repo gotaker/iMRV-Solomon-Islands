@@ -8,5 +8,15 @@ node_modules/
 ._*
 .worktrees/
 docs/frappe-admin-training.pptx
-.Sample DB/*
 !.Sample DB/.gitkeep
+package-lock.json
+*.bak*.*
+*.log
+*.backup.*
+*.sql
+*.sqlite
+*.sqlite3
+*.tar.gz
+*.zip
+*.tar
+*.7z
