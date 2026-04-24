@@ -244,6 +244,27 @@ if [[ "${SINGLES_FORCE_SYNC:-0}" == "1" ]]; then
     echo "[entrypoint] singles + seed files reseeded (unset SINGLES_FORCE_SYNC for future boots)"
 fi
 
+# ---- 4e. Optional: one-shot email-domain rewrite ----
+# Set EMAIL_DOMAIN_REWRITE="<old>:<new>" (e.g. "tridotstech.com:netzerolabs.io")
+# on Railway and redeploy to rewrite every Contact / Contact Email / User
+# whose email or login ID ends in @<old> to use @<new>. Uses frappe.rename_doc
+# under the hood so foreign-key references stay consistent. Then DELETE the
+# variable from Railway — leaving it set is harmless (idempotent: no-op once
+# nothing matches) but spams the boot log.
+if [[ -n "${EMAIL_DOMAIN_REWRITE:-}" ]]; then
+    rewrite_old="${EMAIL_DOMAIN_REWRITE%%:*}"
+    rewrite_new="${EMAIL_DOMAIN_REWRITE##*:}"
+    if [[ -z "$rewrite_old" || -z "$rewrite_new" || "$rewrite_old" == "$EMAIL_DOMAIN_REWRITE" ]]; then
+        echo "[entrypoint] EMAIL_DOMAIN_REWRITE malformed — expected '<old>:<new>', got '$EMAIL_DOMAIN_REWRITE' (skipping)"
+    else
+        echo "[entrypoint] EMAIL_DOMAIN_REWRITE — rewriting @$rewrite_old to @$rewrite_new"
+        gosu frappe env BENCH="$BENCH" SITE_NAME="$SITE_NAME" \
+            REWRITE_OLD="$rewrite_old" REWRITE_NEW="$rewrite_new" \
+            bash -c 'cd "$BENCH" && bench --site "$SITE_NAME" execute mrvtools.api.replace_email_domain --kwargs "{\"old_domain\":\"$REWRITE_OLD\",\"new_domain\":\"$REWRITE_NEW\",\"dry_run\":0}" && bench --site "$SITE_NAME" clear-cache'
+        echo "[entrypoint] email-domain rewrite complete (delete EMAIL_DOMAIN_REWRITE for future boots)"
+    fi
+fi
+
 # ---- 4a. Set host_name so Frappe's realtime server accepts the public URL ----
 # Without this, socket.io rejects websocket connections from any domain other
 # than the bare SITE_NAME with "Invalid origin". Safe to run every boot — it
