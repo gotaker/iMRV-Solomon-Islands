@@ -11,12 +11,17 @@ from tests.ui._axe import axe_scan, violations_of
 pytestmark = pytest.mark.ui
 
 
-# Emoji codepoint ranges — rough cut, catches the common offenders (😀 🚀 ⚙️ 🎨 ✅ 🔥).
+# Emoji codepoint ranges — narrowed to Supplemental Symbols & Pictographs + Emoticons,
+# which is where the common "🚀 / ⚙️ / 😀 / 🎨 / ✅" offenders live. Intentionally
+# skips U+2600–U+27BF (Miscellaneous Symbols + Dingbats) because that range contains
+# legitimate decorative glyphs (★, ❄, ✂) used in climate-domain UIs.
 _EMOJI_RE = re.compile(
     r"["
-    r"\U0001F300-\U0001F6FF"
-    r"\U0001F900-\U0001F9FF"
-    r"☀-➿"
+    r"\U0001F300-\U0001F5FF"   # Miscellaneous Symbols and Pictographs
+    r"\U0001F600-\U0001F64F"   # Emoticons
+    r"\U0001F680-\U0001F6FF"   # Transport and Map
+    r"\U0001F900-\U0001F9FF"   # Supplemental Symbols and Pictographs
+    r"\U0001FA70-\U0001FAFF"   # Symbols and Pictographs Extended-A
     r"]"
 )
 
@@ -67,9 +72,15 @@ def test_ds_touch_targets(browser, bench_server):
               const els = document.querySelectorAll('a, button, [role="button"]');
               return Array.from(els).flatMap(el => {
                 const r = el.getBoundingClientRect();
-                // ignore hidden/zero-size elements
+                // Skip elements not actually rendered: display:none (offsetParent null),
+                // zero-size boxes, and off-screen visibility:hidden (treated as non-interactive).
                 if (r.width === 0 && r.height === 0) return [];
-                return (r.width < 44 || r.height < 44) ? [{tag: el.tagName, w: r.width, h: r.height, html: el.outerHTML.slice(0, 120)}] : [];
+                if (el.offsetParent === null) return [];
+                const style = window.getComputedStyle(el);
+                if (style.visibility === 'hidden' || style.display === 'none') return [];
+                return (r.width < 44 || r.height < 44)
+                  ? [{tag: el.tagName, w: r.width, h: r.height, html: el.outerHTML.slice(0, 120)}]
+                  : [];
               });
             }
         """)

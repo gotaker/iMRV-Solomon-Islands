@@ -18,15 +18,34 @@ def inject_axe(page) -> None:
 
 
 def axe_scan(page, *, rules: list[str] | None = None) -> dict:
-    """Run an axe scan and return the raw result dict."""
+    """Run an axe scan and return the raw result dict.
+
+    Raises `RuntimeError` with a clear message if axe-core fails to inject
+    (CDN unreachable, CSP blocking, syntax error in the loaded script).
+    This prevents tests from silently passing when the accessibility scan
+    didn't actually run.
+    """
     inject_axe(page)
+
+    # Post-inject guard — confirm `axe` is actually defined on the page.
+    loaded = page.evaluate("() => typeof axe !== 'undefined' && typeof axe.run === 'function'")
+    if not loaded:
+        raise RuntimeError(
+            "axe-core failed to inject on the page (CDN unreachable, CSP blocked the "
+            "script tag, or the vendored axe.min.js is corrupt). Scan aborted; do NOT "
+            "treat this as a pass. Vendor axe-core to tests/ui/vendor/axe.min.js and retry."
+        )
+
     options = {}
     if rules:
         options["runOnly"] = {"type": "rule", "values": rules}
+
     raw = page.evaluate(
         "async (opts) => JSON.stringify(await axe.run(document, opts))",
         options,
     )
+    if raw is None:
+        raise RuntimeError("axe.run() returned undefined — axe may have been evicted by navigation. Scan aborted.")
     return json.loads(raw)
 
 
