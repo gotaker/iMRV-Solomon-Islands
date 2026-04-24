@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 
 # ---------- Stage 1: Build Vue SPA ----------
-FROM node:20-alpine AS frontend-build
+FROM node:24-alpine AS frontend-build
 
 # Mirror the bench directory layout so vite.config.js's dynamic outDir resolves
 # correctly:  outDir = `../${basename(resolve('..'))}/public/frontend`
@@ -28,7 +28,7 @@ RUN test -d /build/mrvtools/mrvtools/public/frontend \
  && test -f /build/mrvtools/mrvtools/www/frontend.html
 
 # ---------- Stage 2: Runtime ----------
-FROM python:3.11-slim-bookworm AS runtime
+FROM python:3.14-slim-bookworm AS runtime
 
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=C.UTF-8 \
@@ -60,8 +60,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       xfonts-base \
    && rm -rf /var/lib/apt/lists/*
 
-# Node 20 for socketio + yarn
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+# Node 24 for socketio + yarn
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
  && apt-get install -y --no-install-recommends nodejs \
  && npm install -g yarn \
  && rm -rf /var/lib/apt/lists/*
@@ -73,7 +73,7 @@ RUN groupadd -g 1000 frappe \
 # frappe-bench CLI, installed for the frappe user
 USER frappe
 WORKDIR /home/frappe
-RUN pip install --user --no-cache-dir "frappe-bench==5.22.6" "click<8.1"
+RUN pip install --user --no-cache-dir frappe-bench
 USER root
 
 # ---------- bench init ----------
@@ -85,8 +85,8 @@ USER root
 USER frappe
 WORKDIR /home/frappe
 RUN bench init \
-      --python python3.11 \
-      --frappe-branch version-15 \
+      --python python3.14 \
+      --frappe-branch version-16 \
       --skip-assets \
       --skip-redis-config-generation \
       --no-backups \

@@ -21,9 +21,9 @@ Sample data:
 
 Environment variables (defaults in parens):
   BENCH_DIR               ($HOME/frappe-bench)  Where bench init lives
-  FRAPPE_BRANCH           (version-15)          Frappe branch for bench init
-  PYTHON_VERSION          (3.11)                Python for bench venv
-  NODE_VERSION            (18)                  Node for bench init
+  FRAPPE_BRANCH           (version-16)          Frappe branch for bench init
+  PYTHON_VERSION          (3.14)                Python for bench venv
+  NODE_VERSION            (24)                  Node for bench init
   SITE_NAME               (mrv.localhost)       Site to create
   ADMIN_PASSWORD          (admin)               Frappe admin password
   MYSQL_ROOT_PASSWORD     (REQUIRED)            MariaDB root password
@@ -43,9 +43,9 @@ EOF
 # --- Config --------------------------------------------------------------
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 BENCH_DIR="${BENCH_DIR:-$HOME/frappe-bench}"
-FRAPPE_BRANCH="${FRAPPE_BRANCH:-version-15}"
-PYTHON_VERSION="${PYTHON_VERSION:-3.11}"
-NODE_VERSION="${NODE_VERSION:-18}"
+FRAPPE_BRANCH="${FRAPPE_BRANCH:-version-16}"
+PYTHON_VERSION="${PYTHON_VERSION:-3.14}"
+NODE_VERSION="${NODE_VERSION:-24}"
 SITE_NAME="${SITE_NAME:-mrv.localhost}"
 ADMIN_PASSWORD="${ADMIN_PASSWORD:-admin}"
 MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD:-}"
@@ -143,7 +143,7 @@ _install_system_deps_macos() {
     err "Homebrew is required on macOS. Install from https://brew.sh and re-run."
     exit 1
   fi
-  local pkgs=(git "python@${PYTHON_VERSION}" "node@${NODE_VERSION}" yarn mariadb redis pipx)
+  local pkgs=(git "python@${PYTHON_VERSION}" "node@${NODE_VERSION}" yarn redis pipx)
   local pkg
   for pkg in "${pkgs[@]}"; do
     if brew list "$pkg" &>/dev/null; then
@@ -152,9 +152,28 @@ _install_system_deps_macos() {
       run brew install "$pkg"
     fi
   done
+  _install_mariadb_macos
   _ensure_wkhtmltopdf_macos
   run brew services start mariadb
   run brew services start redis
+}
+
+_install_mariadb_macos() {
+  if brew list mariadb@12.2 &>/dev/null || brew list mariadb &>/dev/null; then
+    skip "brew mariadb"
+    return
+  fi
+  if [[ "$DRY_RUN" == "1" ]]; then
+    printf 'DRY_RUN: brew install mariadb@12.2 (fallback: brew install mariadb)\n'
+    return
+  fi
+  if brew install mariadb@12.2; then
+    info "installed mariadb@12.2 via Homebrew"
+  else
+    warn "brew install mariadb@12.2 failed; falling back to plain mariadb formula"
+    brew install mariadb
+    info "installed mariadb (current stable) via Homebrew"
+  fi
 }
 
 _ensure_wkhtmltopdf_macos() {
@@ -173,7 +192,10 @@ _ensure_wkhtmltopdf_macos() {
 
 _install_system_deps_ubuntu() {
   run sudo apt-get update
-  local pkgs=(git cron "python${PYTHON_VERSION}" "python${PYTHON_VERSION}-venv" python3-dev mariadb-server redis-server
+  _add_deadsnakes_ppa_if_ubuntu
+  _add_mariadb_repo
+  local pkgs=(git cron "python${PYTHON_VERSION}" "python${PYTHON_VERSION}-venv" "python${PYTHON_VERSION}-dev"
+              python3-dev mariadb-server mariadb-client redis-server
               build-essential libssl-dev libffi-dev xvfb libfontconfig pipx)
   local pkg
   for pkg in "${pkgs[@]}"; do
@@ -205,6 +227,31 @@ _install_system_deps_ubuntu() {
     run sudo systemctl start redis-server
   fi
   _install_wkhtmltopdf_patched
+}
+
+_add_deadsnakes_ppa_if_ubuntu() {
+  # Python 3.14 is not in Ubuntu's default repos; deadsnakes PPA ships it.
+  # Only safe on actual Ubuntu — skip on Debian/WSL-Debian where the PPA
+  # doesn't apply. The OS detector collapses Ubuntu+Debian into OS=ubuntu,
+  # so re-read /etc/os-release here to distinguish.
+  local distro_id=""
+  if [[ -r /etc/os-release ]]; then
+    # shellcheck disable=SC1091
+    distro_id="$(. /etc/os-release && echo "${ID:-}")"
+  fi
+  if [[ "$distro_id" != "ubuntu" ]]; then
+    skip "deadsnakes PPA (distro is '$distro_id', not ubuntu)"
+    return
+  fi
+  run sudo add-apt-repository -y ppa:deadsnakes/ppa
+  run sudo apt-get update
+}
+
+_add_mariadb_repo() {
+  # Pin MariaDB to 12.2 via MariaDB's official repo. The setup script is
+  # idempotent — re-running it rewrites the same apt source list.
+  run_sh "curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | sudo bash -s -- --mariadb-server-version=\"mariadb-12.2\""
+  run sudo apt-get update
 }
 
 _ensure_mariadb_root_password() {
