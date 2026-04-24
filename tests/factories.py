@@ -14,10 +14,11 @@ import frappe
 
 
 def make_project(**overrides) -> str:
-    """Insert a minimal Project. Status defaults to the doctype's configured default; pass `status=...` to override. Returns its name."""
+    """Insert a minimal Project in `Planning` status (the first valid v16 Project status). Pass `status=...` to override. Returns its name."""
     doc = frappe.get_doc({
         "doctype": "Project",
         "project_name": overrides.pop("project_name", f"Test Project {uuid.uuid4().hex[:8]}"),
+        "status": overrides.pop("status", "Planning"),
         **overrides,
     })
     doc.insert(ignore_permissions=True)

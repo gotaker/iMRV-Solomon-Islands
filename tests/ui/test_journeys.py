@@ -50,8 +50,10 @@ def test_spa_home_renders(browser, bench_server):
         page.goto(f"{bench_server}/frontend/home", timeout=20_000)
         page.wait_for_load_state("networkidle", timeout=20_000)
 
-        # Hero should be present — selector is intentionally loose to survive design tweaks.
-        assert page.locator("main, #app, .home, [data-testid=home]").count() >= 1
+        # SPA shell must be mounted — Vue 3 adds `data-v-app` to the root element
+        # when the app has actually hydrated. If Vite's output isn't served or the
+        # SPA bundle 404'd, this hits 0 even if the Frappe web template rendered.
+        assert page.locator("[data-v-app]").count() >= 1, "Vue SPA did not mount — check Vite bundle served under /assets/mrvtools/frontend/"
 
         # 4xx/5xx responses are regressions (the seed-image recovery trap would fire here).
         image_failures = [u for u in failed if any(u.endswith(ext) for ext in (".jpg", ".jpeg", ".png", ".webp", ".svg"))]
@@ -62,11 +64,15 @@ def test_spa_home_renders(browser, bench_server):
 
 def test_approval_workflow_end_to_end(browser, bench_server, frappe_site):
     """
-    Draft user creates Project → submits → approver logs in → approves → DB reflects new status.
+    Smoke-level approval journey: factory-create a Project, log in as an approver,
+    open the project desk page. Asserts the page loads without 404/Permission
+    errors for an approver-role user.
 
-    This journey intentionally spans the widest layer stack we have. If anything
-    in routing, permission queries, workflow state machine, or doc controllers
-    regresses under v16, this test fires.
+    FIXME(v16-harness): the full submit→approve→status-transition flow requires
+    runtime-discovered selectors for the Frappe v16 desk action buttons and
+    a live-bench verification pass. Scope-deferred. Current test pins that the
+    approver role has read access to the project doc — a regression in
+    permission_query_conditions or workflow perm maps will fire here.
     """
     from tests.factories import make_project, make_approver_user
 
@@ -99,10 +105,16 @@ def test_main_dashboard_tiles_render(browser, bench_server):
         page.wait_for_load_state("networkidle", timeout=20_000)
 
         # Tiles render numbers — if the v16 query-builder break resurfaced,
-        # tiles would show 'None' or an error card.
-        html = page.content()
-        assert "None" not in html or html.count("None") < 3, (
-            "Dashboard contains 'None' literals — likely a regressed SQL-string query"
+        # tiles would show 'None' or an error card. Check each tile locator
+        # individually so a single broken tile fires, not just a bulk count.
+        import re
+        tile_texts = page.locator(
+            ".dashboard-widget-box, .widget-body, .number-widget, .dashboard-number-widget"
+        ).all_inner_texts()
+        broken = [t for t in tile_texts if re.fullmatch(r"\s*None\s*", t or "")]
+        assert broken == [], (
+            f"{len(broken)} dashboard tile(s) rendering literal 'None' — "
+            "likely a regressed SQL-string query"
         )
 
         errors = _console_errors(page)
