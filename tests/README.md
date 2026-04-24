@@ -48,3 +48,6 @@ for architecture and intent.
 - **Playwright chromium not found** — `playwright install chromium`.
 - **axe-core scan returns zero results** — the CDN injection failed; check
   network or vendor `axe.min.js` to `tests/ui/vendor/` and update `_axe.py`.
+- **CI skips with "SAMPLE_DB_URL secret not set"** — add the secret at Repo
+  Settings → Secrets → Actions. Value is the URL to a `sample-db-YYYYMMDD`
+  release asset per [deploy/railway/README.md](../deploy/railway/README.md).
