@@ -1,0 +1,33 @@
+{
+  "adaptation": [
+    {
+      "count": "int",
+      "key_sector": "str"
+    },
+    "<12 rows>"
+  ],
+  "mitigation": [
+    {
+      "count": "int",
+      "key_sector": "str"
+    },
+    "<4 rows>"
+  ],
+  "project_count": [
+    {
+      "Adaptation": "int",
+      "Cross-Cutting": "int",
+      "Enablers": "int",
+      "Mitigation": "int",
+      "Transparency": "int"
+    },
+    "<1 rows>"
+  ],
+  "project_status": [
+    {
+      "count": "int",
+      "status": "str"
+    },
+    "<7 rows>"
+  ]
+}

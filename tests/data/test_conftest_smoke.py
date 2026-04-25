@@ -1,6 +1,7 @@
 """Smoke test — verifies conftest fixtures compose without error."""
 
 import pytest
+from tests.conftest import TEST_SITE
 
 pytestmark = pytest.mark.data
 
@@ -13,6 +14,7 @@ def test_frappe_site_connects(frappe_site):
 
 def test_bench_server_responds(bench_server):
     import requests
-    r = requests.get(f"{bench_server}/api/method/ping", timeout=5)
+    headers = {"Host": TEST_SITE}
+    r = requests.get(f"{bench_server}/api/method/ping", headers=headers, timeout=5)
     assert r.status_code == 200
     assert r.json()["message"] == "pong"

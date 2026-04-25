@@ -1,0 +1,17 @@
+{
+  "datasets": [
+    {
+      "chartType": "str",
+      "name": "str",
+      "values": [
+        "float",
+        "<5 rows>"
+      ]
+    },
+    "<6 rows>"
+  ],
+  "labels": [
+    "int",
+    "<5 rows>"
+  ]
+}
