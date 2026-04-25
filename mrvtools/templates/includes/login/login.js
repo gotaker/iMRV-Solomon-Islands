@@ -184,6 +184,8 @@ login.set_status = function (message, color) {
 	$('section:visible .btn-primary').text(message)
 	if (color == "red") {
 		$('section:visible .page-card-body').addClass("invalid");
+	} else {
+		$('section:visible .page-card-body').removeClass("invalid");
 	}
 }
 
@@ -234,8 +236,9 @@ login.login_handlers = (function () {
 				window.location.href = frappe.utils.sanitise_redirect(data.redirect_to);
 			} else if (data.message == "No App") {
 				login.set_status("{{ _('Success') }}", 'green');
+				var last_visited;
 				if (localStorage) {
-					var last_visited =
+					last_visited =
 						localStorage.getItem("last_visited")
 						|| frappe.utils.sanitise_redirect(frappe.utils.get_url_arg("redirect-to"));
 					localStorage.removeItem("last_visited");
@@ -243,9 +246,7 @@ login.login_handlers = (function () {
 
 				if (data.redirect_to) {
 					window.location.href = frappe.utils.sanitise_redirect(data.redirect_to);
-				}
-
-				if (last_visited && last_visited != "/login") {
+				} else if (last_visited && last_visited != "/login") {
 					window.location.href = last_visited;
 				} else {
 					window.location.href = data.home_page;
@@ -346,6 +347,7 @@ var request_otp = function (r) {
 var continue_otp_app = function (setup, qrcode) {
 	request_otp();
 	var qrcode_div = $('<div class="text-muted" style="padding-bottom: 15px;"></div>');
+	var direction;
 
 	if (setup) {
 		direction = $('<div>').attr('id', 'qr_info').html('{{ _("Enter Code displayed in OTP App.") }}');
@@ -366,7 +368,7 @@ var continue_sms = function (setup, prompt) {
 		sms_div.append(prompt)
 		$('#otp_div').prepend(sms_div);
 	} else {
-		direction = $('<div>').attr('id', 'qr_info').html(prompt || '{{ _("SMS was not sent. Please contact Administrator.") }}');
+		var direction = $('<div>').attr('id', 'qr_info').html(prompt || '{{ _("SMS was not sent. Please contact Administrator.") }}');
 		sms_div.append(direction);
 		$('#otp_div').prepend(sms_div)
 	}
