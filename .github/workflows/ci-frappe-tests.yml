@@ -2,11 +2,11 @@ name: CI (Frappe tests)
 
 on:
   pull_request:
-    branches: [master]
+    branches: [Main]
   schedule:
     - cron: '0 2 * * *'
 
-# To require this check on master, configure branch protection
+# To require this check on Main, configure branch protection
 # manually via repo Settings -> Branches. This cannot be encoded
 # in the workflow itself.
 
@@ -20,7 +20,7 @@ jobs:
 
     services:
       mariadb:
-        image: mariadb:10.6
+        image: mariadb:12.2.2
         env:
           MARIADB_ROOT_PASSWORD: ${{ secrets.MARIADB_ROOT_PASSWORD }}
         ports:
@@ -57,12 +57,12 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.14'
           cache: pip
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '24'
 
       - name: Install frappe-bench
         run: pip install frappe-bench
@@ -79,8 +79,8 @@ jobs:
         run: |
           bench init \
             --skip-redis-config-generation \
-            --frappe-branch version-15 \
-            --python python3.11 \
+            --frappe-branch version-16 \
+            --python python3.14 \
             frappe-bench
 
       - name: Fetch mrvtools via bench get-app

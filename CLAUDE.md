@@ -26,9 +26,9 @@ yarn dev                         # runs `cd frontend && yarn dev` — Vite on :8
 yarn build                       # builds into mrvtools/public/frontend/ and copies index.html → mrvtools/www/frontend.html
 ```
 
-The build's `copy-html-entry` step (see [frontend/package.json](frontend/package.json)) is what makes `/frontend` resolve in production — Frappe serves `mrvtools/www/frontend.html`. The actual `build` script is `vite build --base=/assets/mrvtools/frontend/ && yarn copy-html-entry` — the `--base` flag, the `copy-html-entry` destination, and the `website_route_rules` / `app_include_*` entries in [mrvtools/hooks.py](mrvtools/hooks.py) all have to stay in sync; editing one without the others breaks asset URLs or the SPA mount.
+The build pipeline is driven by [frontend/vite.config.mjs](frontend/vite.config.mjs), which invokes `frappe-ui/vite`'s plugin with `buildConfig: { outDir, baseUrl, indexHtmlPath }` — the plugin does three things in one pass: writes the bundle to `mrvtools/public/frontend/`, injects `/assets/mrvtools/frontend/` as the production base URL, and copies the emitted `index.html` to `mrvtools/www/frontend.html` (which is what Frappe serves under `/frontend`). Those three paths, plus the `website_route_rules` / `app_include_*` entries in [mrvtools/hooks.py](mrvtools/hooks.py), all have to stay in sync — changing the app name or URL prefix means editing `vite.config.mjs` and `hooks.py` together. Note the `.mjs` extension is load-bearing: `frappe-ui/vite` is ESM-only and can't be `require`d, and the `frontend/package.json` has no `"type": "module"` (so the tailwind/postcss CommonJS configs keep working).
 
-Dev-server requirement (from [frontend/README.md](frontend/README.md)): add `"ignore_csrf": 1` to `site_config.json` while running Vite on :8080, otherwise CSRF errors block API calls. [frontend/vite.config.js](frontend/vite.config.js) contains a commented-out proxy block pointing at `http://192.168.0.183:8080` — a hint of a past dev-host setup, not active.
+Dev-server: `yarn dev` runs Vite on :8080. The plugin's `frappeProxy` reads `common_site_config.json` from the adjacent bench and proxies `/api`, `/method`, `/assets`, `/files`, `/private`, `/app`, `/login`, `/logout`, and `/socket.io` to the Frappe webserver (host-header-aware — visiting `http://mrv.localhost:8080` proxies to `http://mrv.localhost:8000`). The old `"ignore_csrf": 1` workaround in `site_config.json` is no longer strictly required since CSRF tokens round-trip through the proxy, but leave it on for dev ergonomics if other tooling expects it.
 
 [frontend/src/main.js](frontend/src/main.js) wires Frappe-UI with `frappeRequest` as the resource fetcher and registers `Button`/`Card`/`Input` globally; AOS (animate-on-scroll) is initialized in `App.vue`. If a Frappe-UI component looks unresolved, it needs registering here.
 
@@ -39,6 +39,8 @@ Day-to-day stack lifecycle on an already-installed bench: [start.sh](start.sh) a
 For a one-command bootstrap (fresh macOS, Ubuntu, or Windows/WSL2 laptop → working dev or prod install), run [install.sh](install.sh) at the repo root: `MYSQL_ROOT_PASSWORD=<pw> ./install.sh --dev` (or `--prod`). The script is idempotent — it automates exactly the `bench get-app` / `install-app` / `migrate` / `yarn build` sequence documented above, plus OS package install (Homebrew on macOS, apt on Ubuntu/WSL2), `bench init`, `new-site`, and the `ignore_csrf` / `developer_mode` flip for dev. Env vars (`BENCH_DIR`, `SITE_NAME`, `FRAPPE_BRANCH`, `PROD_DOMAIN`, `PROD_ENABLE_TLS`, etc.) override defaults; `DRY_RUN=1` prints what would run without executing it. Prod-only: set `PROD_DOMAIN=<fqdn>` to run `bench setup add-domain`, and `PROD_ENABLE_TLS=1` (Ubuntu only) to provision a Let's Encrypt cert via `bench setup lets-encrypt`. See [docs/superpowers/specs/2026-04-19-unified-setup-script-design.md](docs/superpowers/specs/2026-04-19-unified-setup-script-design.md) for the full spec.
 
 **Sample data on install.** `./install.sh --dev` force-restores the newest `*.sql.gz` from [.Sample DB/](.Sample%20DB/) (gitignored — drop a current dump there before running install on a fresh clone) and re-runs `bench migrate` after restore so the schema tracks the app code. `--prod` skips the restore by default. Override either way with `--with-sample-data` / `--no-sample-data` or `LOAD_SAMPLE_DATA=1/0`; `SAMPLE_DB_PATH=<file>` selects a specific dump. The restore step copies the file to `mktemp` first because Frappe's `bench restore` shells out to `zgrep`/`gunzip` without quoting the path and chokes on the space in `.Sample DB/`.
+
+**Publishing a new sample DB release.** Railway consumes sample DBs via `SAMPLE_DB_URL` pointing at a GitHub Release asset; cut a new release from the latest `.Sample DB/*.sql.gz` using the `gh release create` recipe in [deploy/railway/README.md](deploy/railway/README.md) (tag format `sample-db-YYYYMMDD`, no PII scrub — demo data only).
 
 Frappe app install (run from your bench root, not this directory):
 
@@ -63,8 +65,8 @@ There is no standalone Python test harness in this repo — every `test_*.py` li
 
 CI runs via GitHub Actions. Two workflows:
 
-- [.github/workflows/ci-fast.yml](.github/workflows/ci-fast.yml) — runs on every PR and on pushes to `master`. Three parallel jobs: `frontend-build` (Vite build), `frontend-format` (Prettier `--check` against `frontend/src/**/*.{js,vue,css}`), `python-lint` (ruff on both Frappe apps). Target <2 min.
-- [.github/workflows/ci-frappe-tests.yml](.github/workflows/ci-frappe-tests.yml) — runs on PRs targeting `master` and nightly at 02:00 UTC. Spins up MariaDB 10.6 + Redis 7 service containers, runs `bench init`, installs both apps into a fresh `test_site`, then `bench run-tests --app mrvtools` and `--app frappe_side_menu`. On failure, uploads `frappe-bench/logs/` as an artifact; nightly failures also auto-open a GitHub issue labelled `ci-nightly-failure` (the label must exist in the repo).
+- [.github/workflows/ci-fast.yml](.github/workflows/ci-fast.yml) — runs on every PR and on pushes to `Main`. Three parallel jobs: `frontend-build` (Vite build), `frontend-format` (Prettier `--check` against `frontend/src/**/*.{js,vue,css}`), `python-lint` (ruff on both Frappe apps). Target <2 min.
+- [.github/workflows/ci-frappe-tests.yml](.github/workflows/ci-frappe-tests.yml) — runs on PRs targeting `Main` and nightly at 02:00 UTC. Spins up MariaDB 10.6 + Redis 7 service containers, runs `bench init`, installs both apps into a fresh `test_site`, then `bench run-tests --app mrvtools` and `--app frappe_side_menu`. On failure, uploads `frappe-bench/logs/` as an artifact; nightly failures also auto-open a GitHub issue labelled `ci-nightly-failure` (the label must exist in the repo).
 
 Design spec: [docs/superpowers/specs/2026-04-19-ci-pipeline-design.md](docs/superpowers/specs/2026-04-19-ci-pipeline-design.md).
 
@@ -72,7 +74,11 @@ Version pins live in both workflow files and in [install.sh](install.sh) — kee
 
 [ruff.toml](ruff.toml) is intentionally conservative: only `E`/`F`/`I` are selected, and ~10 specific rules (`E501`, `E711`, `E712`, `E722`, `F841`, …) are explicitly ignored as "pre-existing legacy patterns" in Frappe controllers. The ignores are baseline, not aspirational — don't widen ruff's scope or "clean up" `== None` / bare `except:` / unused locals as a side-effect of unrelated work; that's a separate, opt-in cleanup.
 
-Branch protection on `master` requires these status checks (configure manually via repo Settings → Branches): `frontend-build`, `frontend-format`, `python-lint`, `frappe-tests`.
+Branch protection on `Main` requires these status checks (configure manually via repo Settings → Branches): `frontend-build`, `frontend-format`, `python-lint`, `frappe-tests`.
+
+The test harness adds three more required checks: `harness-data-integration`, `harness-ui`, `harness-security`. `harness-regression` is advisory for the first two weeks, then flipped to blocking in [ci-test-harness.yml](.github/workflows/ci-test-harness.yml).
+
+Secrets needed: `SAMPLE_DB_URL` (URL to a `sample-db-YYYYMMDD` GitHub release asset, per [deploy/railway/README.md](deploy/railway/README.md)).
 
 Secrets needed: `MARIADB_ROOT_PASSWORD` (any strong password — only used inside the ephemeral MariaDB service container).
 

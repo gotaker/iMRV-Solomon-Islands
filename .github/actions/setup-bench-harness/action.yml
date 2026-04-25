@@ -1,0 +1,89 @@
+name: "Setup bench harness"
+description: "Install system deps, bootstrap bench via install.sh, download sample DB, install pytest+playwright"
+
+inputs:
+  mariadb-root-password:
+    description: "MariaDB root password"
+    required: true
+  sample-db-url:
+    description: "URL to sample DB release asset"
+    required: true
+  python-version:
+    description: "Python version to install"
+    default: "3.14"
+  node-version:
+    description: "Node.js version to install"
+    default: "24"
+  frappe-branch:
+    description: "Frappe branch to check out"
+    default: "version-16"
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    # Install CLIENT-ONLY apt deps. MariaDB/Redis are provided by the
+    # workflow's service containers on 127.0.0.1:3306 / :6379. We do NOT
+    # want install.sh's Ubuntu path to `apt install mariadb-server redis-server`
+    # because each package's post-install would try to bind a port already
+    # held by the service container and dpkg would exit non-zero.
+    #
+    # Redis is an exception: `bench init` shells out to `redis-server --version`
+    # (unconditionally — no --skip-redis-config-generation flag in install.sh's
+    # bench invocation), so we need the BINARY on $PATH. The policy-rc.d gate
+    # below is the canonical Docker-image trick to install redis-server without
+    # its systemd unit starting a daemon that would collide with the service
+    # container on :6379.
+    - name: Install client-only apt deps + redis-server binary (no daemon)
+      shell: bash
+      run: |
+        set -euo pipefail
+        sudo apt-get update
+        sudo apt-get install -y \
+          git \
+          mariadb-client \
+          build-essential libssl-dev libffi-dev \
+          xvfb libfontconfig
+        # Prevent apt postinst from starting the redis daemon during install
+        echo 'exit 101' | sudo tee /usr/sbin/policy-rc.d >/dev/null
+        sudo chmod +x /usr/sbin/policy-rc.d
+        sudo apt-get install -y redis-server
+        sudo rm /usr/sbin/policy-rc.d
+        # Belt-and-suspenders: ensure systemd-managed instance is not running
+        sudo systemctl stop redis-server 2>/dev/null || true
+        sudo systemctl disable redis-server 2>/dev/null || true
+        # Sanity: bench will invoke this next
+        redis-server --version
+
+    - name: Bootstrap bench (install.sh --dev --no-sample-data, SKIP_SYSTEM_DEPS=1)
+      shell: bash
+      env:
+        MYSQL_ROOT_PASSWORD: ${{ inputs.mariadb-root-password }}
+        BENCH_DIR: ${{ github.workspace }}/../frappe-bench
+        SITE_NAME: test_mrv.localhost
+        FRAPPE_BRANCH: ${{ inputs.frappe-branch }}
+        SKIP_SYSTEM_DEPS: '1'
+        SKIP_START_SERVICES: '1'
+      run: |
+        ./install.sh --dev --no-sample-data
+
+    - name: Download sample DB from release asset
+      shell: bash
+      run: |
+        mkdir -p ".Sample DB"
+        curl -fsSL "${{ inputs.sample-db-url }}" -o ".Sample DB/ci-sample.sql.gz"
+
+    - name: Install harness Python deps
+      shell: bash
+      run: |
+        pip install pytest pytest-timeout playwright requests httpx
+        playwright install --with-deps chromium

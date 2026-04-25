@@ -138,6 +138,9 @@ class ApprovedUser(Document):
 		
 
 	def insert_user(self, roles):
+		# Called transitively from on_update. Must not call frappe.db.commit()
+		# here — v16 disallows explicit commits anywhere within a document
+		# lifecycle call chain (the framework manages the surrounding txn).
 		if frappe.db.exists("User",self.email):
 			doc = frappe.get_doc("User",self.email)
 			
@@ -152,7 +155,6 @@ class ApprovedUser(Document):
 				decrypted_password = get_decrypted_password(doctype = "Approved User", name = self.name, fieldname="password", raise_exception=False)
 				update_password(self.email,pwd = decrypted_password, logout_all_sessions=1)
 			doc.save(ignore_permissions=True)
-			frappe.db.commit()
 			self.password = ""
 		else:
 			doc = frappe.get_doc({
@@ -167,7 +169,6 @@ class ApprovedUser(Document):
 			})
 			doc.insert(ignore_permissions=True)
 			doc.save(ignore_permissions=True)
-			frappe.db.commit()
 
 	@Document.hook
 	def validate_reset_password(self):
@@ -348,6 +349,11 @@ def reset_password(user):
 
 
 def get_query_conditions(user):
-	
+	# System Manager / MRV Admin see every record. Non-admins only see their
+	# own Approved User row.
+	# Returning "" for the admin branch is required by Frappe v16 — its
+	# permission-query-conditions layer rejects None and expects either a SQL
+	# fragment string or "" (no additional filter).
 	if "System Manager" not in frappe.get_roles(user) and "MRV Admin" not in frappe.get_roles(user):
 		return f"""(`tabApproved User` .name = '{user}')"""
+	return ""

@@ -41,8 +41,8 @@
     />
 
         <!-- bootstrap v3.3.6 css -->
-  <script type="module" crossorigin src="/assets/mrvtools/frontend/assets/index.78b2e80a.js"></script>
-  <link rel="stylesheet" href="/assets/mrvtools/frontend/assets/index.24fe954d.css">
+  <script type="module" crossorigin src="/assets/mrvtools/frontend/assets/index-akeORqAo.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/mrvtools/frontend/assets/index-6vErNMMx.css">
 </head>
 <body>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -51,7 +51,6 @@
   <div id="app"></div>
   <div id="modals"></div>
   <div id="popovers"></div>
-  
   <div id="app"></div>
   <div id="modals"></div>
   <div id="popovers"></div>
@@ -59,8 +58,14 @@
   <script>
     window.csrf_token = 'b66afe44b11a83741e962f24b4c975f6de55ccbb3f7d94d9e4a27a35'
   </script>
-  
-</body>
+
+          <script>
+              {% for key in boot %}
+              window["{{ key }}"] = {{ boot[key] | tojson }};
+              {% endfor %}
+          </script>
+          </body>
+          
 
 </html>
 

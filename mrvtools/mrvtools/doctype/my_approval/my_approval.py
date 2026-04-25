@@ -26,6 +26,11 @@ def delete_record(reference_name,reference_doctype):
 	frappe.db.commit()
 
 def get_query_conditions(user):
-	
+	# System Manager / MRV Admin see every record. Non-admins only see rows where
+	# they are the listed approver.
+	# Returning "" for the admin branch is required by Frappe v16 — its
+	# permission-query-conditions layer rejects None and expects either a SQL
+	# fragment string or "" (no additional filter).
 	if "System Manager" not in frappe.get_roles(user) and "MRV Admin"  not in frappe.get_roles(user):
 		return f"""(`tabMy Approval` .approver = '{user}')"""
+	return ""

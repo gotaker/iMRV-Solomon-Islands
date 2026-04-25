@@ -1,0 +1,23 @@
+{
+  "enable_detail_left_menu": "NoneType",
+  "enable_list_left_menu": "NoneType",
+  "menu": [
+    {
+      "has_sub_menu": "int",
+      "has_sublist": "int",
+      "icon_image": "str",
+      "is_single_doc": "int",
+      "is_static_link": "int",
+      "label": "str",
+      "menu_doc": "NoneType",
+      "menu_icon": "NoneType",
+      "menu_type": "NoneType",
+      "module_name": "str",
+      "name": "str",
+      "static_link": "str"
+    },
+    "<16 rows>"
+  ],
+  "side_menu_settings": "SideMenuSettings",
+  "template_html": "str"
+}

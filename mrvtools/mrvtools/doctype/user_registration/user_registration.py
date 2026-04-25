@@ -19,6 +19,10 @@ class UserRegistration(Document):
 
 
 	def create_approved_user(self):
+		# Called from on_submit and on_update_after_submit. Must not call
+		# frappe.db.commit() here — v16 disallows explicit commits anywhere
+		# within a document lifecycle call chain; the surrounding txn commits
+		# naturally once the hook returns.
 		if not frappe.db.exists("Approved User",{"email":self.email_id}):
 
 			doc = frappe.new_doc("Approved User")
@@ -65,8 +69,7 @@ class UserRegistration(Document):
 				row = doc.append('reports',{})
 				row.project_tracking = i.project_tracking
 			doc.save(ignore_permissions = True)
-			frappe.db.commit()
-	
+
 
 
 @frappe.whitelist(allow_guest = True)

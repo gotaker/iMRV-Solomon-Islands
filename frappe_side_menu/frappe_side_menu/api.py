@@ -157,8 +157,10 @@ def get_permitted_pages_reports(role, parenttype):
 # Kishore
 @frappe.whitelist(allow_guest=True)
 def get_all_records(doctype, limit_start=0, limit_page_length=10):
+	# order_by pinned to `modified desc` to preserve v15 ordering — v16 changed
+	# the get_list() default from `modified` to `creation`.
 	try:
-		data = frappe.get_list(doctype, fields=["*"], start=limit_start, page_length=limit_page_length)
+		data = frappe.get_list(doctype, fields=["*"], start=limit_start, page_length=limit_page_length, order_by="modified desc")
 		return data
 	except Exception as e:
 		# frappe.log_error(f"Error in get_all_records for {doctype}", e)
@@ -166,7 +168,8 @@ def get_all_records(doctype, limit_start=0, limit_page_length=10):
 
 @frappe.whitelist(allow_guest=True)
 def get_list():
-	data = frappe.get_list('Project', fields=["*"])
+	# order_by pinned for the same v16 default-sort reason as get_all_records above.
+	data = frappe.get_list('Project', fields=["*"], order_by="modified desc")
 	for i in data:
 		x = i.columns
 		return x
@@ -180,14 +183,24 @@ def get_doctype():
 @frappe.whitelist(allow_guest=True)
 def set_default_route():
 	route = frappe.db.get_single_value("Side Menu Settings", "route_logo") or "main-dashboard"
-	frappe.local.response['home_page'] = "/app/" + route
+	target = "/app/" + route
 
-	# Frappe v15's LoginManager.set_user_info() runs AFTER on_session_creation and
-	# unconditionally overwrites response['home_page'] with "/app/" + slug(info.default_workspace)
-	# or "/app" (frappe/auth.py:189-195). Mutate info.default_workspace so our route survives —
-	# slug() round-trips lower-kebab values, so "main-dashboard" stays "main-dashboard".
-	# Without this, Safari and Chrome diverge post-login because a client-side fallback in
-	# frappe_side_menu.js only wins the redirect race in Chrome.
+	# frappe.local.flags.home_page short-circuits get_home_page() at the very top
+	# (frappe/website/utils.py: `if frappe.local.flags.home_page: return it`), which
+	# wins against v16's role-iteration loop (ibid: `for role in frappe.get_roles():
+	# home_page = frappe.db.get_value("Role", role, "home_page")`). Any Role with a
+	# home_page value would otherwise hijack the redirect for Administrator, who has
+	# every role — on this site, a sample-DB role named "Approver Mitigation Report"
+	# sets home_page and lands users at `/Approver Mitigation Report` (404).
+	frappe.local.flags.home_page = target
+
+	# Also set response['home_page'] for the legacy v13/v14 code path. v15+
+	# set_user_info() overwrites this, but the flag above still wins there.
+	frappe.local.response['home_page'] = target
+
+	# v15 legacy: LoginManager.set_user_info() used to build home_page from
+	# slug(info.default_workspace). v16 no longer does this, but setting it is
+	# harmless for forward compat.
 	login_manager = getattr(frappe.local, "login_manager", None)
 	info = getattr(login_manager, "info", None) if login_manager else None
 	if info is not None:

@@ -5,6 +5,8 @@
 tags
 mrvtools/docs/current
 node_modules/
+frontend/auto-imports.d.ts
+frontend/components.d.ts
 ._*
 .worktrees/
 docs/frappe-admin-training.pptx
@@ -18,5 +20,13 @@ package-lock.json
 *.sqlite3
 *.tar.gz
 *.zip
+!mrvtools/public/mrv_default_files.zip
 *.tar
 *.7z
+
+# Test harness artifacts
+tests/.pytest_cache/
+tests/**/__pycache__/
+tests/playwright-report/
+tests/playwright-traces/
+tests/.screenshots/

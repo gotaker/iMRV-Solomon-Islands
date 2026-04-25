@@ -1,0 +1,14 @@
+{
+  "data": [
+    "float",
+    "<1 rows>"
+  ],
+  "expected": [
+    "int",
+    "<1 rows>"
+  ],
+  "labels": [
+    "str",
+    "<1 rows>"
+  ]
+}

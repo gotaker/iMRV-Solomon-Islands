@@ -22,10 +22,10 @@
 
 Pinned to match [install.sh](../../../install.sh):
 
-- Python **3.11**
-- Node **18**
-- Frappe branch **version-15**
-- MariaDB **10.6**, Redis **7** (CI service containers)
+- Python **3.14**
+- Node **24**
+- Frappe branch **version-16**
+- MariaDB **12.2.2**, Redis **7** (CI service containers)
 
 Drift between CI and install.sh is a real risk — these values live in one place in each workflow file and must be updated together when install.sh's defaults change.
 
@@ -46,7 +46,7 @@ Runs on `ubuntu-latest`. `fail-fast: false` so contributors see all three result
 
 ### Job: `frontend-build`
 
-- `actions/setup-node@v4` with Node 18, `cache: yarn`, `cache-dependency-path: frontend/yarn.lock`
+- `actions/setup-node@v4` with Node 24, `cache: yarn`, `cache-dependency-path: frontend/yarn.lock`
 - `yarn --cwd frontend install --frozen-lockfile`
 - `yarn --cwd frontend build`
 
@@ -54,7 +54,7 @@ Catches broken imports, Vite misconfig, missing deps, and drift between the `--b
 
 ### Job: `frontend-format`
 
-- Same Node 18 setup
+- Same Node 24 setup
 - `yarn --cwd frontend install --frozen-lockfile`
 - `npx prettier --check "frontend/src/**/*.{js,vue,css}"`
 
@@ -62,7 +62,7 @@ Catches broken imports, Vite misconfig, missing deps, and drift between the `--b
 
 ### Job: `python-lint`
 
-- `actions/setup-python@v5` with Python 3.11, `cache: pip`
+- `actions/setup-python@v5` with Python 3.14, `cache: pip`
 - `pip install ruff`
 - `ruff check mrvtools/ frappe_side_menu/`
 
@@ -87,7 +87,7 @@ on:
 ```yaml
 services:
   mariadb:
-    image: mariadb:10.6
+    image: mariadb:12.2.2
     env:
       MARIADB_ROOT_PASSWORD: ${{ secrets.MARIADB_ROOT_PASSWORD }}
     ports: [3306:3306]
@@ -103,11 +103,11 @@ services:
 
 1. Checkout repo at `apps/mrvtools` inside a bench directory layout.
 2. Install system apt deps: `wkhtmltopdf`, `libcups2-dev`, `xfonts-75dpi`, `xfonts-base`, `software-properties-common`, etc. (the subset of install.sh's apt list that isn't covered by the service containers).
-3. `actions/setup-python@v5` Python 3.11 (with pip cache).
-4. `actions/setup-node@v4` Node 18 (with yarn cache).
+3. `actions/setup-python@v5` Python 3.14 (with pip cache).
+4. `actions/setup-node@v4` Node 24 (with yarn cache).
 5. `actions/cache@v4` for the apt package list, keyed on the hash of the package list. ~1 min savings per run.
 6. `pip install frappe-bench`.
-7. `bench init --skip-redis-config-generation --frappe-branch version-15 --python python3.11 frappe-bench`.
+7. `bench init --skip-redis-config-generation --frappe-branch version-16 --python python3.14 frappe-bench`.
 8. Symlink the checkout into `frappe-bench/apps/mrvtools`; same for `frappe_side_menu`.
 9. `bench new-site test_site --mariadb-root-password <secret> --admin-password admin --no-mariadb-socket`.
 10. `bench --site test_site install-app mrvtools`.

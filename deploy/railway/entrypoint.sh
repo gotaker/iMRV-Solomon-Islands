@@ -49,6 +49,21 @@ if [[ -d /home/frappe/sites-template/assets ]]; then
     gosu frappe cp -a /home/frappe/sites-template/assets "$SITES/assets"
 fi
 
+# ---- 1c. Invalidate the cached asset manifest in Redis ----
+# Frappe v16 caches the build's output filename hashes in a single Redis key
+# (assets_json). Redis persists across image rebuilds, so a new image's fresh
+# CSS/JS bundle names can drift out of sync with the hashes Frappe renders in
+# HTML — producing 404s on every CSS/JS include until the cache is manually
+# invalidated AND gunicorn is bounced. DEL the key here so gunicorn repopulates
+# it from the on-disk manifest on first request. Site-scoped `bench clear-cache`
+# doesn't touch this key. Non-fatal: if redis-cli fails (auth drift, transient
+# connect error), we still boot — worst case is one stale-manifest cycle.
+if redis-cli -u "$REDIS_CACHE_URL" DEL assets_json assets_json_rtl >/dev/null 2>&1; then
+    echo "[entrypoint] invalidated cached asset manifest in redis_cache"
+else
+    echo "[entrypoint] warn: could not invalidate cached asset manifest (non-fatal)"
+fi
+
 # ---- 2. Render nginx config ----
 # envsubst swaps $PORT from env; all other $vars in the template are nginx
 # variables (prefixed $http_*, $proxy_*, $uri, etc.) — we whitelist only PORT.
@@ -79,6 +94,12 @@ existing.update({
     "serve_default_site": True,
     "auto_update": False,
     "restart_supervisor_on_update": False,
+    # Frappe v16's default max_queued_jobs (550) is too low for this site's
+    # initial migrate: Property Setter cleanup enqueues delete_dynamic_links
+    # jobs per-row, and no worker is running yet during entrypoint to drain
+    # them. Bumping the threshold lets migrate finish; supervisord's workers
+    # consume the backlog as soon as the stack is up.
+    "max_queued_jobs": 10000,
 })
 with open(path, "w") as f:
     json.dump(existing, f, indent=1, sort_keys=True)
@@ -137,6 +158,26 @@ PY
     echo "[entrypoint] DB_USER_FORCE_SYNC complete (unset DB_USER_FORCE_SYNC for future boots)"
 fi
 
+# Predicate: will the maybe_restore_sample_db step (section 4b) actually
+# restore? Mirrors its own guard so the migrate branch below can skip the
+# pre-restore migrate — on a DB_USER_FORCE_SYNC recovery the sync creates
+# an empty DB and `bench migrate` then crashes with "Table tabDefaultValue
+# doesn't exist" before the restore has a chance to import schema. The
+# restore block runs its own post-import migrate, so skipping here is safe.
+will_restore_sample_db() {
+    local src_url="${SAMPLE_DB_URL:-}"
+    local src_path="${SAMPLE_DB_PATH:-}"
+    if [[ -z "$src_url" && -z "$src_path" ]]; then
+        shopt -s nullglob
+        local baked=(/home/frappe/sample-db/*.sql.gz)
+        shopt -u nullglob
+        [[ ${#baked[@]} -gt 0 ]] && src_path="${baked[0]}"
+    fi
+    [[ -z "$src_url" && -z "$src_path" ]] && return 1
+    [[ -f "$SITE_DIR/.sample_db_restored" && "${SAMPLE_DB_FORCE_RESTORE:-0}" != "1" ]] && return 1
+    return 0
+}
+
 # ---- 4. First-boot site creation OR routine migrate ----
 # Pass secrets and site name via the child process's environment (gosu -E
 # preserves them) so a single quote or other shell metacharacter in any value
@@ -156,6 +197,8 @@ if [[ ! -f "$SITE_DIR/site_config.json" ]]; then
             --install-app frappe_side_menu \
             "$SITE_NAME"'
     echo "[entrypoint] site created and apps installed"
+elif will_restore_sample_db; then
+    echo "[entrypoint] existing site — sample DB restore pending, skipping pre-restore migrate"
 else
     echo "[entrypoint] existing site — running migrate"
     gosu frappe env \
@@ -199,6 +242,15 @@ maybe_restore_sample_db() {
     fi
 
     local dump=/tmp/sample-db.sql.gz
+
+    # Wipe any stale /tmp/sample-db.sql.gz from a previous (failed) deploy.
+    # Railway appears to run the container with a user-namespace mapping where
+    # in-container root lacks CAP_DAC_OVERRIDE against files owned by other
+    # in-container UIDs — so curl's fopen("wb") on a frappe-owned leftover
+    # fails with EACCES. Removing first lets curl create the file fresh
+    # (sticky-bit on /tmp permits root unlink).
+    rm -f "$dump" 2>/dev/null || true
+
     if [[ -n "$src_url" ]]; then
         echo "[entrypoint] fetching sample DB from \$SAMPLE_DB_URL"
         # Private-repo GitHub Release assets need a PAT; any other bespoke

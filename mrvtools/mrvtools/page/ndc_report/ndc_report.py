@@ -197,9 +197,11 @@ def get_pie_chart(year = None):
 		sector_label_list=[]
 		actual_reduction_list=[]
 		for i in result:
-			tillDateActual = frappe.db.get_all('Mitigation Monitoring Information',
-				filters={"key_sector":f"{i.key_sector}"},
-				fields = ["sum(actual_annual_ghg) as till_date_actual_ghg"])
+			tillDateActual = frappe.db.sql(
+				"""SELECT SUM(actual_annual_ghg) AS till_date_actual_ghg
+				   FROM `tabMitigation Monitoring Information`
+				   WHERE key_sector = %s""",
+				(i.key_sector,), as_dict=True)
 			actual_reduction_list.append(tillDateActual[0].till_date_actual_ghg)
 			sector_label_list.append(i.key_sector)
 	
