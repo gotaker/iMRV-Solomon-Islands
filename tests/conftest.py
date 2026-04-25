@@ -126,7 +126,7 @@ def frappe_site():
                    "--install-app", "mrvtools",
                    "--install-app", "frappe_side_menu")
 
-        _bench("--site", TEST_SITE, "--force", "restore", str(dump))
+        _bench("--site", TEST_SITE, "--force", "restore", str(dump), "--mariadb-root-password", os.environ.get("MARIADB_ROOT_PASSWORD", "admin"))
         _bench("--site", TEST_SITE, "migrate")  # <-- THE v16 gate
     except subprocess.CalledProcessError as e:
         pytest.fail(
