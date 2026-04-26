@@ -12,10 +12,10 @@
         <div class="section-headline text-center">
           <h2
             style="
-              color: #000;
+              color: #022e1d;
               font-weight: 700;
               font-size: 3rem;
-              font-family: Inter;
+              font-family: 'Anton', 'Helvetica Neue', sans-serif;
             "
             class="p-5 text-center"
           >

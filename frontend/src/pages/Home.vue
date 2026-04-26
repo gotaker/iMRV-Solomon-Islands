@@ -11,7 +11,7 @@ import imgForest from '@/assets/images/editorial/program-forest.jpg'
 import imgReef from '@/assets/images/editorial/program-reef.jpg'
 
 /* ----- staggered hero text ----- */
-const heroLetters = [...'Climate']
+const heroLetters = [...'iMRV']
 
 /* ----- fallback demo content (used when Frappe data is empty/unavailable) ----- */
 const fallbackPrograms = [
@@ -155,7 +155,7 @@ onUnmounted(() => {
       </div>
 
       <div class="hero-display">
-        <h1 class="hero-text" aria-label="Climate">
+        <h1 class="hero-text" aria-label="iMRV">
           <span
             v-for="(ch, i) in heroLetters"
             :key="i"
@@ -278,7 +278,7 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <Footer />
+    <Footer :data="homeResource.data" mega-text="Climate" />
   </div>
 </template>
 

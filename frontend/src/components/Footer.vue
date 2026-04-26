@@ -1,9 +1,20 @@
 <script setup>
+import { computed } from 'vue'
+
 // `data` accepted to keep parity with legacy `<Footer :data="..." />` callers.
 // `flush` lets legacy pages opt out of the editorial overlap (negative margin + radius).
-defineProps({
+const props = defineProps({
   data: { type: [Object, Array], default: () => ({}) },
   flush: { type: Boolean, default: false },
+  megaText: { type: String, default: 'iMRV' },
+})
+
+const partnerLogos = computed(() => {
+  const p = props.data?.message?.parent_data
+  if (!p) return []
+  return [1, 2, 3, 4, 5, 6]
+    .map((n) => p[`partner${n}`])
+    .filter(Boolean)
 })
 
 const onSubscribe = (e) => {
@@ -113,7 +124,20 @@ const onSubscribe = (e) => {
       </div>
     </div>
 
-    <div class="ed-mega" aria-hidden="true">iMRV</div>
+    <div v-if="partnerLogos.length" class="ed-partners">
+      <span class="ed-eyebrow">In Partnership With</span>
+      <div class="ed-partners-row">
+        <div
+          v-for="(src, i) in partnerLogos"
+          :key="i"
+          class="ed-partner"
+        >
+          <img :src="src" :alt="`Partner ${i + 1}`" loading="lazy" />
+        </div>
+      </div>
+    </div>
+
+    <div class="ed-mega" aria-hidden="true">{{ megaText }}</div>
 
     <div class="ed-mark">
       <span>© 2026 Government of Solomon Islands · MECDM</span>
@@ -332,6 +356,60 @@ const onSubscribe = (e) => {
   transform: translateX(-4px);
 }
 
+.ed-partners {
+  position: relative;
+  margin-top: 5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1.5rem;
+  padding-top: 3rem;
+  border-top: 1px solid rgba(204, 213, 174, 0.18);
+}
+.ed-partners .ed-eyebrow {
+  margin-bottom: 0;
+}
+.ed-partners-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  justify-content: flex-end;
+  align-items: center;
+}
+.ed-partner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 116px;
+  height: 60px;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid rgba(204, 213, 174, 0.22);
+  border-radius: 14px;
+  background: rgba(254, 250, 224, 0.04);
+  transition:
+    border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ed-partner img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.82;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ed-partner:hover {
+  border-color: rgba(254, 250, 224, 0.55);
+  background: rgba(254, 250, 224, 0.09);
+  transform: translateY(-2px);
+}
+.ed-partner:hover img {
+  opacity: 1;
+}
+
 .ed-mega {
   position: relative;
   font-family: 'Anton', 'Helvetica Neue', sans-serif;
@@ -398,6 +476,13 @@ const onSubscribe = (e) => {
   }
   .ed-mega {
     font-size: 45vw;
+  }
+  .ed-partners {
+    align-items: flex-start;
+    margin-top: 3rem;
+  }
+  .ed-partners-row {
+    justify-content: flex-start;
   }
 }
 

@@ -156,7 +156,7 @@ $(function () {
 
 <style scoped>
 .active {
-  color: rgb(0, 174, 0) !important;
+  color: #01472e !important;
   text-decoration: none;
   font-size: 17px !important;
   font-weight: 700 !important;
@@ -221,7 +221,7 @@ li {
   left: 0;
   width: 100%;
   height: 1px;
-  background-color: rgb(0, 174, 0);
+  background-color: #01472e;
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.3s ease;

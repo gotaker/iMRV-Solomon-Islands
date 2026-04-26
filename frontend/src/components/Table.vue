@@ -76,7 +76,7 @@
                   <table class="table table-striped table-bordered table-hover">
                     <thead
                       style="
-                        background-color: #006600;
+                        background-color: #01472e;
                         color: white;
                         padding: 20px;
                       "
@@ -145,7 +145,7 @@
                   <table class="table table-striped table-bordered table-hover">
                     <thead
                       style="
-                        background-color: #006600;
+                        background-color: #01472e;
                         color: white;
                         padding: 20px;
                       "
@@ -208,7 +208,7 @@
                   <table class="table table-striped table-bordered table-hover">
                     <thead
                       style="
-                        background-color: #006600;
+                        background-color: #01472e;
                         color: white;
                         padding: 20px;
                       "
@@ -258,7 +258,7 @@
                   <table class="table table-striped table-bordered table-hover">
                     <thead
                       style="
-                        background-color: #006600;
+                        background-color: #01472e;
                         color: white;
                         padding: 20px;
                       "
@@ -383,7 +383,7 @@
                 <table class="table table-striped table-bordered table-hover">
                   <thead
                     style="
-                      background-color: #006600;
+                      background-color: #01472e;
                       color: white;
                       padding: 20px;
                     "
@@ -452,7 +452,7 @@
                 <table class="table table-striped table-bordered table-hover">
                   <thead
                     style="
-                      background-color: #006600;
+                      background-color: #01472e;
                       color: white;
                       padding: 20px;
                     "
@@ -515,7 +515,7 @@
                 <table class="table table-striped table-bordered table-hover">
                   <thead
                     style="
-                      background-color: #006600;
+                      background-color: #01472e;
                       color: white;
                       padding: 20px;
                     "
@@ -565,7 +565,7 @@
                 <table class="table table-striped table-bordered table-hover">
                   <thead
                     style="
-                      background-color: #006600;
+                      background-color: #01472e;
                       color: white;
                       padding: 20px;
                     "
@@ -621,7 +621,8 @@
   border: 1px solid rgba(1, 71, 46, 0.08);
   box-shadow: 0 25px 60px -25px rgba(1, 71, 46, 0.2);
   background: #ffffff;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .editorial-table :deep(table.table) {
@@ -665,8 +666,13 @@
 }
 
 .editorial-table :deep(table.table tbody tr:hover),
-.editorial-table :deep(table.table tbody tr:hover:nth-child(even)) {
-  background: #ccd5ae;
+.editorial-table :deep(table.table tbody tr:hover:nth-child(even)),
+.editorial-table :deep(table.table tbody tr:hover > td),
+.editorial-table :deep(table.table tbody tr:hover > th) {
+  background: #ccd5ae !important;
+  background-color: #ccd5ae !important;
+  --bs-table-hover-bg: #ccd5ae;
+  --bs-table-bg-state: #ccd5ae;
 }
 
 .editorial-table :deep(table.table tbody td),
@@ -689,6 +695,9 @@
 
 .editorial-table :deep(table.table-bordered),
 .editorial-table :deep(table.table-bordered > :not(caption) > * > *) {
-  border-width: 0;
+  border-width: 0 !important;
+  border-top: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
 }
 </style>
