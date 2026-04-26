@@ -89,6 +89,15 @@ def get_menulist():
 						continue
 					if n.menu_type == 'Page' and n.menu_doc and n.menu_doc in permitted_pages:
 						continue
+			# Skip parent sections whose every leaf was filtered out by perms.
+			# Without this, Side Menu sections (e.g. MASTER DATABASE, USERS)
+			# render in the drawer for users who have zero accessible items
+			# inside them — clicking each leaf 403s. The Jinja templates already
+			# gate on `has_sublist >= 1`, but we hide the entry from the data
+			# layer too so other consumers (e.g. test fixtures, future SPA
+			# adapters) see a clean menu.
+			if n.has_sub_menu and not n.has_sublist:
+				continue
 			menu_items_list.append(n)
 	
 	theme, enable_detail_left_menu, enable_list_left_menu = None, None, None

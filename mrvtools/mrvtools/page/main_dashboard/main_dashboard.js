@@ -72,6 +72,10 @@ function programCard(slug, title, copy, route) {
 	`;
 }
 
+function canRead(doctype) {
+	return !!(frappe.boot && frappe.boot.user && frappe.boot.user.can_read && frappe.boot.user.can_read.indexOf(doctype) !== -1);
+}
+
 function loadStats($body) {
 	const tiles = [
 		{ slot: 'projects', doctype: 'Project', filters: {} },
@@ -81,6 +85,12 @@ function loadStats($body) {
 
 	tiles.forEach((tile) => {
 		const $num = $body.find(`.ed-stat-tile[data-slot="${tile.slot}"] .ed-stat-number`);
+		// Skip the request entirely if the user lacks read perm — avoids a server
+		// 403 + console traceback when widgets reference doctypes the role can't see.
+		if (!canRead(tile.doctype)) {
+			$num.text('—');
+			return;
+		}
 		frappe.call({
 			method: 'frappe.client.get_count',
 			args: { doctype: tile.doctype, filters: tile.filters },
@@ -95,6 +105,10 @@ function loadStats($body) {
 
 function loadActivity($body) {
 	const $slot = $body.find('.ed-activity-body');
+	if (!canRead('Activity Log')) {
+		$slot.html(emptyActivity());
+		return;
+	}
 	frappe.db
 		.get_list('Activity Log', {
 			filters: { user: frappe.session.user },
