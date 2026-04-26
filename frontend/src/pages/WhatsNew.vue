@@ -95,7 +95,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import axios from 'axios'
 import Footer from '@/components/Footer.vue'
 import Header from '@/components/Header.vue'
@@ -119,6 +119,14 @@ const fetchData = async () => {
       for (let i = 0; i < data.value.message.add_new_content.length; i++) {
         let date = new Date(data.value.message.add_new_content[i].date)
         data.value.message.add_new_content[i].creation = formatter.format(date)
+      }
+      // v-if/v-for elements gated on data are inserted now — observe them
+      // so the reveal animation actually fires.
+      await nextTick()
+      if (observer) {
+        document
+          .querySelectorAll('[data-reveal]')
+          .forEach((el) => observer.observe(el))
       }
     } else {
       throw new Error('Network response was not ok')

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import axios from 'axios'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
@@ -14,6 +14,12 @@ const fetchData = async () => {
     )
     if (response.status === 200) {
       data.value = response.data
+      // v-if elements gated on data are inserted now — observe them
+      // so the reveal animation actually fires.
+      await nextTick()
+      if (io) {
+        document.querySelectorAll('[data-reveal]').forEach((el) => io.observe(el))
+      }
     } else {
       throw new Error('Network response was not ok')
     }

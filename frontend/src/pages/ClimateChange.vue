@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import axios from 'axios'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
@@ -13,6 +13,12 @@ const fetchData = async () => {
     )
     if (response.status === 200) {
       data.value = response.data
+      // v-if elements gated on parentData.* are inserted now — observe them
+      // so the reveal animation actually fires.
+      await nextTick()
+      if (io) {
+        document.querySelectorAll('[data-reveal]').forEach((el) => io.observe(el))
+      }
     } else {
       throw new Error('Network response was not ok')
     }
@@ -140,6 +146,39 @@ onUnmounted(() => {
           />
         </figure>
       </div>
+
+      <div
+        v-if="
+          parentData.climate_change_division_content2 ||
+          parentData.climate_change_division_content3
+        "
+        class="info-cards"
+      >
+        <article
+          v-if="parentData.climate_change_division_content2"
+          class="info-card"
+          data-reveal
+          data-reveal-delay="3"
+        >
+          <span class="block-num">02</span>
+          <div
+            class="prose"
+            v-html="decodeHtml(parentData.climate_change_division_content2)"
+          ></div>
+        </article>
+        <article
+          v-if="parentData.climate_change_division_content3"
+          class="info-card"
+          data-reveal
+          data-reveal-delay="4"
+        >
+          <span class="block-num">03</span>
+          <div
+            class="prose"
+            v-html="decodeHtml(parentData.climate_change_division_content3)"
+          ></div>
+        </article>
+      </div>
     </section>
 
     <!-- ========== GALLERY (Sage) ========== -->
@@ -184,23 +223,6 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- Prose below gallery -->
-      <div class="gallery-prose">
-        <div
-          v-if="parentData.climate_change_division_content2"
-          class="prose"
-          data-reveal
-          data-reveal-delay="2"
-          v-html="decodeHtml(parentData.climate_change_division_content2)"
-        ></div>
-        <div
-          v-if="parentData.climate_change_division_content3"
-          class="prose"
-          data-reveal
-          data-reveal-delay="3"
-          v-html="decodeHtml(parentData.climate_change_division_content3)"
-        ></div>
-      </div>
     </section>
 
     <!-- ========== CTA (Forest) ========== -->
@@ -424,6 +446,27 @@ onUnmounted(() => {
   display: block;
 }
 
+/* ---------- info cards (inside narrative / Index 01) ---------- */
+.info-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-top: 4rem;
+  max-width: 1100px;
+}
+.info-card {
+  background: var(--cream);
+  border-radius: 2rem;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 25px 60px -25px var(--forest-shadow);
+}
+.info-card .prose {
+  font-size: 15px;
+}
+
 /* ---------- gallery (sage) ---------- */
 .gallery {
   position: relative;
@@ -478,11 +521,6 @@ onUnmounted(() => {
 }
 .masonry-cell:hover .masonry-img {
   transform: scale(1.04);
-}
-.gallery-prose {
-  display: grid;
-  gap: 2rem;
-  max-width: 1100px;
 }
 
 /* ---------- cta (forest) ---------- */
@@ -609,6 +647,13 @@ onUnmounted(() => {
   .float-image {
     width: 100%;
     height: 260px;
+  }
+  .info-cards {
+    grid-template-columns: 1fr;
+    margin-top: 2.5rem;
+  }
+  .info-card {
+    padding: 2rem;
   }
   .photo-grid {
     grid-template-columns: 1fr;

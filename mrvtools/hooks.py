@@ -33,7 +33,16 @@ app_include_css = [
 	"/assets/mrvtools/css/editorial/06-modals.css",
 	"/assets/mrvtools/css/editorial/07-workspaces.css",
 ]
-app_include_js = ["/assets/mrvtools/js/mrvtools.js","/assets/mrvtools/js/map_defaults.js"]
+app_include_js = [
+	"/assets/mrvtools/js/mrvtools.js",
+	"/assets/mrvtools/js/map_defaults.js",
+	# BUG-013 mitigation: empty chart container before re-render + filter the
+	# benign Frappe-Charts removeChild NotFoundError out of the console.
+	"/assets/mrvtools/js/chart_safe_render.js",
+	# BUG-016 mitigation: gate frappe.new_doc on can_create so users without
+	# create perm can't land on an editable New form they'll be 403'd from.
+	"/assets/mrvtools/js/perm_guards.js",
+]
 # app_include_js = "/assets/mrvtools/js/adaptationreport.js"
 
 website_route_rules = [{'from_route': '/frontend/<path:app_path>', 'to_route': 'frontend'},{"from_route":"/login","to_route":"custom_login"},]
