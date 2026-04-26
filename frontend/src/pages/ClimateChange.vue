@@ -38,6 +38,62 @@ const decodeHtml = (raw) => {
     .replace(/&amp;/g, '&')
 }
 
+// Split a Quill-edited rich-text blob into named sections by detecting
+// `<strong>` headings inside `<p>` children. Returns { [key]: htmlBody }.
+// keyDetector(strongText) returns a section key string or null.
+// Heading paragraphs that also contain inline body text (e.g.
+// `<p><strong>Vision: </strong>Body…</p>`) keep that body in the section.
+const splitByStrongHeadings = (raw, keyDetector) => {
+  const out = {}
+  const html = decodeHtml(raw)
+  if (!html) return out
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+  const root = doc.querySelector('.ql-editor') || doc.body
+  let currentKey = null
+  for (const node of Array.from(root.children)) {
+    const strong = node.tagName === 'P' ? node.querySelector('strong') : null
+    const matched = strong ? keyDetector(strong.textContent.trim()) : null
+    if (matched) {
+      currentKey = matched
+      out[currentKey] = out[currentKey] || ''
+      const clone = node.cloneNode(true)
+      clone.querySelectorAll('strong').forEach((s) => {
+        if (keyDetector(s.textContent.trim())) s.remove()
+      })
+      if (clone.textContent.trim()) out[currentKey] += clone.outerHTML
+    } else if (currentKey) {
+      out[currentKey] += node.outerHTML
+    }
+  }
+  return out
+}
+
+const visionMissionFunctions = computed(() =>
+  splitByStrongHeadings(
+    parentData.value.climate_change_division_content2,
+    (txt) => {
+      const t = txt.toLowerCase().replace(/[:.\s]+$/, '')
+      if (t.startsWith('vision')) return 'vision'
+      if (t.startsWith('mission')) return 'mission'
+      if (t.startsWith('functions')) return 'functions'
+      return null
+    },
+  ),
+)
+
+const goalsAndSupport = computed(() =>
+  splitByStrongHeadings(
+    parentData.value.climate_change_division_content3,
+    (txt) => {
+      const t = txt.toLowerCase()
+      if (t.startsWith('2.') || t.includes('long-term climate change goals'))
+        return 'goals'
+      if (t.startsWith('3.') || t.startsWith('support')) return 'support'
+      return null
+    },
+  ),
+)
+
 /* ----- intersection-observer reveals ----- */
 let io = null
 
@@ -94,6 +150,30 @@ onUnmounted(() => {
       >
         {{ parentData.climate_change_title }}
       </h2>
+
+      <div
+        v-if="visionMissionFunctions.vision || visionMissionFunctions.mission"
+        class="vision-mission"
+      >
+        <div
+          v-if="visionMissionFunctions.vision"
+          class="vm-block"
+          data-reveal
+          data-reveal-delay="3"
+        >
+          <span class="vm-label">Vision</span>
+          <div class="prose vm-prose" v-html="visionMissionFunctions.vision"></div>
+        </div>
+        <div
+          v-if="visionMissionFunctions.mission"
+          class="vm-block"
+          data-reveal
+          data-reveal-delay="4"
+        >
+          <span class="vm-label">Mission</span>
+          <div class="prose vm-prose" v-html="visionMissionFunctions.mission"></div>
+        </div>
+      </div>
     </section>
 
     <!-- ========== NARRATIVE (Olive) ========== -->
@@ -149,34 +229,41 @@ onUnmounted(() => {
 
       <div
         v-if="
-          parentData.climate_change_division_content2 ||
-          parentData.climate_change_division_content3
+          visionMissionFunctions.functions ||
+          goalsAndSupport.goals ||
+          goalsAndSupport.support
         "
         class="info-cards"
       >
         <article
-          v-if="parentData.climate_change_division_content2"
+          v-if="visionMissionFunctions.functions"
           class="info-card"
           data-reveal
           data-reveal-delay="3"
         >
           <span class="block-num">02</span>
-          <div
-            class="prose"
-            v-html="decodeHtml(parentData.climate_change_division_content2)"
-          ></div>
+          <h3 class="card-title">Functions and Responsibility</h3>
+          <div class="prose" v-html="visionMissionFunctions.functions"></div>
         </article>
         <article
-          v-if="parentData.climate_change_division_content3"
+          v-if="goalsAndSupport.goals"
           class="info-card"
           data-reveal
           data-reveal-delay="4"
         >
           <span class="block-num">03</span>
-          <div
-            class="prose"
-            v-html="decodeHtml(parentData.climate_change_division_content3)"
-          ></div>
+          <h3 class="card-title">Climate Change Goals & Policy</h3>
+          <div class="prose" v-html="goalsAndSupport.goals"></div>
+        </article>
+        <article
+          v-if="goalsAndSupport.support"
+          class="info-card"
+          data-reveal
+          data-reveal-delay="5"
+        >
+          <span class="block-num">04</span>
+          <h3 class="card-title">Support Requirements</h3>
+          <div class="prose" v-html="goalsAndSupport.support"></div>
         </article>
       </div>
     </section>
@@ -446,10 +533,37 @@ onUnmounted(() => {
   display: block;
 }
 
+/* ---------- vision / mission (intro section) ---------- */
+.vision-mission {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 1px solid rgba(1, 71, 46, 0.18);
+  max-width: 1100px;
+}
+.vm-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.vm-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--forest);
+  opacity: 0.55;
+}
+.vm-prose {
+  font-size: 16px;
+}
+
 /* ---------- info cards (inside narrative / Index 01) ---------- */
 .info-cards {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
   margin-top: 4rem;
   max-width: 1100px;
@@ -457,14 +571,29 @@ onUnmounted(() => {
 .info-card {
   background: var(--cream);
   border-radius: 2rem;
-  padding: 2.5rem;
+  padding: 2.25rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   box-shadow: 0 25px 60px -25px var(--forest-shadow);
 }
+.card-title {
+  font-family: var(--display);
+  font-size: 1.5rem;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--forest);
+  margin: 0;
+}
 .info-card .prose {
   font-size: 15px;
+  line-height: 1.55;
+}
+.info-card .prose :deep(p) {
+  margin: 0 0 0.5rem;
+}
+.info-card .prose :deep(p:last-child) {
+  margin-bottom: 0;
 }
 
 /* ---------- gallery (sage) ---------- */
@@ -627,6 +756,9 @@ onUnmounted(() => {
 [data-reveal-delay='4'] {
   transition-delay: 0.4s;
 }
+[data-reveal-delay='5'] {
+  transition-delay: 0.5s;
+}
 
 @media (max-width: 900px) {
   .intro-head {
@@ -648,12 +780,18 @@ onUnmounted(() => {
     width: 100%;
     height: 260px;
   }
+  .vision-mission {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+  }
   .info-cards {
     grid-template-columns: 1fr;
     margin-top: 2.5rem;
   }
   .info-card {
-    padding: 2rem;
+    padding: 2rem 1.75rem;
   }
   .photo-grid {
     grid-template-columns: 1fr;
