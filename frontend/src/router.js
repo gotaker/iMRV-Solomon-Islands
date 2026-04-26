@@ -66,7 +66,7 @@ const routes = [
     path: '/support',
     component: () => import('@/pages/Support.vue'),
     meta: {
-      title: 'MRV Report',
+      title: 'MRV Support',
     },
   },
   {

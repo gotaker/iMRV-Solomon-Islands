@@ -72,7 +72,7 @@
             <!-- Start Tab Content -->
             <div class="tab-pane active" id="p-view-2">
               <div class="tab-inner">
-                <div class="table-responsive table-rounded">
+                <div class="table-responsive table-rounded editorial-table">
                   <table class="table table-striped table-bordered table-hover">
                     <thead
                       style="
@@ -141,7 +141,7 @@
             </div>
             <div class="tab-pane" id="p-view-5">
               <div class="tab-inner">
-                <div class="table-responsive">
+                <div class="table-responsive editorial-table">
                   <table class="table table-striped table-bordered table-hover">
                     <thead
                       style="
@@ -204,7 +204,7 @@
             </div>
             <div class="tab-pane" id="p-view-6">
               <div class="tab-inner">
-                <div class="table-responsive">
+                <div class="table-responsive editorial-table">
                   <table class="table table-striped table-bordered table-hover">
                     <thead
                       style="
@@ -254,7 +254,7 @@
             </div>
             <div class="tab-pane" id="p-view-7">
               <div class="tab-inner">
-                <div class="table-responsive">
+                <div class="table-responsive editorial-table">
                   <table class="table table-striped table-bordered table-hover">
                     <thead
                       style="
@@ -379,7 +379,7 @@
           <!-- Start Tab Content -->
           <div class="tab-pane active" id="p-view-2">
             <div class="tab-inner">
-              <div class="table-responsive table-rounded">
+              <div class="table-responsive table-rounded editorial-table">
                 <table class="table table-striped table-bordered table-hover">
                   <thead
                     style="
@@ -448,7 +448,7 @@
           </div>
           <div class="tab-pane" id="p-view-5">
             <div class="tab-inner">
-              <div class="table-responsive">
+              <div class="table-responsive editorial-table">
                 <table class="table table-striped table-bordered table-hover">
                   <thead
                     style="
@@ -511,7 +511,7 @@
           </div>
           <div class="tab-pane" id="p-view-6">
             <div class="tab-inner">
-              <div class="table-responsive">
+              <div class="table-responsive editorial-table">
                 <table class="table table-striped table-bordered table-hover">
                   <thead
                     style="
@@ -561,7 +561,7 @@
           </div>
           <div class="tab-pane" id="p-view-7">
             <div class="tab-inner">
-              <div class="table-responsive">
+              <div class="table-responsive editorial-table">
                 <table class="table table-striped table-bordered table-hover">
                   <thead
                     style="
@@ -614,3 +614,81 @@
     </div>
   </div>
 </template>
+
+<style scoped>
+.editorial-table {
+  border-radius: 1.5rem;
+  border: 1px solid rgba(1, 71, 46, 0.08);
+  box-shadow: 0 25px 60px -25px rgba(1, 71, 46, 0.2);
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.editorial-table :deep(table.table) {
+  margin: 0;
+  border: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #ffffff;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.editorial-table :deep(table.table thead) {
+  background-color: #01472e !important;
+}
+
+.editorial-table :deep(table.table thead tr) {
+  background-color: #01472e !important;
+}
+
+.editorial-table :deep(table.table thead th) {
+  background-color: #01472e !important;
+  color: #fefae0 !important;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  border: 0;
+  border-bottom: 1px solid rgba(1, 71, 46, 0.08);
+  white-space: nowrap;
+}
+
+.editorial-table :deep(table.table tbody tr) {
+  background: #ffffff;
+  transition: background 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.editorial-table :deep(table.table tbody tr:nth-child(even)) {
+  background: #fefae0;
+}
+
+.editorial-table :deep(table.table tbody tr:hover),
+.editorial-table :deep(table.table tbody tr:hover:nth-child(even)) {
+  background: #ccd5ae;
+}
+
+.editorial-table :deep(table.table tbody td),
+.editorial-table :deep(table.table tbody th) {
+  background: transparent;
+  color: #022e1d;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.875rem 1.25rem;
+  border: 0;
+  border-bottom: 1px solid rgba(1, 71, 46, 0.08);
+  vertical-align: middle;
+}
+
+.editorial-table :deep(table.table tbody tr:last-child td),
+.editorial-table :deep(table.table tbody tr:last-child th) {
+  border-bottom: 0;
+}
+
+.editorial-table :deep(table.table-bordered),
+.editorial-table :deep(table.table-bordered > :not(caption) > * > *) {
+  border-width: 0;
+}
+</style>

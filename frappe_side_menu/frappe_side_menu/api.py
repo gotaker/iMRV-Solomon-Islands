@@ -26,19 +26,34 @@ def get_menulist():
 			# check for report & page
 			reports += get_permitted_pages_reports(role, 'Report')
 			pages += get_permitted_pages_reports(role, 'Page')
-	if docs:
-		docs_list = list(set(docs))
-		permitted_docs = ','.join(['"' + str(i) + '"' for i in docs_list])
+	# Two parallel views over each permission list:
+	#  • the comma-joined SQL fragment for the `IN (...)` clauses below
+	#  • a Python set used by the post-fetch Python `if menu_doc not in …` checks.
+	# Without the set, those Python `in` checks degrade to substring matches on
+	# the SQL fragment and let drawer items leak across users (e.g. an Observer
+	# who only has "User Registration" perm sees the top-level "USERS" section
+	# because "User" is a substring of the comma-joined string).
+	#
+	# Additionally narrow the doctype set with `frappe.has_permission(..., "read")`
+	# — `get_permitted_docs_for_role` returns every doctype that has any DocPerm
+	# row for the role (read or otherwise, ignoring permission_query_conditions
+	# and `if_owner` flags), which over-reports for users like Observer whose
+	# DocPerm entries grant access only via specific Custom Roles. Without this
+	# extra filter the drawer shows top-level entries (GHG INVENTORY, USERS)
+	# whose target page then 403s on click.
+	permitted_docs_set = {d for d in set(docs) if frappe.has_permission(d, ptype="read", user=user)}
+	permitted_reports_set = set(reports)
+	permitted_pages_set = set(pages)
+	if permitted_docs_set:
+		permitted_docs = ','.join(['"' + str(i) + '"' for i in permitted_docs_set])
 	else:
 		permitted_docs = '""'
 	if reports:
-		reports_list = list(set(reports))
-		permitted_reports = ','.join(['"' + str(i) + '"' for i in reports_list])
+		permitted_reports = ','.join(['"' + str(i) + '"' for i in permitted_reports_set])
 	else:
 		permitted_reports = '""'
 	if pages:
-		pages_list = list(set(pages))
-		permitted_pages = ','.join(['"' + str(i) + '"' for i in pages_list])
+		permitted_pages = ','.join(['"' + str(i) + '"' for i in permitted_pages_set])
 	else:
 		permitted_pages = '""'
 	from frappe.core.doctype.domain_settings.domain_settings import get_active_domains
@@ -76,18 +91,18 @@ def get_menulist():
 						n.has_sublist=n.has_sublist+1
 			else:
 				if not n.is_static_link:
-					if n.menu_type == 'DocType' and n.menu_doc not in permitted_docs:
+					if n.menu_type == 'DocType' and n.menu_doc not in permitted_docs_set:
 						continue
-					if n.menu_type == 'Report' and n.menu_doc not in permitted_reports:
+					if n.menu_type == 'Report' and n.menu_doc not in permitted_reports_set:
 						continue
-					if n.menu_type == 'Page' and n.menu_doc not in permitted_pages:
+					if n.menu_type == 'Page' and n.menu_doc not in permitted_pages_set:
 						continue
 				else:
-					if n.menu_type == 'DocType' and n.menu_doc and n.menu_doc not in permitted_docs:
+					if n.menu_type == 'DocType' and n.menu_doc and n.menu_doc not in permitted_docs_set:
 						continue
-					if n.menu_type == 'Report' and n.menu_doc and n.menu_doc in permitted_reports:
+					if n.menu_type == 'Report' and n.menu_doc and n.menu_doc in permitted_reports_set:
 						continue
-					if n.menu_type == 'Page' and n.menu_doc and n.menu_doc in permitted_pages:
+					if n.menu_type == 'Page' and n.menu_doc and n.menu_doc in permitted_pages_set:
 						continue
 			# Skip parent sections whose every leaf was filtered out by perms.
 			# Without this, Side Menu sections (e.g. MASTER DATABASE, USERS)

@@ -30,3 +30,6 @@ tests/**/__pycache__/
 tests/playwright-report/
 tests/playwright-traces/
 tests/.screenshots/
+# UI/UX sweep test artifacts (not tracked)
+screenshots/
+.playwright-mcp/

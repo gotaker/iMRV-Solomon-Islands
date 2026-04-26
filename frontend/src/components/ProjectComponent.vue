@@ -19,7 +19,7 @@
             "
             class="p-5 text-center"
           >
-            Our <span style="color: green; font-weight: 700">Projects</span>
+            Our <span style="color: #01472e; font-weight: 700">Projects</span>
           </h2>
         </div>
         <ul
@@ -150,7 +150,7 @@
               <div class="tab-content p-4">
                 <!-- Start Tab Content -->
                 <v-data-table
-                  :items="data.message.parent_data.adaptation_table"
+                  :items="sortedData1"
                   class="datatable"
                 ></v-data-table>
                 <div class="tab-pane active" id="p-view-2">
@@ -167,7 +167,7 @@
                       >
                         <thead
                           style="
-                            background-color: #006600;
+                            background-color: #01472e;
                             color: white;
                             padding: 20px;
                           "
@@ -222,7 +222,7 @@
                               End Date <span style="float: right">&#8597;</span>
                             </th>
                           </tr>
-                          <tr style="background-color: #f6f6f6">
+                          <tr style="background-color: #fefae0">
                             <th></th>
                             <th>
                               <input
@@ -232,8 +232,8 @@
                                 v-on:keyup="filterRows1"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -251,8 +251,8 @@
                                 v-on:keyup="filterRows1"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -270,8 +270,8 @@
                                 v-on:keyup="filterRows1"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -289,8 +289,8 @@
                                 v-on:keyup="filterRows1"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -308,8 +308,8 @@
                                 v-on:keyup="filterRows1"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -327,8 +327,8 @@
                                 v-on:keyup="filterRows1"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -346,8 +346,8 @@
                                 v-on:keyup="filterRows1"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -365,8 +365,8 @@
                                 v-on:keyup="filterRows1"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -384,8 +384,8 @@
                                 v-on:keyup="filterRows1"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -403,8 +403,8 @@
                                 v-on:keyup="filterRows1"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -421,8 +421,7 @@
                           style="overflow: auto"
                         >
                           <tr
-                            v-for="table_item in data.message.parent_data
-                              .adaptation_table"
+                            v-for="table_item in sortedData1"
                             :key="table_item.name"
                           >
                             <th style="padding: 10px" scope="row">
@@ -531,7 +530,7 @@
                       >
                         <thead
                           style="
-                            background-color: #006600;
+                            background-color: #01472e;
                             color: white;
                             padding: 20px;
                           "
@@ -586,7 +585,7 @@
                               End Date <span style="float: right">&#8597;</span>
                             </th>
                           </tr>
-                          <tr style="background-color: #f6f6f6">
+                          <tr style="background-color: #fefae0">
                             <th scope="col"></th>
                             <th scope="col">
                               <input
@@ -596,8 +595,8 @@
                                 v-on:keyup="filterRows2"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -615,8 +614,8 @@
                                 v-on:keyup="filterRows2"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -634,8 +633,8 @@
                                 v-on:keyup="filterRows2"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -653,8 +652,8 @@
                                 v-on:keyup="filterRows2"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -672,8 +671,8 @@
                                 v-on:keyup="filterRows2"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -691,8 +690,8 @@
                                 v-on:keyup="filterRows2"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -710,8 +709,8 @@
                                 v-on:keyup="filterRows2"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -729,8 +728,8 @@
                                 v-on:keyup="filterRows2"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -748,8 +747,8 @@
                                 v-on:keyup="filterRows2"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -767,8 +766,8 @@
                                 v-on:keyup="filterRows2"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -782,8 +781,7 @@
                         </thead>
                         <tbody class="table-group-divider table-divider-color">
                           <tr
-                            v-for="table_item in data.message.parent_data
-                              .mitigation_table"
+                            v-for="table_item in sortedData2"
                             :key="table_item.name"
                           >
                             <th style="padding: 10px" scope="row">
@@ -891,7 +889,7 @@
                       >
                         <thead
                           style="
-                            background-color: #006600;
+                            background-color: #01472e;
                             color: white;
                             padding: 20px;
                           "
@@ -946,7 +944,7 @@
                               End Date <span style="float: right">&#8597;</span>
                             </th>
                           </tr>
-                          <tr style="background-color: #f6f6f6">
+                          <tr style="background-color: #fefae0">
                             <th scope="col"></th>
                             <th scope="col">
                               <input
@@ -956,8 +954,8 @@
                                 v-on:keyup="filterRows3"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -975,8 +973,8 @@
                                 v-on:keyup="filterRows3"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -994,8 +992,8 @@
                                 v-on:keyup="filterRows3"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1013,8 +1011,8 @@
                                 v-on:keyup="filterRows3"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1032,8 +1030,8 @@
                                 v-on:keyup="filterRows3"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1051,8 +1049,8 @@
                                 v-on:keyup="filterRows3"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1070,8 +1068,8 @@
                                 v-on:keyup="filterRows3"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1089,8 +1087,8 @@
                                 v-on:keyup="filterRows3"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1108,8 +1106,8 @@
                                 v-on:keyup="filterRows3"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1127,8 +1125,8 @@
                                 v-on:keyup="filterRows3"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1142,8 +1140,7 @@
                         </thead>
                         <tbody class="table-group-divider table-divider-color">
                           <tr
-                            v-for="table_item in data.message.parent_data
-                              .cross_cutting_table"
+                            v-for="table_item in sortedData3"
                             :key="table_item.name"
                           >
                             <th style="padding: 10px" scope="row">
@@ -1251,7 +1248,7 @@
                       >
                         <thead
                           style="
-                            background-color: #006600;
+                            background-color: #01472e;
                             color: white;
                             padding: 20px;
                           "
@@ -1306,7 +1303,7 @@
                               End Date <span style="float: right">&#8597;</span>
                             </th>
                           </tr>
-                          <tr style="background-color: #f6f6f6">
+                          <tr style="background-color: #fefae0">
                             <th scope="col"></th>
                             <th scope="col">
                               <input
@@ -1316,8 +1313,8 @@
                                 v-on:keyup="filterRows4"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1335,8 +1332,8 @@
                                 v-on:keyup="filterRows4"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1354,8 +1351,8 @@
                                 v-on:keyup="filterRows4"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1373,8 +1370,8 @@
                                 v-on:keyup="filterRows4"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1392,8 +1389,8 @@
                                 v-on:keyup="filterRows4"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1411,8 +1408,8 @@
                                 v-on:keyup="filterRows4"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1430,8 +1427,8 @@
                                 v-on:keyup="filterRows4"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1449,8 +1446,8 @@
                                 v-on:keyup="filterRows4"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1468,8 +1465,8 @@
                                 v-on:keyup="filterRows4"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1487,8 +1484,8 @@
                                 v-on:keyup="filterRows4"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1502,8 +1499,7 @@
                         </thead>
                         <tbody class="table-group-divider table-divider-color">
                           <tr
-                            v-for="table_item in data.message.parent_data
-                              .enablers_table"
+                            v-for="table_item in sortedData4"
                             :key="table_item.name"
                           >
                             <th style="padding: 10px" scope="row">
@@ -1611,7 +1607,7 @@
                       >
                         <thead
                           style="
-                            background-color: #006600;
+                            background-color: #01472e;
                             color: white;
                             padding: 20px;
                           "
@@ -1666,7 +1662,7 @@
                               End Date <span style="float: right">&#8597;</span>
                             </th>
                           </tr>
-                          <tr style="background-color: #f6f6f6">
+                          <tr style="background-color: #fefae0">
                             <th scope="col"></th>
                             <th scope="col">
                               <input
@@ -1676,8 +1672,8 @@
                                 v-on:keyup="filterRows5"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1695,8 +1691,8 @@
                                 v-on:keyup="filterRows5"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1714,8 +1710,8 @@
                                 v-on:keyup="filterRows5"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1733,8 +1729,8 @@
                                 v-on:keyup="filterRows5"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1752,8 +1748,8 @@
                                 v-on:keyup="filterRows5"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1771,8 +1767,8 @@
                                 v-on:keyup="filterRows5"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1790,8 +1786,8 @@
                                 v-on:keyup="filterRows5"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1809,8 +1805,8 @@
                                 v-on:keyup="filterRows5"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1828,8 +1824,8 @@
                                 v-on:keyup="filterRows5"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1847,8 +1843,8 @@
                                 v-on:keyup="filterRows5"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -1862,8 +1858,7 @@
                         </thead>
                         <tbody class="table-group-divider table-divider-color">
                           <tr
-                            v-for="trans_item in data.message.parent_data
-                              .transparency_table"
+                            v-for="trans_item in sortedData5"
                             :key="trans_item.name"
                           >
                             <th style="padding: 10px" scope="row">
@@ -1980,7 +1975,7 @@
                       >
                         <thead
                           style="
-                            background-color: #006600;
+                            background-color: #01472e;
                             color: white;
                             padding: 20px;
                           "
@@ -2035,7 +2030,7 @@
                               End Date <span style="float: right">&#8597;</span>
                             </th>
                           </tr>
-                          <tr style="background-color: #f6f6f6">
+                          <tr style="background-color: #fefae0">
                             <th scope="col"></th>
                             <th scope="col">
                               <input
@@ -2045,8 +2040,8 @@
                                 v-on:keyup="filterRows6"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -2064,8 +2059,8 @@
                                 v-on:keyup="filterRows6"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -2083,8 +2078,8 @@
                                 v-on:keyup="filterRows6"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -2102,8 +2097,8 @@
                                 v-on:keyup="filterRows6"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -2121,8 +2116,8 @@
                                 v-on:keyup="filterRows6"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -2140,8 +2135,8 @@
                                 v-on:keyup="filterRows6"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -2159,8 +2154,8 @@
                                 v-on:keyup="filterRows6"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -2178,8 +2173,8 @@
                                 v-on:keyup="filterRows6"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -2197,8 +2192,8 @@
                                 v-on:keyup="filterRows6"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -2216,8 +2211,8 @@
                                 v-on:keyup="filterRows6"
                                 style="
                                   border-radius: 4px;
-                                  background: #ececec;
-                                  color: #403f3f;
+                                  background: #fefae0;
+                                  color: #022e1d;
                                   padding: 0px 0px 0px 4px;
                                   font-size: 12px;
                                   font-weight: 200;
@@ -2231,8 +2226,7 @@
                         </thead>
                         <tbody class="table-group-divider table-divider-color">
                           <tr
-                            v-for="support_item in data.message.parent_data
-                              .support_table"
+                            v-for="support_item in sortedData6"
                             :key="support_item.name"
                           >
                             <th style="padding: 10px" scope="row">
@@ -2351,7 +2345,7 @@
 export default {
   props: {
     data: {
-      type: Array,
+      type: Object,
       required: true,
     },
   },
@@ -2359,6 +2353,12 @@ export default {
   data() {
     return {
       sortedData: [],
+      sortedData1: [],
+      sortedData2: [],
+      sortedData3: [],
+      sortedData4: [],
+      sortedData5: [],
+      sortedData6: [],
       sortedbyASC1: true,
       sortedbyASC2: true,
       sortedbyASC3: true,
@@ -2367,13 +2367,21 @@ export default {
       sortedbyASC6: true,
     }
   },
-  mounted() {
-    this.sortedData1 = this.data.message.parent_data.adaptation_table
-    this.sortedData2 = this.data.message.parent_data.mitigation_table
-    this.sortedData3 = this.data.message.parent_data.cross_cutting_table
-    this.sortedData4 = this.data.message.parent_data.enablers_table
-    this.sortedData5 = this.data.message.parent_data.transparency_table
-    this.sortedData6 = this.data.message.parent_data.support_table
+  watch: {
+    data: {
+      deep: true,
+      immediate: true,
+      handler(val) {
+        const pd = val?.message?.parent_data
+        if (!pd) return
+        this.sortedData1 = pd.adaptation_table || []
+        this.sortedData2 = pd.mitigation_table || []
+        this.sortedData3 = pd.cross_cutting_table || []
+        this.sortedData4 = pd.enablers_table || []
+        this.sortedData5 = pd.transparency_table || []
+        this.sortedData6 = pd.support_table || []
+      },
+    },
   },
   methods: {
     sortList1(sortBy) {
@@ -2970,14 +2978,14 @@ export default {
 .nav-pills > li.active > a:focus,
 .nav-pills > li.active > a:hover {
   color: #fff !important;
-  background-color: green;
+  background-color: #01472e;
   border: none !important;
   box-shadow: #014b053e 0 0 10px;
 }
 
 .tab-area .nav-pills .nav-link:not(.active):hover {
   color: #ffffff !important;
-  background-color: green !important;
+  background-color: #01472e !important;
 }
 
 .style-class:hover {

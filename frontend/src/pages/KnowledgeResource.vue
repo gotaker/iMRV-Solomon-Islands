@@ -72,9 +72,9 @@ onUnmounted(() => {
     <section class="overview">
       <span class="eyebrow" data-reveal>(Index 01) Overview</span>
 
-      <template v-if="data.value?.message?.length">
+      <template v-if="data?.message?.length">
         <div
-          v-for="(item, i) in data.value.message"
+          v-for="(item, i) in data.message"
           :key="item.name || i"
           class="overview-block"
           data-reveal

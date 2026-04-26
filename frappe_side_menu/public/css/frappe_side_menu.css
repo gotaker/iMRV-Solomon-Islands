@@ -68,111 +68,9 @@ body.full-width .layout-main-section-wrapper,
 }
 
 
-.main-sidebar .sidebar-menu {
-    background: #267db9 !important;
-    font-family: 'Poppins', sans-serif;
-    left: 0 !important;    z-index: 2000;
-}
-.main-sidebar .sidebar-menu>li {
-    position: relative;
-    margin: 0;
-    padding: 0;list-style: none;
-   
-}
-.main-sidebar .sidebar-menu li>a {
-    position: relative;
-}
-.main-sidebar .sidebar-menu>li>a {
-    padding: 10px 0px 10px 0px;
-    display: block;
-    color: #fff;
-    text-align: center;
-    min-width: 40px;
-    max-width: 95px;
-}
-.main-sidebar .sidebar-menu > li > a span {
-    font-size: 12px !important;
-    font-weight: 500;
-    /* text-overflow: ellipsis; */
-    overflow: hidden;
-    /* white-space: nowrap; */
-    /* line-height: 20px; */
-    display: block;
-    letter-spacing: 1px;
-    font-family: 'Poppins', sans-serif !important;
-    opacity: 1;
-}
-.main-sidebar .sidebar-menu .treeview-menu {
-    display: none;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    padding-left: 0px;
-    box-shadow: rgba(0, 0, 0, .05) 0px 0.5px 0px 0px;
-    border-right: 1px solid #f4f5f6;
-}
-li.treeview.drop-down:hover .treeview-menu{
-    display: block;
-    position: fixed !important;
-}
-.treeview-menu {
-    margin-left: 1px !important;
-    margin-right: 0 !important;
-    left: 94px;
-    width: 265px;
-    top: 0px !important;
-    position: fixed !important;
-    height: 100%;
-    z-index: 2000;
-    overflow-y: auto;
-    background: #fff;
-}.treeview-menu .user-info {
-    padding: 9px;
-    box-shadow: -1px 1px 5px -2px #000;
-    background: #184482;
-    /* background: repeating-linear-gradient(45deg,#184482,#184482 12px,#267db9 10px,#267db9 15px); */
-    color: #fff;
-}
-.treeview-head {
-    /* text-align: center; */
-    border-bottom: 1px solid #f4f5f6;;
-    font-size: 15px;
-    padding: 10px;
-    color: #184482;
-    /* color: #fff; */
-    font-weight: 500;
-}
-.main-sidebar .sidebar-menu li>a {
-    position: relative;
-}
-.main-sidebar .sidebar-menu .treeview-menu>li>a {
-    padding: 8px 30px 8px 10px;
-    display: block;
-    font-size: 13px;
-    font-weight: normal;
-}
-.main-sidebar .sidebar-menu > li.treeview .treeview-menu a {
-    pointer-events: auto;
-    cursor: pointer;
-}
-.main-sidebar .sidebar-menu .treeview-menu>li>a>.fi, .main-sidebar .sidebar-menu .treeview-menu>li>a>.fa, .main-sidebar .sidebar-menu .treeview-menu>li>a>.glyphicon, .main-sidebar .sidebar-menu .treeview-menu>li>a>.ion {
-    width: 1.28571429em;
-    font-size: 15px;
-    margin-right: 10px;
-    float: left;
-}
-a.navbar-brand.navbar-home {
-    display: none;
-}
-ul#navbar-breadcrumbs li:first-child a::before{
-   display: none;
-}
-
 /* =====================================================================
    Editorial palette retint — iMRV / Solomon Islands
-   Tokens-only re-skin: keeps original sidebar layout & density,
-   just swaps the blue palette + Poppins for Forest/Sage + Inter
-   so the desk feels continuous with the SPA after login.
+   Tokens-only re-skin for the sidebar rail / drill-down panel.
    Forest #01472e · Sage #ccd5ae · Olive #e9edc9 · Cream #fefae0 · Moss #a3b18a
    ===================================================================== */
 
@@ -255,6 +153,15 @@ ul#navbar-breadcrumbs li:first-child a::before{
 }
 .col-md-12.layout-main-section-wrapper {
     max-width: 100% !important;
+}
+
+/* Push the desk top-bar breadcrumbs/page-title clear of the floating
+   menu trigger (40px wide at left:12px → reserve 60px). Without this
+   the page title (e.g. "Main Dashboard") renders behind the button. */
+.navbar-breadcrumbs,
+.page-head .page-title,
+.page-head .title-area {
+    margin-left: 60px !important;
 }
 
 /* Floating trigger button (always visible) */

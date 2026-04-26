@@ -153,15 +153,29 @@
 }
 
 /* === Form tabs === */
-.form-tabs-list .form-tabs .nav-link {
+/* Specificity-bumped + !important on padding/color: Bootstrap's
+   .nav-tabs .nav-link.active rule (in desk.bundle.css) ships with higher
+   specificity than the editorial rule below, which previously left the
+   active tab with 0px padding-left and dark text on dark green — the
+   first letter sat under the rounded pill edge and the label read as
+   `ETAILS` instead of `DETAILS`. Keep this guard until the desk theme
+   is consolidated. */
+.form-tabs-list .form-tabs .nav-link,
+.form-tabs-list .form-tabs .nav-link.active,
+.form-tabs-list .form-tabs .nav-item.show .nav-link {
   border-radius: var(--ed-radius-pill);
-  padding: 0.4rem 1rem;
+  padding: 0.4rem 1.1rem !important;
   font-family: var(--ed-font-body);
   font-weight: 600;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   font-size: 11px;
-  color: var(--ed-forest-60);
+  border-color: transparent !important;
+}
+
+.form-tabs-list .form-tabs .nav-link {
+  color: var(--ed-forest-60) !important;
+  background: transparent;
   transition:
     background var(--ed-dur-fast) var(--ed-ease),
     color var(--ed-dur-fast) var(--ed-ease);
@@ -169,12 +183,19 @@
 
 .form-tabs-list .form-tabs .nav-link:hover {
   background: var(--ed-sage-soft);
-  color: var(--ed-forest);
+  color: var(--ed-forest) !important;
 }
 
-.form-tabs-list .form-tabs .nav-link.active {
-  background: var(--ed-forest);
-  color: var(--ed-cream);
+.form-tabs-list .form-tabs .nav-link.active,
+.form-tabs-list .form-tabs .nav-item.show .nav-link {
+  background: var(--ed-forest) !important;
+  color: var(--ed-cream) !important;
+}
+
+/* Reserve breathing room on the leftmost tab so its first letter doesn't
+   sit flush against the viewport edge / page indent. */
+.form-tabs-list .form-tabs {
+  padding-left: 0.25rem;
 }
 
 /* === Indicator pills inside forms === */

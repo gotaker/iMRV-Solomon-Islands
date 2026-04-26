@@ -19,10 +19,10 @@
       /></router-link>
     </div>
     <h2
-      style="color: #000; font-weight: 700; font-size: 3rem; font-family: Inter"
+      style="color: #022e1d; font-weight: 700; font-size: 3rem; font-family: 'Anton', 'Helvetica Neue', sans-serif"
       class="p-5 text-center"
     >
-      About<span style="color: green; font-weight: 700"> MRV Tools</span>
+      About<span style="color: #01472e; font-weight: 700"> MRV Tools</span>
     </h2>
   </div>
 
@@ -40,7 +40,7 @@
         aria-expanded="false"
         aria-label="Toggle navigation"
       >
-        <span><i class="bi bi-list" style="color: white !important"></i></span>
+        <span><i class="bi bi-list" style="color: #fefae0 !important"></i></span>
       </button>
       <div class="site-logo ml-auto mr-4">
         <!-- Display only on lg and smaller screens -->

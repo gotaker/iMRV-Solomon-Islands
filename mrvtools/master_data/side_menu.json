@@ -585,7 +585,7 @@
   "icon_image": null,
   "is_single_doc": 0,
   "is_static_link": 0,
-  "label": "Document Resorce Tool",
+  "label": "Document Resource Tool",
   "menu_doc": "Document Resource Tool",
   "menu_icon": "fa fa-download",
   "menu_type": "DocType",

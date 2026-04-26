@@ -20,7 +20,7 @@
               "
             >
               <div
-                v-for="item in data.message.child_table_data"
+                v-for="item in data?.message?.child_table_data"
                 :key="item.name"
                 class="col col-md-3 col-sm-3 col-xs-12 custom-col"
               >
@@ -33,7 +33,7 @@
                     :href="item.document"
                     class="cus-text mobile-hidden"
                     target="blank"
-                    style="text-decoration: none; color: #000; font-weight: 900"
+                    style="text-decoration: none; color: #022e1d; font-weight: 700"
                   >
                     <img
                       :src="item.image"
@@ -48,7 +48,7 @@
                           display: flex;
                           place-items: center;
                           align-items: center;
-                          font-family: serif;
+                          font-family: 'Inter', system-ui, sans-serif;
                           margin-top: 50%;
                           text-align: center;
                         "
@@ -74,7 +74,7 @@
               "
             >
               <div
-                v-for="item in data.message.child_table_data2"
+                v-for="item in data?.message?.child_table_data2"
                 :key="item.name"
                 class="col col-md-3 col-sm-3 col-xs-12 custom-col"
               >
@@ -87,7 +87,7 @@
                     :href="item.document"
                     class="cus-text mobile-hidden"
                     target="blank"
-                    style="text-decoration: none; color: #000; font-weight: 900"
+                    style="text-decoration: none; color: #022e1d; font-weight: 700"
                   >
                     <img
                       :src="item.image"
@@ -106,7 +106,7 @@
                           display: flex;
                           place-items: center;
                           align-items: center;
-                          font-family: serif;
+                          font-family: 'Inter', system-ui, sans-serif;
                           margin-top: 50%;
                           text-align: center;
                         "

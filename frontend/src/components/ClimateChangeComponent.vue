@@ -3,10 +3,10 @@
     <h1
       data-aos="fade-right"
       data-aos-delay="100"
-      style="color: #000; font-weight: 700; font-size: 3rem; font-family: Inter"
+      style="color: #022e1d; font-weight: 700; font-size: 3rem; font-family: 'Anton', 'Helvetica Neue', sans-serif"
       class="pt-5 pb-3 text-center"
     >
-      Knowledge <span style="color: green; font-weight: 700">Resources</span>
+      Knowledge <span style="color: #01472e; font-weight: 700">Resources</span>
     </h1>
     <div
       data-aos="fade-right"
@@ -32,7 +32,7 @@
                   <a
                     :href="item.document"
                     class="cus-text mobile-hidden"
-                    style="text-decoration: none; color: #000; font-weight: 900"
+                    style="text-decoration: none; color: #022e1d; font-weight: 700"
                   >
                     <img
                       :src="item.image"
@@ -45,7 +45,7 @@
                         style="
                           justify-content: center;
                           place-items: center;
-                          font-family: serif;
+                          font-family: 'Inter', system-ui, sans-serif;
                           padding: inherit;
                           margin: revert;
                         "
@@ -75,7 +75,7 @@
                   <a
                     :href="item.document"
                     class="cus-text mobile-hidden"
-                    style="text-decoration: none; color: #000; font-weight: 900"
+                    style="text-decoration: none; color: #022e1d; font-weight: 700"
                   >
                     <img
                       :src="item.image"
@@ -88,7 +88,7 @@
                         style="
                           justify-content: center;
                           place-items: center;
-                          font-family: serif;
+                          font-family: 'Inter', system-ui, sans-serif;
                           padding: inherit;
                           margin: revert;
                         "
@@ -107,10 +107,10 @@
               <div class="row" style="width: 98%; margin-left: 5px;">
                 <div v-for="item in data.message.child_table_data2" :key="item.name" class="col col-md-3 col-sm-3 col-xs-12 custom-col">
                   <div v-if="item.image" class="card mx-0 image-overlay cus-card" style="border-radius: none;">
-                    <a :href="item.document" class="cus-text mobile-hidden" style="text-decoration: none; color: #000; font-weight: 900;">
+                    <a :href="item.document" class="cus-text mobile-hidden" style="text-decoration: none; color: #022e1d; font-weight: 700;">
                       <img :src="item.image" class="card-img-top" style="position:relative; border-radius: 6px;" alt="..." />
                       <div v-if="item.link_name" class="overlay">
-                        <h5 style="justify-content: center;    place-items: center; font-family: serif; padding: inherit; margin: revert;">{{ item.link_name }}</h5>
+                        <h5 style="justify-content: center;    place-items: center; font-family: 'Inter', system-ui, sans-serif; padding: inherit; margin: revert;">{{ item.link_name }}</h5>
                       </div>
                     </a>
                   </div>
