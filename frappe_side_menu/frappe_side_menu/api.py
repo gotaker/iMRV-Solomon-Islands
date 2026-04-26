@@ -182,7 +182,7 @@ def get_doctype():
 
 @frappe.whitelist(allow_guest=True)
 def set_default_route():
-	route = frappe.db.get_single_value("Side Menu Settings", "route_logo") or "main-dashboard"
+	route = frappe.db.get_single_value("Side Menu Settings", "post_login_landing_route") or "main-dashboard"
 	target = "/app/" + route
 
 	# frappe.local.flags.home_page short-circuits get_home_page() at the very top

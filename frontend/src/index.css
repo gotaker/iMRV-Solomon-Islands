@@ -1,7 +1,7 @@
 @import './assets/Inter/inter.css';
 @import 'frappe-ui/style.css';
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300&family=Poppins:wght@300&display=swap');
+@import './assets/Anton/anton.css';
 
 .breadcrumb-area {
   /* background: url('../src/assets/images/hero-banner.png');  */
@@ -12,7 +12,6 @@
 a,
 p {
   font-family: 'Inter', sans-serif;
-  font-family: 'Poppins', sans-serif;
 }
 h2 {
   color: #000;

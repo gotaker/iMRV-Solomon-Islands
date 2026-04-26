@@ -1,0 +1,245 @@
+/* ============================================================
+ * Phase 7 — Workspaces / Dashboards / Reports
+ * Plan ref: /Users/utahjazz/.claude/plans/zesty-wiggling-clock.md
+ * Out of scope: navbar, sidebar, breadcrumbs, forms, lists, modals, :root
+ * ============================================================ */
+
+/* === Workspace page wrapper === */
+.workspace,
+.workspace-content {
+  background: var(--ed-cream);
+  padding: 1.5rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* === Workspace sidebar === */
+.workspace-sidebar {
+  background: var(--ed-cream);
+  border-right: 1px solid var(--ed-forest-08);
+  padding: 1rem;
+}
+
+/* === Workspace sidebar items === */
+.workspace-sidebar-item {
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  color: var(--ed-forest);
+  font-family: var(--ed-font-body);
+  font-weight: 500;
+  transition: background var(--ed-dur-fast) var(--ed-ease),
+    color var(--ed-dur-fast) var(--ed-ease);
+  border-left: 2px solid transparent;
+}
+
+.workspace-sidebar-item:hover {
+  background: var(--ed-sage-soft);
+  color: var(--ed-forest-dark);
+}
+
+.workspace-sidebar-item.selected {
+  background: rgba(204, 213, 174, 0.25);
+  color: var(--ed-forest);
+  border-left-color: var(--ed-forest);
+}
+
+/* === Workspace sidebar sections === */
+.workspace-sidebar-section {
+  margin-top: 1rem;
+}
+
+.workspace-sidebar-section .standard-sidebar-section-title {
+  font-family: var(--ed-font-body);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 11px;
+  color: var(--ed-forest-60);
+  padding: 0.5rem 0.75rem;
+}
+
+/* === Shortcut widget cards === */
+.shortcut-widget-box,
+.widget.shortcut-widget-box {
+  background: #ffffff;
+  border: 1px solid var(--ed-forest-08);
+  border-radius: var(--ed-radius-card);
+  box-shadow: var(--ed-shadow-forest);
+  padding: 1.25rem;
+  transition: transform var(--ed-dur-fast) var(--ed-ease),
+    box-shadow var(--ed-dur-fast) var(--ed-ease);
+}
+
+.shortcut-widget-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 30px 70px -20px rgba(1, 71, 46, 0.25);
+}
+
+.shortcut-widget-box .widget-head .widget-title,
+.shortcut-widget-box .widget-title {
+  font-family: var(--ed-font-display);
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--ed-forest);
+  margin: 0;
+}
+
+.shortcut-widget {
+  background: var(--ed-sage-soft);
+  border-radius: 12px;
+  color: var(--ed-forest);
+}
+
+/* === Shortcut color tints — remap rainbow palette to sage family === */
+.shortcut-widget-box[data-color="green"],
+.shortcut-widget-box[data-color="blue"],
+.shortcut-widget-box[data-color="orange"],
+.shortcut-widget-box[data-color="red"],
+.shortcut-widget-box[data-color="yellow"],
+.shortcut-widget-box[data-color="purple"],
+.shortcut-widget-box[data-color="pink"],
+.shortcut-widget-box[data-color="grey"],
+.shortcut-widget-box[data-color="gray"] {
+  background: var(--ed-olive);
+  color: var(--ed-forest);
+}
+
+.shortcut-widget-box[data-color="green"] .shortcut-widget {
+  background: var(--ed-sage-soft);
+}
+
+.shortcut-widget-box[data-color="blue"] .shortcut-widget,
+.shortcut-widget-box[data-color="purple"] .shortcut-widget {
+  background: var(--ed-moss);
+}
+
+/* === Links widget === */
+.links-widget-box,
+.widget.links-widget-box {
+  background: #ffffff;
+  border: 1px solid var(--ed-forest-08);
+  border-radius: var(--ed-radius-card);
+  box-shadow: var(--ed-shadow-forest);
+  padding: 1.25rem;
+}
+
+.links-widget-box .link-content {
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--ed-forest-08);
+}
+
+.links-widget-box .link-content:first-child {
+  border-top: none;
+}
+
+/* === Number cards === */
+.number-card,
+.widget.number-widget-box {
+  background: #ffffff;
+  border: 1px solid var(--ed-forest-08);
+  border-radius: var(--ed-radius-card);
+  box-shadow: var(--ed-shadow-forest);
+  padding: 1.5rem;
+}
+
+.number-card .widget-title,
+.widget.number-widget-box .widget-title {
+  font-family: var(--ed-font-display);
+  font-size: 3rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ed-forest);
+  margin: 0;
+}
+
+.number-card .widget-content {
+  font-family: var(--ed-font-body);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--ed-forest-60);
+  margin-top: 0.4rem;
+}
+
+/* === Chart widget cards === */
+.chart-widget-box,
+.widget.chart-widget-box,
+.dashboard-graph-container {
+  background: #ffffff;
+  border: 1px solid var(--ed-forest-08);
+  border-radius: var(--ed-radius-card);
+  box-shadow: var(--ed-shadow-forest);
+  padding: 1.5rem;
+}
+
+/* === Onboarding & quick list widgets === */
+.onboarding-widget-box,
+.quick-list-widget-box {
+  background: #ffffff;
+  border: 1px solid var(--ed-forest-08);
+  border-radius: var(--ed-radius-card);
+  box-shadow: var(--ed-shadow-forest);
+  padding: 1.25rem;
+}
+
+/* === Report summary === */
+.report-summary {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.report-summary .summary-item {
+  background: #ffffff;
+  border: 1px solid var(--ed-forest-08);
+  border-radius: var(--ed-radius-card);
+  padding: 1rem 1.25rem;
+  color: var(--ed-forest);
+  font-family: var(--ed-font-body);
+}
+
+/* === Dashboard chart container === */
+.dashboard-graph .chart-container {
+  padding: 0.75rem;
+}
+
+/* === Widget footer & actions === */
+.widget-foot {
+  border-top: 1px solid var(--ed-forest-08);
+  padding: 0.75rem 1rem;
+  color: var(--ed-forest-60);
+  font-size: 11px;
+}
+
+.widget-control .actions {
+  gap: 0.4rem;
+}
+
+/* === Dashboard top filter bar === */
+.dashboard-graph-list .dashboard-actions {
+  background: var(--ed-cream);
+  border: 1px solid var(--ed-forest-08);
+  border-radius: var(--ed-radius-pill);
+  padding: 0.5rem 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* === Frappe Charts SVG (where reachable) === */
+.chart-container .axis text {
+  fill: var(--ed-forest-60);
+  font-family: var(--ed-font-body);
+  font-size: 11px;
+}
+
+.chart-container .axis line,
+.chart-container .axis path {
+  stroke: var(--ed-forest-08);
+}
+
+.chart-container .y-regions text,
+.chart-container .axis-region text {
+  fill: var(--ed-forest-60);
+}

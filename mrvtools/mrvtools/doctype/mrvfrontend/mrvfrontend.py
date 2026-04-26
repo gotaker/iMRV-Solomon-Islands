@@ -17,6 +17,18 @@ class MrvFrontend(Document):
 
 @frappe.whitelist(allow_guest=True)
 def get_all():
+    # TODO(editorial-wiring): expose editorial home content to the SPA Home page.
+    # Add the following child tables to the MrvFrontend doctype (schema change
+    # requires editor review — do NOT modify mrvfrontend.json from code):
+    #
+    # editorial_programs (child table): num (Data), title (Data), metaTop (Data),
+    #   metaBottom (Data), img (Attach Image), alt (Data)
+    # editorial_stats (child table): num (Data), sup (Data), label (Data),
+    #   sub (Data, optional), subSup (Data, optional)
+    #
+    # Once the fields exist, parent_doc.as_dict() will surface them under
+    # parent_data.editorial_programs / parent_data.editorial_stats and
+    # frontend/src/pages/Home.vue will swap its fallback arrays for live data.
     parent_doc = frappe.get_doc('MrvFrontend')
     parent_data = parent_doc.as_dict()
     

@@ -119,14 +119,16 @@ def get_chart(year = None):
 			actualAnnualValue = frappe.db.get_value('Mitigation Monitoring Information',
 					{"project_id":i.name},
 					["actual_annual_ghg"], as_dict=1)
-			startDate = frappe.db.get_value('Mitigation Monitoring Information',
-					{"project_id":i.name},"YEAR('start_date') as start_date")
-			tillDateActual = frappe.db.get_all('Mitigation Monitoring Information',
-						filters={"project_id":f"{i.name}"},
-						fields = "sum(actual_annual_ghg) as till_date_actual_ghg")
+			startDateValue = frappe.db.get_value('Mitigation Monitoring Information',
+					{"project_id":i.name}, "start_date")
+			startDate = startDateValue.year if startDateValue else None
+			till_records = frappe.db.get_all('Mitigation Monitoring Information',
+						filters={"project_id": i.name},
+						fields=["actual_annual_ghg"])
+			till_date_actual_ghg = sum((r.actual_annual_ghg or 0) for r in till_records)
 			i['actual_annual_ghg'] = actualAnnualValue.actual_annual_ghg if actualAnnualValue else 0
 			if actualAnnualValue:
-				sum_actual_annual_ghg += actualAnnualValue.actual_annual_ghg 
+				sum_actual_annual_ghg += actualAnnualValue.actual_annual_ghg
 			else:
 				sum_actual_annual_ghg += 0
 			sum_expected_annual_ghg += i.expected_annual_ghg
@@ -138,12 +140,8 @@ def get_chart(year = None):
 				i['till_date_expected_ghg'] = int((i.expected_annual_ghg) * (datetime.now().year - (startDate)))
 				till_sum_expected_annual_ghg += int((i.expected_annual_ghg) * (datetime.now().year - (startDate)))
 
-			if tillDateActual[0].till_date_actual_ghg is not None:
-				i['till_date_actual_ghg'] = tillDateActual[0].till_date_actual_ghg
-				till_sum_actual_annual_ghg += tillDateActual[0].till_date_actual_ghg
-			else:
-				till_sum_actual_annual_ghg += 0
-				i['till_date_actual_ghg'] = 0
+			i['till_date_actual_ghg'] = till_date_actual_ghg
+			till_sum_actual_annual_ghg += till_date_actual_ghg
 		values_only = [list({k: v for k, v in item.items() if k != 'name'}.values()) for item in data]
 
 

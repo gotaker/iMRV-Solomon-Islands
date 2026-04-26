@@ -1,7 +1,41 @@
+/* =====================================================================
+   iMRV Editorial design tokens — declared once, consumed everywhere.
+   Lifted from the SPA (frontend/src/components/Header.vue, tailwind.config.js)
+   so the desk and the public site share one palette/type/motion contract.
+   Phase 1 of the desk editorial reskin.
+   ===================================================================== */
+:root {
+    --ed-forest:        #01472e;
+    --ed-forest-dark:   #022e1d;
+    --ed-cream:         #fefae0;
+    --ed-sage:          #ccd5ae;
+    --ed-sage-soft:     #c1cba4;
+    --ed-olive:         #e9edc9;
+    --ed-moss:          #a3b18a;
+
+    --ed-forest-08:     rgba(1, 71, 46, 0.08);
+    --ed-forest-12:     rgba(1, 71, 46, 0.12);
+    --ed-forest-20:     rgba(1, 71, 46, 0.2);
+    --ed-forest-60:     rgba(1, 71, 46, 0.6);
+    --ed-frost-bg:      rgba(255, 255, 255, 0.6);
+
+    --ed-font-display:  'Anton', 'Helvetica Neue', sans-serif;
+    --ed-font-body:     'Inter', system-ui, sans-serif;
+
+    --ed-ease:          cubic-bezier(0.16, 1, 0.3, 1);
+    --ed-dur-fast:      0.4s;
+    --ed-dur-mid:       0.6s;
+
+    --ed-radius-pill:   999px;
+    --ed-radius-card:   1.5rem;
+
+    --ed-shadow-forest: 0 25px 60px -25px rgba(1, 71, 46, 0.2);
+}
+
 .main-section .navbar.navbar-expand.sticky-top .container .navbar-brand.navbar-home{
     display: none !important;
     display:none;
-    
+
 }
 
 .main-section .navbar.navbar-expand.sticky-top .container #navbar-breadcrumbs{
@@ -11,6 +45,20 @@
 
 .layout-side-section,.page-title .sidebar-toggle-btn{
     display: none;
+}
+
+/* Hide v16's workspace sidebar — frappe_side_menu replaces it entirely.
+   v15 used .layout-side-section (kept above for back-compat); v16 added
+   .body-sidebar-container which the old rule doesn't catch, causing the
+   default workspace tree + user info strip to bleed through behind the
+   editorial side menu. */
+.body-sidebar-container,
+.body-sidebar-placeholder {
+    display: none !important;
+}
+body.full-width .layout-main-section-wrapper,
+.layout-main-section-wrapper {
+    margin-left: 0 !important;
 }
 .container-xl, .container-lg, .container-md, .container-sm, .container {
     max-width: 100%;
@@ -118,4 +166,69 @@ ul#navbar-breadcrumbs {
 }
 ul#navbar-breadcrumbs li:first-child a::before{
    display: none;
+}
+
+/* =====================================================================
+   Editorial palette retint — iMRV / Solomon Islands
+   Tokens-only re-skin: keeps original sidebar layout & density,
+   just swaps the blue palette + Poppins for Forest/Sage + Inter
+   so the desk feels continuous with the SPA after login.
+   Forest #01472e · Sage #ccd5ae · Olive #e9edc9 · Cream #fefae0 · Moss #a3b18a
+   ===================================================================== */
+
+/* primary sidebar rail */
+.main-sidebar .sidebar-menu {
+    background: var(--ed-forest) !important;
+    font-family: var(--ed-font-body);
+}
+.main-sidebar .sidebar-menu > li > a span {
+    font-family: var(--ed-font-body) !important;
+    letter-spacing: 0.06em;
+}
+
+/* hover/active rail item — moss accent strip on the leading edge */
+.main-sidebar .sidebar-menu > li > a {
+    transition: background 0.25s var(--ed-ease);
+    border-left: 2px solid transparent;
+}
+.main-sidebar .sidebar-menu > li > a:hover,
+.main-sidebar .sidebar-menu > li.active > a,
+.main-sidebar .sidebar-menu > li:hover > a {
+    background: rgba(204, 213, 174, 0.12);
+    border-left-color: var(--ed-moss);
+    color: var(--ed-cream);
+}
+
+/* drill-down panel — warm cream surface instead of stark white */
+.treeview-menu {
+    background: var(--ed-cream) !important;
+    border-right: 1px solid var(--ed-forest-08) !important;
+    box-shadow: 0 0 24px -12px rgba(1, 71, 46, 0.18);
+}
+.treeview-menu .user-info {
+    background: var(--ed-forest-dark);
+    color: var(--ed-cream);
+    box-shadow: -1px 1px 5px -2px rgba(1, 71, 46, 0.4);
+}
+.treeview-head {
+    color: var(--ed-forest);
+    border-bottom: 1px solid var(--ed-forest-12);
+    font-family: var(--ed-font-body);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+.main-sidebar .sidebar-menu .treeview-menu > li > a {
+    color: var(--ed-forest);
+    font-family: var(--ed-font-body);
+    transition: background 0.2s var(--ed-ease),
+                color 0.2s var(--ed-ease);
+}
+.main-sidebar .sidebar-menu .treeview-menu > li > a:hover {
+    background: rgba(163, 177, 138, 0.25);
+    color: var(--ed-forest);
+}
+.main-sidebar .sidebar-menu .treeview-menu > li.active > a,
+.main-sidebar .sidebar-menu .treeview-menu > li > a.active {
+    background: var(--ed-forest);
+    color: var(--ed-cream);
 }

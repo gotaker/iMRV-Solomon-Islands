@@ -4,20 +4,17 @@
 {% if not disable_user_pass_login or (ldap_settings and ldap_settings.enabled) %}
 <div class="page-card-body">
 	<div class="form-group">
-		<label class="form-label sr-only" for="login_email">{{ login_label or _("Email")}}</label>
+		<label class="form-label sr-only" for="login_email">{{ login_label or _("Email") }}</label>
 		<div class="email-field">
 			<input type="text" id="login_email" class="form-control"
-				placeholder="{% if login_name_placeholder %}{{ login_name_placeholder  }}{% else %}{{ _('jane@example.com') }}{% endif %}"
+				placeholder="{% if login_name_placeholder %}{{ login_name_placeholder }}{% else %}{{ _('jane@example.com') }}{% endif %}"
 				required autofocus autocomplete="username">
-
 			<svg class="field-icon email-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"
 				xmlns="http://www.w3.org/2000/svg">
-				<path
-					d="M2.5 7.65149V15.0757C2.5 15.4374 2.64367 15.7842 2.8994 16.04C3.15513 16.2957 3.50198 16.4394 3.86364 16.4394H16.1364C16.498 16.4394 16.8449 16.2957 17.1006 16.04C17.3563 15.7842 17.5 15.4374 17.5 15.0757V7.65149"
-					stroke="#74808B" stroke-miterlimit="10" stroke-linecap="square" />
-				<path
-					d="M17.5 7.57572V5.53026C17.5 5.1686 17.3563 4.82176 17.1006 4.56603C16.8449 4.31029 16.498 4.16663 16.1364 4.16663H3.86364C3.50198 4.16663 3.15513 4.31029 2.8994 4.56603C2.64367 4.82176 2.5 5.1686 2.5 5.53026V7.57572L10 10.8333L17.5 7.57572Z"
-					stroke="#74808B" stroke-miterlimit="10" stroke-linecap="square" />
+				<path d="M2.5 7.65149V15.0757C2.5 15.4374 2.64367 15.7842 2.8994 16.04C3.15513 16.2957 3.50198 16.4394 3.86364 16.4394H16.1364C16.498 16.4394 16.8449 16.2957 17.1006 16.04C17.3563 15.7842 17.5 15.4374 17.5 15.0757V7.65149"
+					stroke="currentColor" stroke-miterlimit="10" stroke-linecap="square" />
+				<path d="M17.5 7.57572V5.53026C17.5 5.1686 17.3563 4.82176 17.1006 4.56603C16.8449 4.31029 16.498 4.16663 16.1364 4.16663H3.86364C3.50198 4.16663 3.15513 4.31029 2.8994 4.56603C2.64367 4.82176 2.5 5.1686 2.5 5.53026V7.57572L10 10.8333L17.5 7.57572Z"
+					stroke="currentColor" stroke-miterlimit="10" stroke-linecap="square" />
 			</svg>
 		</div>
 	</div>
@@ -25,16 +22,15 @@
 	<div class="form-group">
 		<label class="form-label sr-only" for="login_password">{{ _("Password") }}</label>
 		<div class="password-field">
-			<input type="password" id="login_password" class="form-control" placeholder="•••••"
+			<input type="password" id="login_password" class="form-control" placeholder="•••••••"
 				autocomplete="current-password" required>
-
 			<svg class="field-icon password-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"
 				xmlns="http://www.w3.org/2000/svg">
 				<path fill-rule="evenodd" clip-rule="evenodd"
-					d="M10.0961 1.93768H10.0264C8.94806 1.92763 7.90976 2.34591 7.13951 3.10075C6.36866 3.85619 5.9294 4.88687 5.91833 5.96612L5.91831 5.96612V5.97124V6.52695H4.3125C3.20793 6.52695 2.3125 7.42238 2.3125 8.52695V16.0165C2.3125 17.121 3.20793 18.0165 4.3125 18.0165H15.7356C16.8401 18.0165 17.7356 17.121 17.7356 16.0165V8.52695C17.7356 7.42238 16.8401 6.52695 15.7356 6.52695H14.1297V6.04576C14.1397 4.96742 13.7214 3.92913 12.9666 3.15888C12.2112 2.38803 11.1805 1.94877 10.1012 1.9377V1.93768H10.0961ZM13.1297 6.52695V6.04336V6.03838H13.1297C13.1378 5.22428 12.8222 4.44029 12.2524 3.85881C11.6831 3.27793 10.9067 2.94667 10.0934 2.93768H10.024H10.019V2.93765C9.20491 2.92955 8.42092 3.24512 7.83944 3.81497C7.25856 4.38423 6.9273 5.1607 6.91831 5.9739V6.52695H13.1297ZM4.3125 7.52695C3.76022 7.52695 3.3125 7.97467 3.3125 8.52695V16.0165C3.3125 16.5687 3.76022 17.0165 4.3125 17.0165H15.7356C16.2879 17.0165 16.7356 16.5687 16.7356 16.0165V8.52695C16.7356 7.97467 16.2879 7.52695 15.7356 7.52695H4.3125ZM10.0242 13.2384C10.5581 13.2384 10.9909 12.8056 10.9909 12.2717C10.9909 11.7377 10.5581 11.3049 10.0242 11.3049C9.49023 11.3049 9.05738 11.7377 9.05738 12.2717C9.05738 12.8056 9.49023 13.2384 10.0242 13.2384ZM11.9909 12.2717C11.9909 13.3579 11.1104 14.2384 10.0242 14.2384C8.93794 14.2384 8.05738 13.3579 8.05738 12.2717C8.05738 11.1854 8.93794 10.3049 10.0242 10.3049C11.1104 10.3049 11.9909 11.1854 11.9909 12.2717Z"
-					fill="#74808B" />
+					d="M10.0961 1.93768H10.0264C8.94806 1.92763 7.90976 2.34591 7.13951 3.10075C6.36866 3.85619 5.9294 4.88687 5.91833 5.96612V5.97124V6.52695H4.3125C3.20793 6.52695 2.3125 7.42238 2.3125 8.52695V16.0165C2.3125 17.121 3.20793 18.0165 4.3125 18.0165H15.7356C16.8401 18.0165 17.7356 17.121 17.7356 16.0165V8.52695C17.7356 7.42238 16.8401 6.52695 15.7356 6.52695H14.1297V6.04576C14.1397 4.96742 13.7214 3.92913 12.9666 3.15888C12.2112 2.38803 11.1805 1.94877 10.1012 1.9377V1.93768H10.0961ZM13.1297 6.52695V6.04336V6.03838C13.1378 5.22428 12.8222 4.44029 12.2524 3.85881C11.6831 3.27793 10.9067 2.94667 10.0934 2.93768H10.024H10.019V2.93765C9.20491 2.92955 8.42092 3.24512 7.83944 3.81497C7.25856 4.38423 6.9273 5.1607 6.91831 5.9739V6.52695H13.1297ZM4.3125 7.52695C3.76022 7.52695 3.3125 7.97467 3.3125 8.52695V16.0165C3.3125 16.5687 3.76022 17.0165 4.3125 17.0165H15.7356C16.2879 17.0165 16.7356 16.5687 16.7356 16.0165V8.52695C16.7356 7.97467 16.2879 7.52695 15.7356 7.52695H4.3125ZM10.0242 13.2384C10.5581 13.2384 10.9909 12.8056 10.9909 12.2717C10.9909 11.7377 10.5581 11.3049 10.0242 11.3049C9.49023 11.3049 9.05738 11.7377 9.05738 12.2717C9.05738 12.8056 9.49023 13.2384 10.0242 13.2384ZM11.9909 12.2717C11.9909 13.3579 11.1104 14.2384 10.0242 14.2384C8.93794 14.2384 8.05738 13.3579 8.05738 12.2717C8.05738 11.1854 8.93794 10.3049 10.0242 10.3049C11.1104 10.3049 11.9909 11.1854 11.9909 12.2717Z"
+					fill="currentColor" />
 			</svg>
-			<span toggle="#login_password" class="toggle-password text-muted">{{ _('Show') }}</span>
+			<span toggle="#login_password" class="toggle-password">{{ _('Show') }}</span>
 		</div>
 	</div>
 
@@ -45,119 +41,505 @@
 {% endif %}
 <div class="page-card-actions">
 	{% if not disable_user_pass_login %}
-	<button class="btn btn-sm btn-primary btn-block btn-login" type="submit">
-		{{ _("Login") }}</button>
+	<button class="btn btn-sm btn-primary btn-block btn-login" type="submit">{{ _("Sign In") }}</button>
 	{% endif %}
 	{% if ldap_settings and ldap_settings.enabled %}
-	<button class="btn btn-sm btn-default btn-block btn-login btn-ldap-login">
-		{{ _("Login with LDAP") }}</button>
+	<button type="button" class="btn btn-sm btn-default btn-block btn-login btn-ldap-login">{{ _("Login with LDAP") }}</button>
 	{% endif %}
 </div>
 {% endmacro %}
 
 {% block head_include %}
 {{ include_style('login.bundle.css') }}
-{% endblock %}
+<style>
+	@font-face {
+		font-family: 'Anton';
+		src: url('/assets/mrvtools/fonts/anton/Anton-Regular.woff2') format('woff2');
+		font-weight: 400;
+		font-style: normal;
+		font-display: swap;
+		unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+	}
 
-{% macro logo_section() %}
-<div class="page-card-head">
-	<img class="app-logo" src="/assets/mrvtools/Flag_of_the_Solomon_Islands.png">
-	<h4>Login Account</h4>
-</div>
-{% endmacro %}
+	html, body {
+		background: #fefae0;
+		font-family: 'Inter', system-ui, sans-serif;
+		color: #01472e;
+	}
+
+	.navbar, .page-header, .web-footer, #wrap-footer { display: none !important; }
+	.page-content, main.container { width: 100%; max-width: 100%; padding: 0; margin: 0 !important; }
+	.page-content-wrapper { background: transparent !important; height: auto !important; }
+	#wrap { background: transparent !important; }
+
+	.ed-login {
+		min-height: 100vh;
+		display: grid;
+		grid-template-columns: 1.15fr 1fr;
+		background:
+			radial-gradient(circle at 8% 12%, rgba(204, 213, 174, 0.55) 0%, transparent 45%),
+			radial-gradient(circle at 92% 88%, rgba(1, 71, 46, 0.10) 0%, transparent 50%),
+			#fefae0;
+		color: #01472e;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.ed-login::before {
+		content: '';
+		position: absolute;
+		top: 0; bottom: 0;
+		left: calc(53.5% - 1px);
+		width: 1px;
+		background: rgba(1, 71, 46, 0.08);
+		pointer-events: none;
+	}
+
+	.ed-login-hero {
+		padding: 5rem 4rem;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		position: relative;
+		z-index: 1;
+	}
+
+	.ed-login-eyebrow {
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.32em;
+		text-transform: uppercase;
+		color: rgba(1, 71, 46, 0.6);
+		margin: 0 0 2rem;
+		display: flex;
+		align-items: center;
+		gap: 0.85rem;
+	}
+
+	.ed-login-eyebrow::after {
+		content: '';
+		flex: 0 0 48px;
+		height: 1px;
+		background: rgba(1, 71, 46, 0.3);
+	}
+
+	.ed-login-hero h1 {
+		font-family: 'Anton', 'Helvetica Neue', sans-serif;
+		font-size: clamp(3rem, 6.5vw, 5.75rem);
+		line-height: 0.95;
+		letter-spacing: -0.02em;
+		text-transform: uppercase;
+		color: #01472e;
+		margin: 0;
+	}
+
+	.ed-login-hero h1 .accent {
+		display: block;
+		color: #ccd5ae;
+	}
+
+	.ed-login-hero h1 .ampersand {
+		font-style: italic;
+		font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+		font-weight: 400;
+		font-size: 0.9em;
+		color: #a3b18a;
+		margin: 0 0.05em;
+		letter-spacing: -0.05em;
+	}
+
+	.ed-login-tagline {
+		font-size: 16px;
+		line-height: 1.55;
+		color: rgba(1, 71, 46, 0.65);
+		max-width: 38ch;
+		margin: 2rem 0 0;
+	}
+
+	.ed-login-meta {
+		margin-top: auto;
+		padding-top: 4rem;
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		font-size: 12px;
+		font-weight: 600;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: rgba(1, 71, 46, 0.7);
+	}
+
+	.ed-login-meta img {
+		width: 44px;
+		height: auto;
+		border-radius: 4px;
+		box-shadow: 0 4px 14px -6px rgba(1, 71, 46, 0.4);
+	}
+
+	.ed-login-meta-text {
+		display: flex;
+		flex-direction: column;
+		line-height: 1.4;
+	}
+
+	.ed-login-meta-text small {
+		font-size: 10px;
+		font-weight: 700;
+		letter-spacing: 0.3em;
+		color: rgba(1, 71, 46, 0.45);
+	}
+
+	.ed-login-form-pane {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 3rem 4rem;
+		position: relative;
+		z-index: 1;
+	}
+
+	.ed-login-card {
+		width: 100%;
+		max-width: 420px;
+		background: rgba(255, 255, 255, 0.65);
+		-webkit-backdrop-filter: blur(20px) saturate(140%);
+		backdrop-filter: blur(20px) saturate(140%);
+		border: 1px solid rgba(1, 71, 46, 0.12);
+		border-radius: 1.5rem;
+		box-shadow: 0 25px 60px -25px rgba(1, 71, 46, 0.25);
+		padding: 2.75rem 2.5rem;
+	}
+
+	.ed-login-card .page-card-head {
+		text-align: center;
+		margin-bottom: 1.75rem;
+		padding-bottom: 1.75rem;
+		border-bottom: 1px solid rgba(1, 71, 46, 0.08);
+	}
+
+	.ed-login-card .page-card-head img {
+		width: 56px;
+		height: auto;
+		border-radius: 6px;
+		margin: 0 auto 1rem;
+		display: block;
+		box-shadow: 0 4px 14px -6px rgba(1, 71, 46, 0.35);
+	}
+
+	.ed-login-card .page-card-head h4 {
+		font-family: 'Anton', sans-serif;
+		font-size: 1.5rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: #01472e;
+		margin: 0 0 0.25rem;
+	}
+
+	.ed-login-card-sub {
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.3em;
+		text-transform: uppercase;
+		color: rgba(1, 71, 46, 0.5);
+		margin: 0;
+	}
+
+	.ed-login-card .form-group { margin-bottom: 1rem; }
+
+	.ed-login-card .form-control {
+		background: rgba(255, 255, 255, 0.85);
+		border: 1px solid rgba(1, 71, 46, 0.15);
+		border-radius: 10px;
+		padding: 13px 16px 13px 44px;
+		font-size: 14px;
+		color: #01472e;
+		font-family: 'Inter', system-ui, sans-serif;
+		width: 100%;
+		height: auto;
+		box-shadow: none;
+		transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+			box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.ed-login-card .form-control:focus {
+		outline: none;
+		border-color: #01472e;
+		box-shadow: 0 0 0 3px rgba(1, 71, 46, 0.12);
+		background: #ffffff;
+	}
+
+	.ed-login-card .form-control::placeholder {
+		color: rgba(1, 71, 46, 0.4);
+	}
+
+	.ed-login-card .email-field,
+	.ed-login-card .password-field {
+		position: relative;
+	}
+
+	.ed-login-card .field-icon {
+		position: absolute;
+		left: 14px;
+		top: 50%;
+		transform: translateY(-50%);
+		color: rgba(1, 71, 46, 0.45);
+		pointer-events: none;
+	}
+
+	.ed-login-card .toggle-password {
+		position: absolute;
+		right: 14px;
+		top: 50%;
+		transform: translateY(-50%);
+		font-size: 10px;
+		font-weight: 700;
+		letter-spacing: 0.25em;
+		text-transform: uppercase;
+		color: rgba(1, 71, 46, 0.55);
+		cursor: pointer;
+		-webkit-user-select: none;
+		user-select: none;
+	}
+
+	.ed-login-card .toggle-password:hover {
+		color: #01472e;
+	}
+
+	.ed-login-card .forgot-password-message {
+		text-align: right;
+		margin: 0.75rem 0 1.5rem;
+	}
+
+	.ed-login-card .forgot-password-message a {
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: rgba(1, 71, 46, 0.6);
+		text-decoration: none;
+		border-bottom: 1px solid rgba(1, 71, 46, 0.2);
+		padding-bottom: 1px;
+		transition: color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.ed-login-card .forgot-password-message a:hover {
+		color: #01472e;
+	}
+
+	.ed-login-card .btn-login {
+		width: 100%;
+		background: #01472e;
+		color: #fefae0;
+		border: 1px solid #01472e;
+		border-radius: 999px;
+		padding: 14px 24px;
+		font-family: 'Inter', system-ui, sans-serif;
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.3em;
+		text-transform: uppercase;
+		cursor: pointer;
+		transition: background 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+			color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+			transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+			box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+		margin-top: 0;
+		box-shadow: 0 8px 24px -10px rgba(1, 71, 46, 0.4);
+	}
+
+	.ed-login-card .btn-login:hover {
+		background: #022e1d;
+		transform: translateY(-2px);
+		box-shadow: 0 14px 32px -10px rgba(1, 71, 46, 0.5);
+	}
+
+	.ed-login-card .btn-login:focus-visible {
+		outline: 2px solid #01472e;
+		outline-offset: 4px;
+	}
+
+	.ed-login-card .btn-login + .btn-login {
+		margin-top: 0.75rem;
+		background: transparent;
+		color: #01472e;
+		border: 1px solid rgba(1, 71, 46, 0.25);
+		box-shadow: none;
+	}
+
+	.ed-login-card .btn-login + .btn-login:hover {
+		background: rgba(1, 71, 46, 0.05);
+	}
+
+	.ed-login-card .login-divider {
+		text-align: center;
+		margin: 1.5rem 0 1rem;
+		font-size: 10px;
+		font-weight: 700;
+		letter-spacing: 0.35em;
+		text-transform: uppercase;
+		color: rgba(1, 71, 46, 0.4);
+	}
+
+	.ed-login-card .social-login-buttons .btn,
+	.ed-login-card .login-button-wrapper .btn {
+		background: transparent;
+		color: #01472e;
+		border: 1px solid rgba(1, 71, 46, 0.18);
+		border-radius: 999px;
+		padding: 11px 18px;
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.22em;
+		text-transform: uppercase;
+		width: 100%;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		margin-top: 0.5rem;
+		transition: background 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.ed-login-card .social-login-buttons .btn:hover,
+	.ed-login-card .login-button-wrapper .btn:hover {
+		background: rgba(1, 71, 46, 0.05);
+	}
+
+	.ed-login-card .sign-up-message {
+		margin-top: 1.75rem;
+		text-align: center;
+		font-size: 12px;
+		color: rgba(1, 71, 46, 0.6);
+		letter-spacing: 0.04em;
+	}
+
+	.ed-login-card .sign-up-message a {
+		color: #01472e;
+		font-weight: 700;
+		text-decoration: none;
+		border-bottom: 1px solid rgba(1, 71, 46, 0.25);
+		margin-left: 0.4rem;
+		padding-bottom: 1px;
+	}
+
+	.ed-login-card .sign-up-message a:hover {
+		color: #022e1d;
+		border-bottom-color: #022e1d;
+	}
+
+	.ed-login-version {
+		text-align: center;
+		margin: 1.5rem 0 0;
+		font-size: 10px;
+		font-weight: 700;
+		letter-spacing: 0.35em;
+		text-transform: uppercase;
+		color: rgba(1, 71, 46, 0.35);
+	}
+
+	.for-forgot, .for-signup, .for-email-login { display: none; }
+	.for-forgot.show, .for-signup.show, .for-email-login.show { display: block; }
+
+	.ed-login-card .form-forgot .page-card-head h4 {
+		font-family: 'Anton', sans-serif;
+		font-size: 1.5rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		text-align: center;
+		margin: 0 0 1rem;
+	}
+
+	.ed-login-card .btn-forgot {
+		width: 100%;
+		background: #01472e;
+		color: #fefae0;
+		border: 1px solid #01472e;
+		border-radius: 999px;
+		padding: 14px 24px;
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.3em;
+		text-transform: uppercase;
+		cursor: pointer;
+		transition: background 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+			transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.ed-login-card .btn-forgot:hover {
+		background: #022e1d;
+		transform: translateY(-2px);
+	}
+
+	@media (max-width: 960px) {
+		.ed-login {
+			grid-template-columns: 1fr;
+			min-height: 0;
+		}
+		.ed-login::before { display: none; }
+		.ed-login-hero {
+			padding: 3.5rem 2rem 2rem;
+			text-align: left;
+		}
+		.ed-login-meta { padding-top: 2.5rem; }
+		.ed-login-form-pane { padding: 2rem 1.5rem 3.5rem; }
+		.ed-login-card { padding: 2.25rem 1.75rem; }
+	}
+
+	@media (max-width: 480px) {
+		.ed-login-hero { padding: 2.5rem 1.5rem 1.5rem; }
+		.ed-login-meta { gap: 0.75rem; }
+		.ed-login-meta img { width: 36px; }
+	}
+</style>
+{% endblock %}
 
 {% block page_content %}
 <!-- {{ for_test }} -->
-<div class="main-section">
-	<style>
-		.page-content-wrapper{
-			background-image:url(/assets/mrvtools/login-bgimg.png);
-			background-size: 100% 100%;
-			height:125%;
-		}
-		main.container{
-			margin:0 auto !important;
-		}
-		#page-custom_login{
-			height:70%;
-		}
-		.main-section{
-			display: flex;
-			width: 100%;
-		}
-		.director-content{
-			width: 60%;
-		}
-		.for-login{
-			width: 40%;
-		}
-		.for-login .page-card {
-			padding-top: 25px;
-			padding-bottom: 25px;
-		}
-		.for-login .page-card-head{
-			margin-bottom: 20px;
-		}
-		.for-login .page-card-head img{
-			margin-bottom:0px
-		}
-		.for-forgot{
-			width: 40%;
-		}
-		.for-forgot .page-card {
-			padding-top: 25px;
-			padding-bottom: 25px;
-		}
-		.for-forgot .page-card-head{
-			margin-bottom: 20px;
-		}
-		.for-forgot .page-card-head img{
-			margin-bottom:0px
-		}
-		.director-content{
-			padding-top: 5.5rem;
-			padding-bottom: 5.5rem;
-			padding-left: 4rem;
-			padding-right: 4rem;
-			color: white;
-			font-size: 25px;
-		}
-		.welcome{
-			font-weight: 600;
-			font-size: 35px;
-		}
-		
-	</style>
-	<section class = "director-content">
-		<div class="msg-content">
-			<span class="welcome">Welcome</span>			
-			<span>to</span><br>
-			<span>Solomon Island iMRV Tool for Climate Actions</span>
-		</div>
+<div class="ed-login">
+	<section class="ed-login-hero">
+		<p class="ed-login-eyebrow">Solomon Islands · iMRV</p>
+		<h1>
+			Climate
+			<span class="ampersand">&amp;</span>
+			<span class="accent">Action</span>
+			Tool
+		</h1>
+		<p class="ed-login-tagline">
+			Track Solomon Islands' progress on adaptation, mitigation, and climate finance — measure, report, verify.
+		</p>
 
+		<div class="ed-login-meta">
+			<img src="/assets/mrvtools/Flag_of_the_Solomon_Islands.png" alt="Flag of the Solomon Islands">
+			<div class="ed-login-meta-text">
+				<small>Government of</small>
+				<span>Solomon Islands</span>
+			</div>
+		</div>
 	</section>
-	<section class='for-login'>
-		<div class="login-content page-card">
-			{{ logo_section() }}
+
+	<section class="ed-login-form-pane">
+		<div class="ed-login-card login-content page-card">
+			<div class="page-card-head">
+				<img src="/assets/mrvtools/Flag_of_the_Solomon_Islands.png" alt="Solomon Islands">
+				<h4>Sign In</h4>
+				<p class="ed-login-card-sub">iMRV Tool · Authorised Access</p>
+			</div>
+
 			<form class="form-signin form-login" role="form">
 				{%- if social_login or login_with_email_link -%}
-				<div class="page-card-body">
-					<form class="form-signin form-login" role="form">
-						{{ email_login_body() }}
-					</form>
+					{{ email_login_body() }}
 					<div class="social-logins text-center">
 						{% if not disable_user_pass_login or (ldap_settings and ldap_settings.enabled) %}
-						<p class="text-muted login-divider">{{ _("or") }}</p>
+						<p class="login-divider">{{ _("or") }}</p>
 						{% endif %}
 						<div class="social-login-buttons">
 							{% for provider in provider_logins %}
 							<div class="login-button-wrapper">
 								<a href="{{ provider.auth_url }}"
 									class="btn btn-block btn-default btn-sm btn-login-option btn-{{ provider.name }}">
-									{% if provider.icon %}
-										{{ provider.icon }}
-									{% endif %}
-									{{ _("Login With {0}").format(provider.provider_name) }}</a>
+									{% if provider.icon %}{{ provider.icon }}{% endif %}
+									{{ _("Login With {0}").format(provider.provider_name) }}
+								</a>
 							</div>
 							{% endfor %}
 						</div>
@@ -166,90 +548,60 @@
 							<div class="login-button-wrapper">
 								<a href="#login-with-email-link"
 									class="btn btn-block btn-default btn-sm btn-login-option btn-login-with-email-link">
-									{{ _("Login with Email Link") }}</a>
+									{{ _("Login with Email Link") }}
+								</a>
 							</div>
 						</div>
 						{% endif %}
 					</div>
-				</div>
-				{% else %}
+				{%- else -%}
 					{{ email_login_body() }}
 				{%- endif -%}
 			</form>
-			<div class="text-center sign-up-message">
-				{{ _("Don't have an account?") }}
-				<a href="#signup">{{ _("Sign up") }}</a>
-			</div>
-			<p style="float: right;margin-right: 13px;font-size: 12px;font-weight: 400;color: #333c62;">Version 1.0</p>
-		</div>
-		{%- if not disable_signup and not disable_user_pass_login -%}
-		
-		{%- endif -%}
-	</section>
 
-	{%- if social_login -%}
-	<section class='for-email-login'>
-		<div class="login-content page-card">
-			{{ logo_section() }}
-			<form class="form-signin form-login" role="form">
-			{{ email_login_body() }}
-			</form>
-		</div>
-		{%- if not disable_signup and not disable_user_pass_login -%}
-		<div class="text-center sign-up-message">
-			{{ _("Don't have an account?") }}
-			<a href="#signup">{{ _("Sign up") }}</a>
-		</div>
-		{%- endif -%}
-	</section>
-	{%- endif -%}
-	
-
-	<section class='for-forgot'>
-		<div class="login-content page-card">
 			<form class="form-signin form-forgot hide" role="form">
 				<div class="page-card-head">
 					<h4>{{ _('Forgot Password') }}</h4>
 				</div>
 				<div class="page-card-body">
-					<div class="email-field">
-						<input type="email" id="forgot_email" class="form-control"
-							placeholder="{{ _('Email Address') }}" required autofocus autocomplete="username">
-						<svg class="field-icon email-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"
-							xmlns="http://www.w3.org/2000/svg">
-							<path
-								d="M2.5 7.65149V15.0757C2.5 15.4374 2.64367 15.7842 2.8994 16.04C3.15513 16.2957 3.50198 16.4394 3.86364 16.4394H16.1364C16.498 16.4394 16.8449 16.2957 17.1006 16.04C17.3563 15.7842 17.5 15.4374 17.5 15.0757V7.65149"
-								stroke="#74808B" stroke-miterlimit="10" stroke-linecap="square" />
-							<path
-								d="M17.5 7.57572V5.53026C17.5 5.1686 17.3563 4.82176 17.1006 4.56603C16.8449 4.31029 16.498 4.16663 16.1364 4.16663H3.86364C3.50198 4.16663 3.15513 4.31029 2.8994 4.56603C2.64367 4.82176 2.5 5.1686 2.5 5.53026V7.57572L10 10.8333L17.5 7.57572Z"
-								stroke="#74808B" stroke-miterlimit="10" stroke-linecap="square" />
-						</svg>
-
+					<div class="form-group">
+						<div class="email-field">
+							<input type="email" id="forgot_email" class="form-control"
+								placeholder="{{ _('Email Address') }}" required autocomplete="username">
+							<svg class="field-icon email-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"
+								xmlns="http://www.w3.org/2000/svg">
+								<path d="M2.5 7.65149V15.0757C2.5 15.4374 2.64367 15.7842 2.8994 16.04C3.15513 16.2957 3.50198 16.4394 3.86364 16.4394H16.1364C16.498 16.4394 16.8449 16.2957 17.1006 16.04C17.3563 15.7842 17.5 15.4374 17.5 15.0757V7.65149"
+									stroke="currentColor" stroke-miterlimit="10" stroke-linecap="square" />
+								<path d="M17.5 7.57572V5.53026C17.5 5.1686 17.3563 4.82176 17.1006 4.56603C16.8449 4.31029 16.498 4.16663 16.1364 4.16663H3.86364C3.50198 4.16663 3.15513 4.31029 2.8994 4.56603C2.64367 4.82176 2.5 5.1686 2.5 5.53026V7.57572L10 10.8333L17.5 7.57572Z"
+									stroke="currentColor" stroke-miterlimit="10" stroke-linecap="square" />
+							</svg>
+						</div>
 					</div>
 				</div>
 				<div class="page-card-actions">
-					<button class="btn btn-sm btn-primary btn-block btn-forgot"
-						type="submit">{{ _("Reset Password") }}</button>
+					<button class="btn btn-sm btn-primary btn-block btn-forgot" type="submit">{{ _("Reset Password") }}</button>
 					<p class="text-center sign-up-message">
-						<a href="#login">{{ _("Back to Login") }}</a>
+						<a href="#login">{{ _("Back to Sign In") }}</a>
 					</p>
 				</div>
-
 			</form>
+
+			{%- if not disable_signup and not disable_user_pass_login -%}
+			<div class="text-center sign-up-message">
+				{{ _("Don't have an account?") }}
+				<a href="#signup">{{ _("Request access") }}</a>
+			</div>
+			{%- endif -%}
+
+			<p class="ed-login-version">Version 1.0</p>
 		</div>
 	</section>
 </div>
-
 {% endblock %}
 
 {% block script %}
 <script>{% include "templates/includes/login/login.js" %}
-$('.web-footer').remove()
-// $('#page-custom_login').css("height","70%")
-// $('main.container').attr("style","")
-// $('[data-path="login"] main[class="container my-4"]').css("margin","0px !important")
-$('[id="navbarSupportedContent"]').prepend('<p class="heading-main" data-v-2dd66c2c="" style="    color: rgb(0, 0, 0);font-weight: 700;font-size: 20px;font-family: sans-serif;display: flex;line-height: 1.5;align-items: start;justify-content: start !important;margin-bottom: 0px !important;"> SOLOMON ISLANDS iMRV TOOL <span data-v-2dd66c2c="" style="color: green; margin: 0px 0px 0px 7px;">FOR CLIMATE ACTIONS</span></p>')
-// $('[data-path="custom_login"] div.page-content-wrapper').css({})
+$('.web-footer').remove();
 </script>
 {% endblock %}
 

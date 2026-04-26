@@ -11,7 +11,7 @@ app_license = "MIT"
 
 website_redirects = [
     {"source": "/", "target": "/frontend/home"},
-]  
+]
 
 permission_query_conditions = {
     "My Approval":"mrvtools.mrvtools.doctype.my_approval.my_approval.get_query_conditions",
@@ -23,7 +23,16 @@ permission_query_conditions = {
 # ------------------
 
 # include js, css files in header of desk.html
-app_include_css = "/assets/mrvtools/css/mrvtools.css"
+app_include_css = [
+	"/assets/mrvtools/css/mrvtools.css",
+	# Editorial reskin — load order matters (foundation first, layered on top)
+	"/assets/mrvtools/css/editorial/01-foundation.css",
+	"/assets/mrvtools/css/editorial/02-chrome.css",
+	"/assets/mrvtools/css/editorial/04-forms.css",
+	"/assets/mrvtools/css/editorial/05-lists.css",
+	"/assets/mrvtools/css/editorial/06-modals.css",
+	"/assets/mrvtools/css/editorial/07-workspaces.css",
+]
 app_include_js = ["/assets/mrvtools/js/mrvtools.js","/assets/mrvtools/js/map_defaults.js"]
 # app_include_js = "/assets/mrvtools/js/adaptationreport.js"
 

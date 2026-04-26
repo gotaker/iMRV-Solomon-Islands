@@ -1,0 +1,145 @@
+/* ============================================================
+ * Phase 1 — Editorial Reskin: Foundation
+ * Forest & Sage design system mapped onto Frappe v16 desk.
+ * Plan: /Users/utahjazz/.claude/plans/zesty-wiggling-clock.md
+ * Tokens (`--ed-*`) declared in frappe_side_menu.css — load order first.
+ * ============================================================ */
+
+@font-face {
+  font-family: 'Anton';
+  src: url('/assets/mrvtools/fonts/anton/Anton-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+                 U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122,
+                 U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  --bg-color: var(--ed-cream);
+  --fg-color: #ffffff;
+  --text-color: var(--ed-forest);
+  --text-muted: var(--ed-forest-60);
+  --heading-color: var(--ed-forest);
+  --primary: var(--ed-forest);
+  --primary-color: var(--ed-forest);
+  --brand-color: var(--ed-forest);
+  --btn-primary: var(--ed-forest);
+  --font-stack: var(--ed-font-body);
+  --border-color: var(--ed-forest-08);
+  --card-bg: #ffffff;
+  --card-shadow: var(--ed-shadow-forest);
+  --navbar-bg: var(--ed-cream);
+  --modal-bg: var(--ed-cream);
+  --modal-shadow: var(--ed-shadow-forest);
+  --control-bg: #ffffff;
+  --control-bg-on-gray: var(--ed-cream);
+  --input-disabled-bg: var(--ed-olive);
+  --table-border-color: var(--ed-forest-08);
+}
+
+body {
+  font-family: var(--ed-font-body);
+  background: var(--ed-cream);
+  color: var(--ed-forest);
+}
+
+h1, h2 {
+  font-family: var(--ed-font-display);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--ed-forest);
+}
+
+h3, h4, h5, h6 {
+  font-family: var(--ed-font-body);
+  font-weight: 700;
+  color: var(--ed-forest);
+}
+
+.btn,
+.btn-primary,
+.btn-default,
+.btn-secondary {
+  border-radius: var(--ed-radius-pill);
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0.65rem 1.25rem;
+  transition: background var(--ed-dur-fast) var(--ed-ease),
+              color var(--ed-dur-fast) var(--ed-ease),
+              border-color var(--ed-dur-fast) var(--ed-ease);
+}
+
+.btn-primary {
+  background: var(--ed-forest);
+  color: var(--ed-cream);
+  border: 1px solid var(--ed-forest);
+}
+
+.btn-primary:hover {
+  background: var(--ed-forest-dark);
+  border-color: var(--ed-forest-dark);
+  color: var(--ed-cream);
+}
+
+.btn-default,
+.btn-secondary {
+  background: var(--ed-cream);
+  color: var(--ed-forest);
+  border: 1px solid var(--ed-forest-08);
+}
+
+.btn-default:hover,
+.btn-secondary:hover {
+  background: #ffffff;
+  border-color: var(--ed-forest-20);
+  color: var(--ed-forest-dark);
+}
+
+/* Preserve compact toolbar density — dense buttons must stay dense */
+.btn-xs {
+  padding: 0.25rem 0.6rem;
+  font-size: 10px;
+}
+
+.btn-sm {
+  padding: 0.4rem 0.9rem;
+  font-size: 11px;
+}
+
+.frappe-card,
+.card,
+.layout-main-section.frappe-card {
+  border-radius: var(--ed-radius-card);
+  border: 1px solid var(--ed-forest-08);
+  box-shadow: var(--ed-shadow-forest);
+  background: #ffffff;
+}
+
+/* Indicator remap — only green and grey to brand. Red/yellow/blue
+   stay native for status accuracy. */
+.indicator-pill.green,
+.indicator-pill-right.green,
+.indicator.green {
+  background: var(--ed-sage-soft);
+  color: var(--ed-forest);
+}
+
+.indicator-pill.gray,
+.indicator-pill-right.gray,
+.indicator.gray {
+  background: var(--ed-olive);
+  color: var(--ed-forest);
+}
+
+a {
+  color: var(--ed-forest);
+  transition: color var(--ed-dur-fast) var(--ed-ease);
+}
+
+a:hover {
+  color: var(--ed-forest-dark);
+}

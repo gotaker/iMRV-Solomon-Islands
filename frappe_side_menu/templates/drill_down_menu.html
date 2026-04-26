@@ -104,8 +104,8 @@
            margin-left: {{ side_menu_settings.set_width }}px !important;
            }
            .main-sidebar .sidebar-menu {
-           background: #267db9 !important;
-           font-family: 'Poppins', sans-serif;
+           background: #01472e !important;
+           font-family: 'Inter', sans-serif;
            min-width: 195px !important;
            padding: 0;
            width: 95px !important;
@@ -144,14 +144,14 @@
            position: fixed;
            /* min-width: 80px; */
            width: 280px;
-           background: #f0f0f0;
+           background: #fefae0;
            overflow-y: auto;
            }
            .menu {
            text-decoration: none;
            display: block;
            padding: 10px;
-           border-bottom: 1px solid #e8eaeb;
+           border-bottom: 1px solid rgba(1, 71, 46, 0.08);
            color: #333;
            transition: background-color 0.3s; /* Add a transition for smooth color change */
            }
@@ -176,6 +176,7 @@
            align-items: center;
            margin-left: 7%;
            }
+           /* Editorial defaults applied via frappe_side_menu.css when this DB field is empty */
            .app-logo .logo {
            {% if side_menu_settings.logo_background_color %}
            background:{{side_menu_settings.logo_background_color}};
@@ -184,6 +185,7 @@
            border-bottom:1px solid {{side_menu_settings.logo_bottom_border_color}};
            {% endif %}
            }
+           /* Editorial defaults applied via frappe_side_menu.css when this DB field is empty */
            .main-sidebar .sidebar-menu {
            overflow-y: scroll;
            {% if side_menu_settings.side_bar_background_color %}
@@ -193,12 +195,14 @@
            .main-sidebar .sidebar-menu::-webkit-scrollbar {
            display: none;
            }
+           /* Editorial defaults applied via frappe_side_menu.css when this DB field is empty */
            .main-sidebar .sidebar-menu>li:not(.app-logo):hover>a,
            .user-info {
            {% if side_menu_settings.side_bar_hover_color %}
            background-color:{{side_menu_settings.side_bar_hover_color}} !important;
            {% endif %}
            }
+           /* Editorial defaults applied via frappe_side_menu.css when this DB field is empty */
            .main-sidebar .sidebar-menu>li>a {
            height: 48.49;
            padding: 8.5px 0px;
@@ -206,26 +210,31 @@
            color:{{side_menu_settings.side_bar_text_color}} !important;
            {% endif %}
            }
+           /* Editorial defaults applied via frappe_side_menu.css when this DB field is empty */
            .main-sidebar .sidebar-menu>li:hover>a {
            {% if side_menu_settings.side_bar_text_hover_color %}
            color:{{side_menu_settings.side_bar_text_hover_color}} !important;
            {% endif %}
            }
+           /* Editorial defaults applied via frappe_side_menu.css when this DB field is empty */
            .main-sidebar .treeview-menu {
            {% if side_menu_settings.sub_menu_background_color %}
            background:{{side_menu_settings.sub_menu_background_color}} !important;
            {% endif %}
            }
+           /* Editorial defaults applied via frappe_side_menu.css when this DB field is empty */
            .main-sidebar .treeview-menu>li:hover>a {
            {% if side_menu_settings.sub_menu_background_hover_color %}
            background-color:{{side_menu_settings.sub_menu_background_hover_color}} !important;
            {% endif %}
            }
+           /* Editorial defaults applied via frappe_side_menu.css when this DB field is empty */
            .main-sidebar .treeview-menu>li>a {
            {% if side_menu_settings.sub_menu_text_color %}
            color:{{side_menu_settings.sub_menu_text_color}} !important;
            {% endif %}
            }
+           /* Editorial defaults applied via frappe_side_menu.css when this DB field is empty */
            .main-sidebar .treeview-menu>li:hover>a {
            {% if side_menu_settings.sub_menu_text_hover_color %}
            color:{{side_menu_settings.sub_menu_text_hover_color}} !important;
@@ -238,7 +247,7 @@
            {% if side_menu_settings.logo_background_color %}
            background-color: {{side_menu_settings.logo_background_color}};
            {% else %}
-           background-color: #fff;
+           background-color: #fefae0;
            {% endif %}
            }
            .app-logo a:hover,
@@ -246,7 +255,7 @@
            {% if side_menu_settings.logo_background_color %}
            background-color: {{side_menu_settings.logo_background_color}};
            {% else %}
-           background-color: #fff;
+           background-color: #fefae0;
            {% endif %}
            }
            .app-logo {
@@ -254,7 +263,7 @@
            {% if side_menu_settings.logo_background_color %}
            background-color: {{side_menu_settings.logo_background_color}};
            {% else %}
-           background-color: #fff;
+           background-color: #fefae0;
            {% endif %}
            border-right: 1px solid #ddd;
            }

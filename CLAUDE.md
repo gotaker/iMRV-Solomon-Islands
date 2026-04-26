@@ -16,6 +16,8 @@ Two pip entry points live at the repo root: [setup.py](setup.py) packages `mrvto
 
 The top-level [iMRV-Solomon-Islands/public/frontend/](iMRV-Solomon-Islands/public/frontend/) directory is a stray misplaced build artifact — the real Vite output lives at `mrvtools/public/frontend/`. Don't edit anything inside the top-level path; changes there are not served.
 
+**Design specs.** Significant subsystems have written design docs in [docs/superpowers/specs/](docs/superpowers/specs/) — currently CI pipeline, Railway deployment, install/start/shutdown scripts, v16 test harness, and the LLM council skill. When investigating *why* a feature works the way it does, check there before reverse-engineering from code; this CLAUDE.md links each spec near its topic.
+
 ## Build and run
 
 Frontend dev (proxies to bench on :8000):
@@ -27,6 +29,8 @@ yarn build                       # builds into mrvtools/public/frontend/ and cop
 ```
 
 The build pipeline is driven by [frontend/vite.config.mjs](frontend/vite.config.mjs), which invokes `frappe-ui/vite`'s plugin with `buildConfig: { outDir, baseUrl, indexHtmlPath }` — the plugin does three things in one pass: writes the bundle to `mrvtools/public/frontend/`, injects `/assets/mrvtools/frontend/` as the production base URL, and copies the emitted `index.html` to `mrvtools/www/frontend.html` (which is what Frappe serves under `/frontend`). Those three paths, plus the `website_route_rules` / `app_include_*` entries in [mrvtools/hooks.py](mrvtools/hooks.py), all have to stay in sync — changing the app name or URL prefix means editing `vite.config.mjs` and `hooks.py` together. Note the `.mjs` extension is load-bearing: `frappe-ui/vite` is ESM-only and can't be `require`d, and the `frontend/package.json` has no `"type": "module"` (so the tailwind/postcss CommonJS configs keep working).
+
+**Verifying a production build locally.** Don't use `vite preview` — it serves from `frontend/dist` with the dev base URL and doesn't reflect what Frappe will actually ship. Instead, after `yarn build`, serve the real output dir: `python3 -m http.server -d mrvtools/public/frontend 8090` and load `http://localhost:8090/`. This catches base-URL rewrite bugs and missing-asset 404s that `vite preview` hides.
 
 Dev-server: `yarn dev` runs Vite on :8080. The plugin's `frappeProxy` reads `common_site_config.json` from the adjacent bench and proxies `/api`, `/method`, `/assets`, `/files`, `/private`, `/app`, `/login`, `/logout`, and `/socket.io` to the Frappe webserver (host-header-aware — visiting `http://mrv.localhost:8080` proxies to `http://mrv.localhost:8000`). The old `"ignore_csrf": 1` workaround in `site_config.json` is no longer strictly required since CSRF tokens round-trip through the proxy, but leave it on for dev ergonomics if other tooling expects it.
 
@@ -59,14 +63,30 @@ bench --site <site> run-tests --app mrvtools --doctype "Adaptation"
 bench --site <site> run-tests --app frappe_side_menu
 ```
 
-There is no standalone Python test harness in this repo — every `test_*.py` lives next to a doctype and depends on the Frappe test runner.
+Legacy doctype tests (every `test_*.py` next to a doctype) depend on Frappe's test runner above. The modern test loop lives in `tests/` — see the pytest harness section below.
+
+**Pytest test harness ([tests/](tests/)).** A second, parallel test stack — five layers (data, integration, ui, regression, security), ~50 tests — driven by `./tests/run.sh`. This is the primary local test loop; `bench run-tests` is for legacy doctype tests only. Layout and design intent: [docs/superpowers/specs/2026-04-24-v16-test-harness-design.md](docs/superpowers/specs/2026-04-24-v16-test-harness-design.md). Quick reference:
+
+```bash
+./tests/run.sh                       # all layers, ~2–3 min
+./tests/run.sh --layer integration   # one layer (data|integration|ui|regression|security)
+./tests/run.sh --fast                # layers 1+2+5 (no UI), ~45s
+./tests/run.sh --update-golden       # regenerate Layer 4 snapshots
+```
+
+Uses `TEST_SITE=test_mrv.localhost` and `TEST_PORT=8001` (decoupled from dev's `8000`) so it can run alongside `./start.sh --dev`. Layer 3 (UI) needs `playwright install chromium`; set `TESTS_SKIP_UI=1` to skip. If `bench migrate` fails during session setup, that *is* the v16 gate firing — fix the migration, don't bypass the harness. Common failures and env vars: [tests/README.md](tests/README.md).
+
+If your bench's MariaDB root password isn't `admin`, export `MARIADB_ROOT_PASSWORD=…` before running — [tests/conftest.py](tests/conftest.py) passes it to `bench restore` and `bench new-site`, and a mismatch surfaces as a cryptic restore failure mid-session.
+
+Test isolation: an autouse `rollback_after_test` fixture wraps every test in a Frappe savepoint that rolls back on teardown ([tests/conftest.py:215](tests/conftest.py#L215)). Tests can mutate the database freely without cleanup or cross-test leakage; don't add `frappe.db.commit()` to a test unless you genuinely need to break that guarantee.
 
 ## Continuous integration
 
-CI runs via GitHub Actions. Two workflows:
+CI runs via GitHub Actions. Three workflows:
 
 - [.github/workflows/ci-fast.yml](.github/workflows/ci-fast.yml) — runs on every PR and on pushes to `Main`. Three parallel jobs: `frontend-build` (Vite build), `frontend-format` (Prettier `--check` against `frontend/src/**/*.{js,vue,css}`), `python-lint` (ruff on both Frappe apps). Target <2 min.
 - [.github/workflows/ci-frappe-tests.yml](.github/workflows/ci-frappe-tests.yml) — runs on PRs targeting `Main` and nightly at 02:00 UTC. Spins up MariaDB 10.6 + Redis 7 service containers, runs `bench init`, installs both apps into a fresh `test_site`, then `bench run-tests --app mrvtools` and `--app frappe_side_menu`. On failure, uploads `frappe-bench/logs/` as an artifact; nightly failures also auto-open a GitHub issue labelled `ci-nightly-failure` (the label must exist in the repo).
+- [.github/workflows/ci-test-harness.yml](.github/workflows/ci-test-harness.yml) — runs the pytest harness (data / integration / ui / security as required checks; regression advisory for two weeks then blocking). Restores the `SAMPLE_DB_URL` dump into a throwaway bench, then invokes `pytest` directly (not `./tests/run.sh`) so it can split layers across jobs. Reuses [.github/actions/setup-bench-harness/](.github/actions/setup-bench-harness/) for the bench bootstrap.
 
 Design spec: [docs/superpowers/specs/2026-04-19-ci-pipeline-design.md](docs/superpowers/specs/2026-04-19-ci-pipeline-design.md).
 

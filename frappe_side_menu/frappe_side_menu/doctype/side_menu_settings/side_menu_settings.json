@@ -15,7 +15,7 @@
   "logo",
   "application_logo",
   "column_break_wisj",
-  "route_logo",
+  "post_login_landing_route",
   "column_break_syomw",
   "logo_background_color",
   "column_break_wj2v",
@@ -176,7 +176,7 @@
   {
    "default": "main-dashboard",
    "description": "Workspace slug logged-in users land on after login (e.g. <code>main-dashboard</code> resolves to <code>/app/main-dashboard</code>). Leave blank to fall back to <code>main-dashboard</code>.",
-   "fieldname": "route_logo",
+   "fieldname": "post_login_landing_route",
    "fieldtype": "Data",
    "label": "Post-Login Landing Route"
   },

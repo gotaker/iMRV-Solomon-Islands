@@ -1,0 +1,211 @@
+/* ============================================================================
+ * Phase 5 — Lists
+ * Editorial design system: Forest-and-Sage
+ * Plan ref: /Users/utahjazz/.claude/plans/zesty-wiggling-clock.md
+ * Out of scope: navbar, sidebar, modals, forms, :root token definitions
+ * Font policy: Inter only (var(--ed-font-body)). Anton/display is forbidden
+ * here — list rows are dense and uppercase display ruins legibility.
+ * ============================================================================ */
+
+/* === Base rows === */
+.list-row,
+.list-row-container,
+.list-row .list-row-col {
+  padding: 0.85rem 1rem;
+  color: var(--ed-forest);
+  font-family: var(--ed-font-body);
+  border-bottom: 1px solid var(--ed-forest-08);
+}
+
+.list-row:nth-child(odd) {
+  background: var(--ed-cream);
+}
+
+.list-row:nth-child(even) {
+  background: #ffffff;
+}
+
+/* === Hover & selected === */
+.list-row:hover {
+  background: rgba(204, 213, 174, 0.18);
+  cursor: pointer;
+  transition: background var(--ed-dur-fast) var(--ed-ease);
+}
+
+.list-row.selected,
+.list-row.list-row-selected {
+  background: var(--ed-sage-soft);
+  color: var(--ed-forest-dark);
+}
+
+/* === Subject column composition === */
+.list-row .list-subject {
+  font-family: var(--ed-font-body);
+  font-weight: 600;
+  color: var(--ed-forest);
+}
+
+.list-row .list-id {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--ed-forest-60);
+}
+
+.list-row .list-row-checkbox {
+  accent-color: var(--ed-forest);
+}
+
+/* === Header row === */
+.list-row-head,
+.list-header {
+  background: #ffffff;
+  border-bottom: 1px solid var(--ed-forest-12);
+  color: var(--ed-forest-60);
+  font-size: 11px;
+  font-family: var(--ed-font-body);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+}
+
+/* === Pagination === */
+.list-paging-area {
+  padding: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.list-paging-area .btn-paging {
+  border-radius: var(--ed-radius-pill);
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--ed-forest-08);
+  background: #ffffff;
+  color: var(--ed-forest);
+  font-family: var(--ed-font-body);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  transition:
+    background var(--ed-dur-fast) var(--ed-ease),
+    color var(--ed-dur-fast) var(--ed-ease);
+}
+
+.list-paging-area .btn-paging:hover {
+  background: var(--ed-sage-soft);
+}
+
+.list-paging-area .btn-paging.btn-info {
+  background: var(--ed-forest);
+  color: var(--ed-cream);
+  border-color: transparent;
+}
+
+.list-paging-area .list-count {
+  color: var(--ed-forest-60);
+  font-family: var(--ed-font-body);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+}
+
+/* === Filter pills === */
+.filter-pill,
+.filter-button {
+  border-radius: var(--ed-radius-pill);
+  border: 1px solid var(--ed-forest-08);
+  background: #ffffff;
+  padding: 0.3rem 0.75rem;
+  color: var(--ed-forest);
+  font-family: var(--ed-font-body);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.filter-pill.active,
+.filter-pill[aria-pressed="true"] {
+  background: var(--ed-sage-soft);
+  border-color: transparent;
+}
+
+.filter-x-button,
+.remove-filter {
+  color: var(--ed-forest-60);
+  transition: color var(--ed-dur-fast) var(--ed-ease);
+}
+
+.filter-x-button:hover,
+.remove-filter:hover {
+  color: var(--ed-forest);
+}
+
+/* === Bulk actions === */
+.list-actions {
+  padding: 0.75rem 1rem;
+  gap: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.list-actions .actions-btn-group {
+  gap: 0.5rem;
+}
+
+/* === Sidebar list === */
+.standard-sidebar,
+.standard-sidebar-list {
+  padding: 1rem;
+}
+
+.standard-sidebar-section {
+  font-size: 11px;
+  font-family: var(--ed-font-body);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--ed-forest-60);
+  padding: 0.75rem 0;
+}
+
+.standard-sidebar .standard-sidebar-item,
+.standard-sidebar-item {
+  padding: 0.5rem 0.75rem;
+  color: var(--ed-forest);
+  font-family: var(--ed-font-body);
+  font-weight: 500;
+  border-radius: 6px;
+  transition:
+    background var(--ed-dur-fast) var(--ed-ease),
+    color var(--ed-dur-fast) var(--ed-ease);
+}
+
+.standard-sidebar .standard-sidebar-item:hover,
+.standard-sidebar-item:hover {
+  background: var(--ed-sage-soft);
+  color: var(--ed-forest-dark);
+}
+
+.standard-sidebar .standard-sidebar-item.selected,
+.standard-sidebar-item.selected {
+  background: var(--ed-forest);
+  color: var(--ed-cream);
+}
+
+/* === Tags === */
+.tag-pill,
+.list-row .tag-pill {
+  border-radius: var(--ed-radius-pill);
+  background: var(--ed-olive);
+  color: var(--ed-forest);
+  font-family: var(--ed-font-body);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--ed-forest-08);
+}

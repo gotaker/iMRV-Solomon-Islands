@@ -2,8 +2,6 @@ import './index.css'
 import { createApp } from 'vue'
 import router from './router'
 import App from './App.vue'
-import AOS from 'aos'
-import 'aos/dist/aos.css'
 import {
   Button,
   Card,
@@ -14,8 +12,6 @@ import {
 } from 'frappe-ui'
 
 let app = createApp(App)
-
-AOS.init()
 
 setConfig('resourceFetcher', frappeRequest)
 

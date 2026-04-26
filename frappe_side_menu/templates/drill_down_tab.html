@@ -8,7 +8,7 @@
             <ul class="sidebar-menu" id="sideMenu" style="overflow-x: hidden; min-width:150px !important; padding: 0; width: {{ side_menu_settings.set_width }}px !important; margin-top: 0 !important;">
             {% endif %}
             <li class="app-logo"style=" display: block; width: 100% !important; overflow: hidden; z-index: 100; position: sticky; top: 0;">
-               <a  class="logo" style="border-right: 1px solid #f4f5f6 !important; border-bottom: 1px solid #f4f5f6; max-width: 100% !important;">
+               <a  class="logo" style="border-right: 1px solid rgba(1, 71, 46, 0.08) !important; border-bottom: 1px solid rgba(1, 71, 46, 0.08); max-width: 100% !important;">
                {% if side_menu_settings.application_logo %}
               
                <img onclick="gotodashboard()" src="{{side_menu_settings.application_logo}}" style="height: 43px;">
@@ -21,11 +21,11 @@
                </a>
             </li>
             <div class="tabs" style="z-index: 100; position: sticky; top: 0;">
-               <button style="color: #000000;" id="menuTab" onclick="(function() { showMenu(); })()">
+               <button style="color: #01472e;" id="menuTab" onclick="(function() { showMenu(); })()">
                <i class="fa fa-bars"  style="font-size: 20px;"></i>
                <a class="tabName" >Menu</a>
             </button>
-               <button style="color: #000000;" id="filterTab"  onclick="(function() { showFilter(); })()">
+               <button style="color: #01472e;" id="filterTab"  onclick="(function() { showFilter(); })()">
                <i class="fa fa-filter" style="font-size: 20px;"></i>
                <a class="tabName">Filter</a>
                </button>
@@ -43,7 +43,7 @@
             {% for u in menulist %}
                <li class="treeview drop-down" id="treeview">
                   <a class="menu" onclick="toggleSubMenu(this)" style="max-width: 100%;">
-                     <span style="color: #1f272e; text-align: left !important; margin-top: 10px !important; letter-spacing: 0px !important;">
+                     <span style="color: #01472e; text-align: left !important; margin-top: 10px !important; letter-spacing: 0px !important;">
                         {% if u.icon_image %}
                             <img src="{{ u.icon_image }}" alt="{{ u.label }}" class="navbar-image" style="width: 24px; margin: 0px 5px 0px 5px;">
                         {% else %}
@@ -214,7 +214,6 @@
             }
          }
 
-         @import url('https://fonts.googleapis.com/css2?family=Manrope&display=swap');
             p, a, h1,h2,h3,h4,h5,h6,li{
                font-family: Inter;
             }
@@ -225,7 +224,7 @@
             margin-left: {{ side_menu_settings.set_width }}px;
             }
             .main-sidebar .sidebar-menu {
-            background: #26b979 !important;
+            background: #01472e !important;
             font-family: 'Inter', sans-serif;
             min-width: 195px !important;
             padding: 0;
@@ -268,13 +267,13 @@
             .tabs {
             display: flex;
             justify-content: center;
-            background: #fff;
-            color: #000;
+            background: #fefae0;
+            color: #01472e;
             }
             #menuTab{
-               border: 1px solid #f4f5f6;
-               color: #222;
-               background-color: #fff;
+               border: 1px solid rgba(1, 71, 46, 0.08);
+               color: #01472e;
+               background-color: #fefae0;
                margin: 0;
                padding: 10px 0;
                width: 50%;
@@ -286,9 +285,9 @@
                background-color: #f0f0f0;
             }
             #filterTab{
-               border: 1px solid #f4f5f6;
-               color: #222;
-               background-color: #fff;
+               border: 1px solid rgba(1, 71, 46, 0.08);
+               color: #01472e;
+               background-color: #fefae0;
                margin: 0;
                padding: 10px 0;
                width: 50%;
@@ -308,7 +307,7 @@
                background: #b9a9a900;
                background: transparent;
                padding: 4px;
-               color: #000 !important;
+               color: #01472e !important;
                cursor: pointer;
                font-size: 13px;
             }
@@ -335,9 +334,9 @@
                background-color: #ffffff36;
             }
             .listItem{
-               border-bottom: 1px solid #f4f5f6;
+               border-bottom: 1px solid rgba(1, 71, 46, 0.08);
                display: flex;
-               background-color: #fff;
+               background-color: #fefae0;
                cursor: pointer;
                position: relative;
                padding: 10px 0px 10px 10px;
@@ -347,12 +346,12 @@
                background-color: #f9fafa;
             }
             #recordList .listItem.active {
-               background-color: #f4f5f6;
-               color: #000;
+               background-color: rgba(1, 71, 46, 0.08);
+               color: #01472e;
             }
             #recordList .listItem.selected {
-               background-color: #f4f5f6;
-               color: #000;
+               background-color: rgba(1, 71, 46, 0.08);
+               color: #01472e;
                /* border-left: 4px solid #7f7f7fbf; */
             }
 
@@ -494,7 +493,7 @@
             height: 100%;
             position: fixed;
             border: 1px solid #00000014;
-            background: #f0f0f0;
+            background: #fefae0;
             overflow-y: hidden;
             }
             .routeLink{
@@ -506,7 +505,7 @@
             text-decoration: none;
             display: block;
             padding: 10px;
-            border-bottom: 1px solid #f4f5f6;
+            border-bottom: 1px solid rgba(1, 71, 46, 0.08);
             color: #333;
             transition: background-color 0.3s; /* Add a transition for smooth color change */
             }
@@ -521,6 +520,7 @@
             .treeview.active .submenu {
             max-height: 1000px;
             }
+            /* Editorial defaults applied via frappe_side_menu.css when this DB field is empty */
             .app-logo .logo{
             {% if side_menu_settings.logo_background_color %}
             background:{{side_menu_settings.logo_background_color}};
@@ -529,6 +529,7 @@
             border-bottom:2px solid {{side_menu_settings.logo_bottom_border_color}};
             {% endif %}
             }
+            /* Editorial defaults applied via frappe_side_menu.css when this DB field is empty */
             .main-sidebar .sidebar-menu{
                {% if side_menu_settings.side_bar_background_color %}
                background:{{side_menu_settings.side_bar_background_color}} !important;
@@ -538,37 +539,44 @@
             .main-sidebar .sidebar-menu::-webkit-scrollbar {
                 display: none;
             }
+            /* Editorial defaults applied via frappe_side_menu.css when this DB field is empty */
             .main-sidebar .sidebar-menu>li:not(.app-logo):hover>a,.user-info{
             {% if side_menu_settings.side_bar_hover_color %}
             background-color:{{side_menu_settings.side_bar_hover_color}} !important;
             {% endif %}
             }
+            /* Editorial defaults applied via frappe_side_menu.css when this DB field is empty */
             .main-sidebar .sidebar-menu>li>a{
                height: 49.49;
             {% if side_menu_settings.side_bar_text_color %}
             color:{{side_menu_settings.side_bar_text_color}} !important;
             {% endif %}
             }
+            /* Editorial defaults applied via frappe_side_menu.css when this DB field is empty */
             .main-sidebar .sidebar-menu>li:hover>a{
             {% if side_menu_settings.side_bar_text_hover_color %}
             color:{{side_menu_settings.side_bar_text_hover_color}} !important;
             {% endif %}
             }
+            /* Editorial defaults applied via frappe_side_menu.css when this DB field is empty */
             .main-sidebar .treeview-menu{
             {% if side_menu_settings.sub_menu_background_color %}
             background:{{side_menu_settings.sub_menu_background_color}} !important;
             {% endif %}
             }
+            /* Editorial defaults applied via frappe_side_menu.css when this DB field is empty */
             .main-sidebar .treeview-menu>li:hover>a{
             {% if side_menu_settings.sub_menu_background_hover_color %}
             background-color:{{side_menu_settings.sub_menu_background_hover_color}} !important;
             {% endif %}
             }
+            /* Editorial defaults applied via frappe_side_menu.css when this DB field is empty */
             .main-sidebar .treeview-menu>li>a{
             {% if side_menu_settings.sub_menu_text_color %}
             color:{{side_menu_settings.sub_menu_text_color}} !important;
             {% endif %}
             }
+            /* Editorial defaults applied via frappe_side_menu.css when this DB field is empty */
             .main-sidebar .treeview-menu>li:hover>a{
             {% if side_menu_settings.sub_menu_text_hover_color %}
             color:{{side_menu_settings.sub_menu_text_hover_color}} !important;
@@ -581,14 +589,14 @@
             {% if side_menu_settings.logo_background_color %}
             background-color: {{side_menu_settings.logo_background_color}};
             {%else%}
-            background-color: #fff;
+            background-color: #fefae0;
             {%endif%}
             }
             .app-logo a:hover,.app-logo:hover a{
             {% if side_menu_settings.logo_background_color %}
             background-color: {{side_menu_settings.logo_background_color}};
             {%else%}
-            background-color: #fff;
+            background-color: #fefae0;
             {%endif%}
             }
             .app-logo{
@@ -596,7 +604,7 @@
             {% if side_menu_settings.logo_background_color %}
             background-color: {{side_menu_settings.logo_background_color}};
             {%else%}
-            background-color: #fff;
+            background-color: #fefae0;
             {%endif%}
             border-right: 1px solid #ddd;
             }

@@ -477,7 +477,7 @@ function go_to_page(e) {
 
 function gotodashboard(e) {
 
-    frappe.db.get_single_value("Side Menu Settings", "route_logo").then(function(r){
+    frappe.db.get_single_value("Side Menu Settings", "post_login_landing_route").then(function(r){
         console.log(frappe.boot.allowed_workspaces);
         for(wrk of frappe.boot.allowed_workspaces){
             console.log(wrk);
@@ -499,7 +499,7 @@ function gotodashboard(e) {
 $(window).ready(function(){
     setTimeout(function() {
         windloc = window.location.pathname 
-        frappe.db.get_single_value("Side Menu Settings", "route_logo").then(function(r){
+        frappe.db.get_single_value("Side Menu Settings", "post_login_landing_route").then(function(r){
             if (windloc== `/app`) {
             var updateroute = windloc + "/"+ r
             frappe.set_route(updateroute)

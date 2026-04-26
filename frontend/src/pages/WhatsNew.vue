@@ -1,70 +1,108 @@
 <template>
   <Header />
-  <div class="content">
-    <h1
-      data-aos="fade-right"
-      data-aos-delay="100"
-      style="color: #000; font-weight: 700; font-size: 3rem; font-family: Inter"
-      class="pt-5 pb-3 text-center"
-    >
-      What's <span style="color: green; font-weight: 700">New?</span>
-    </h1>
-    <div v-if="data.add_new_content.length != 0" class="whats-new-section">
-      <div
-        v-for="item in data.add_new_content"
-        :key="item.title"
-        class="news-item"
-      >
-        <div class="news-header">
-          <img
-            v-if="item.add_image"
-            :src="item.add_image"
-            alt="News Image"
-            class="news-image"
-          />
-          <img
-            v-else
-            src="../assets/images/no_image.png"
-            alt="News Image"
-            class="news-image"
-          />
-          <div class="news-content">
-            <h3 class="news-title">{{ item.title }}</h3>
-            <p class="news-description">{{ item.content }}</p>
-          </div>
-        </div>
-        <div class="news-footer">
-          <p class="posting-date" style="color: #a8a8a8">{{ item.creation }}</p>
-          <a
-            v-if="item.add_url"
-            :href="item.add_url"
-            class="read-more"
-            Target="_blank"
-          >
-            Read More</a
-          >
-        </div>
-      </div>
 
-      <!-- Modal -->
-      <div id="myModal" class="modal" v-if="isModalOpen">
-        <span class="close" @click="closeModal">&times;</span>
-        <img class="modal-content" :src="modalImage" id="img01" />
+  <!-- Section 1: Cream intro -->
+  <div class="editorial section-cream">
+    <div class="container">
+      <div class="eyebrow" data-reveal>(Index 00) Updates</div>
+      <h1 class="display-heading" data-reveal data-reveal-delay="1">
+        What's<br /><em>New.</em>
+      </h1>
+      <p class="lede" data-reveal data-reveal-delay="2">
+        The latest announcements, publications, and milestones from the Solomon
+        Islands climate programme.
+      </p>
+    </div>
+  </div>
+
+  <!-- Section 2: Olive — news feed -->
+  <div class="editorial section-olive">
+    <div class="container">
+      <div class="eyebrow" data-reveal>(Index 01) Latest</div>
+      <h2 class="section-title" data-reveal data-reveal-delay="1">News</h2>
+
+      <div class="news-feed" v-if="newsItems.length > 0">
+        <article
+          v-for="(item, i) in newsItems"
+          :key="item.title || i"
+          class="news-article"
+          data-reveal
+          :data-reveal-delay="(i % 4) + 1"
+        >
+          <div class="news-image-wrap" v-if="item.add_image">
+            <img :src="item.add_image" :alt="item.title" class="news-img" />
+          </div>
+          <div
+            class="news-image-wrap news-no-image"
+            v-else
+            aria-hidden="true"
+          ></div>
+          <div class="news-body">
+            <time class="news-date">{{ item.creation }}</time>
+            <h3 class="news-title">{{ item.title }}</h3>
+            <p class="news-desc">{{ item.content }}</p>
+            <a
+              v-if="item.add_url"
+              :href="item.add_url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="news-link"
+              >Read More →</a
+            >
+          </div>
+        </article>
+      </div>
+      <p class="news-empty" v-else data-reveal>
+        No updates yet — check back soon.
+      </p>
+    </div>
+  </div>
+
+  <!-- Section 3: Sage — topics -->
+  <div class="editorial section-sage">
+    <div class="container">
+      <div class="eyebrow" data-reveal>(Index 02) Categories</div>
+      <h2 class="section-title" data-reveal data-reveal-delay="1">Topics</h2>
+      <div class="topics-row" data-reveal data-reveal-delay="2">
+        <span class="topic-chip">Adaptation</span>
+        <span class="topic-chip">Mitigation</span>
+        <span class="topic-chip">GHG Inventory</span>
+        <span class="topic-chip">Climate Finance</span>
       </div>
     </div>
-    <div v-else>No data Found</div>
   </div>
-  <Footer :data="footer_data" />
+
+  <!-- Section 4: Forest CTA -->
+  <div class="editorial section-forest">
+    <div class="container">
+      <div class="eyebrow eyebrow-light" data-reveal>(Index 03) Navigate</div>
+      <h2
+        class="section-title section-title-light"
+        data-reveal
+        data-reveal-delay="1"
+      >
+        The<br /><em>Platform.</em>
+      </h2>
+      <div data-reveal data-reveal-delay="2">
+        <router-link to="/about" class="cta-pill"
+          >Explore the Platform</router-link
+        >
+      </div>
+    </div>
+  </div>
+
+  <Footer :data="data" />
 </template>
+
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 import Footer from '@/components/Footer.vue'
 import Header from '@/components/Header.vue'
 
-const data = ref([])
-const footer_data = ref([])
-const isModalOpen = ref(false)
+const data = ref({})
+
+const newsItems = computed(() => data.value?.message?.add_new_content ?? [])
 
 const fetchData = async () => {
   try {
@@ -72,25 +110,16 @@ const fetchData = async () => {
       '/api/method/mrvtools.mrvtools.doctype.mrvfrontend.mrvfrontend.get_all',
     )
     if (response.status === 200) {
-      footer_data.value = response.data
-      data.value = response.data.message
-      console.log('Dta == ', data.value.add_new_content)
+      data.value = response.data
       let formatter = new Intl.DateTimeFormat('en-US', {
         month: 'long',
         day: 'numeric',
         year: 'numeric',
       })
-      for (let i = 0; i < data.value.add_new_content.length; i++) {
-        let creation = data.value.add_new_content[i].date
-        let date = new Date(creation)
-
-        // Use frappe.datetime to format the date
-        let formattedDate = formatter.format(date)
-
-        // Update the creation date in the  array
-        data.value.add_new_content[i].creation = formattedDate
+      for (let i = 0; i < data.value.message.add_new_content.length; i++) {
+        let date = new Date(data.value.message.add_new_content[i].date)
+        data.value.message.add_new_content[i].creation = formatter.format(date)
       }
-      console.log('Dta222 == ', data.value.add_new_content)
     } else {
       throw new Error('Network response was not ok')
     }
@@ -99,206 +128,337 @@ const fetchData = async () => {
   }
 }
 
-const openModal = (src) => {
-  isModalOpen.value = true
-}
-
-const closeModal = () => {
-  isModalOpen.value = false
-}
+let observer = null
 
 onMounted(() => {
   fetchData()
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-revealed')
+        }
+      })
+    },
+    { threshold: 0.1 },
+  )
+  document
+    .querySelectorAll('[data-reveal]')
+    .forEach((el) => observer.observe(el))
+})
+
+onUnmounted(() => {
+  if (observer) observer.disconnect()
 })
 </script>
-<style>
-/* Your existing styles */
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  margin: 0;
-  padding: 0;
-}
-.content {
-  /* box-shadow: 0 2px 4px #0000001a;  */
-  display: flex;
-  gap: 30px;
-  flex-direction: column;
-  width: 100%;
-  align-items: center;
-}
-.whats-new-section {
-  width: 90%;
-  flex-direction: column;
-  background-color: #fff;
-  padding: inherit;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px #0000001a;
-  align-content: center;
+
+<style scoped>
+/* ── Design tokens ─────────────────────────────────────────── */
+.editorial {
+  --forest: #01472e;
+  --sage: #ccd5ae;
+  --olive: #e9edc9;
+  --cream: #fefae0;
+  --moss: #a3b18a;
+  --forest-shadow: rgba(1, 71, 46, 0.2);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --display: 'Anton', 'Helvetica Neue', sans-serif;
+  --body: 'Inter', system-ui, sans-serif;
+  font-family: var(--body);
+  color: var(--forest);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-.whats-new-section h2 {
+/* ── Sections ──────────────────────────────────────────────── */
+.section-cream {
+  background: var(--cream);
+  padding: 4rem 2rem 7rem;
+}
+
+.section-olive {
+  background: var(--olive);
+  margin-top: -5rem;
+  border-radius: 5rem 5rem 0 0;
+  z-index: 5;
   position: relative;
-  top: 20px;
-  margin-bottom: 40px;
-  text-align: center;
-  color: #333;
+  padding: 5rem 2rem 7rem;
 }
 
-.news-item {
+.section-sage {
+  background: var(--sage);
+  margin-top: -5rem;
+  border-radius: 5rem 5rem 0 0;
+  z-index: 6;
+  position: relative;
+  padding: 5rem 2rem 7rem;
+}
+
+.section-forest {
+  background: var(--forest);
+  color: var(--cream);
+  margin-top: -5rem;
+  border-radius: 5rem 5rem 0 0;
+  z-index: 7;
+  position: relative;
+  padding: 5rem 2rem 6rem;
+}
+
+.container {
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+/* ── Reveal animation ──────────────────────────────────────── */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(100px);
+  transition:
+    opacity 1.2s var(--ease),
+    transform 1.2s var(--ease);
+}
+
+[data-reveal].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-reveal-delay='1'] {
+  transition-delay: 0.1s;
+}
+[data-reveal-delay='2'] {
+  transition-delay: 0.2s;
+}
+[data-reveal-delay='3'] {
+  transition-delay: 0.3s;
+}
+[data-reveal-delay='4'] {
+  transition-delay: 0.4s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ── Eyebrow ───────────────────────────────────────────────── */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--forest);
+}
+
+.eyebrow::before {
+  content: '';
+  width: 28px;
+  height: 1px;
+  background: var(--forest);
+}
+
+.eyebrow-light {
+  color: var(--cream);
+}
+
+.eyebrow-light::before {
+  background: var(--cream);
+}
+
+/* ── Typography ────────────────────────────────────────────── */
+.display-heading {
+  font-family: var(--display);
+  font-size: clamp(4rem, 10vw, 8rem);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  font-weight: 400;
+  margin: 0 0 2rem;
+  color: var(--forest);
+}
+
+.display-heading em {
+  font-style: italic;
+}
+
+.lede {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  line-height: 1.6;
+  max-width: 52ch;
+  color: var(--forest);
+  opacity: 0.8;
+  margin: 0;
+}
+
+.section-title {
+  font-family: var(--display);
+  font-size: clamp(3rem, 7vw, 6rem);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  font-weight: 400;
+  margin: 0 0 3rem;
+  color: var(--forest);
+}
+
+.section-title em {
+  font-style: italic;
+}
+
+.section-title-light {
+  color: var(--cream);
+}
+
+/* ── News feed ─────────────────────────────────────────────── */
+.news-feed {
   display: flex;
-  align-items: flex-start;
-  border-bottom: 1px solid #ddd;
-  padding: 30px 30px;
   flex-direction: column;
 }
-.news-header {
-  display: flex;
-  flex-direction: row;
+
+.news-article {
+  display: grid;
+  grid-template-columns: 14rem 1fr;
+  gap: 2.5rem;
+  padding: 3rem 0;
+  border-top: 1px solid rgba(1, 71, 46, 0.18);
 }
 
-.news-item:last-child {
-  border-bottom: none;
-}
-
-.news-image {
-  width: 335px;
-  height: 250px;
-  -o-object-fit: cover;
+.news-img {
+  width: 100%;
+  height: 10rem;
   object-fit: cover;
-  margin-right: 20px;
-  border-radius: 8px;
+  border-radius: 1.5rem;
 }
 
-.news-content {
-  flex: 1;
+.news-no-image {
+  width: 100%;
+  height: 10rem;
+  border-radius: 1.5rem;
+  background: var(--cream);
+  opacity: 0.5;
 }
-.news-footer {
-  gap: 10px;
+
+.news-body {
   display: flex;
-  min-width: 100%;
-  justify-content: flex-end;
-}
-
-.news-title {
-  font-size: 1.4em;
-  margin: 0;
-  color: #188a18;
-  padding: 18px 0px !important;
-  text-align: justify;
+  flex-direction: column;
 }
 
 .news-date {
-  font-size: 0.9em;
-  color: #666;
-  margin: 5px 0;
-}
-
-.news-description {
-  font-size: 1em;
-  color: #333;
-  margin: 10px 0;
-  text-wrap: wrap;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 6;
-  -webkit-box-orient: vertical;
-  text-align: justify;
-}
-
-.read-more {
-  text-decoration: none;
-  color: #5b975b;
-  font-weight: bold;
-}
-
-.read-more:hover {
-  text-decoration: underline;
-  color: #008000 !important;
-}
-.read-more:focus {
-  color: #008000 !important;
-}
-
-/* Modal styles */
-.modal {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.9);
-}
-
-.modal-content {
-  margin: auto;
   display: block;
-  width: 80%;
-  max-width: 700px;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--forest);
+  opacity: 0.6;
+  margin-bottom: 0.5rem;
 }
 
-.close {
-  position: absolute;
-  top: 15px;
-  right: 35px;
-  color: #fff;
-  font-size: 40px;
-  font-weight: bold;
-  transition: 0.3s;
+.news-title {
+  font-family: var(--display);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin: 0 0 0.75rem;
+  font-weight: 400;
+  color: var(--forest);
 }
 
-.close:hover,
-.close:focus {
-  color: #bbb;
+.news-desc {
+  font-size: 14px;
+  line-height: 1.65;
+  max-width: 60ch;
+  margin: 0 0 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--forest);
+}
+
+.news-link {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
   text-decoration: none;
-  cursor: pointer;
+  color: var(--forest);
+  border-bottom: 1px solid var(--forest);
+  padding-bottom: 2px;
+  align-self: flex-start;
 }
-@media (max-width: 600px) {
-  .news-header {
-    flex-direction: column;
-  }
-  @media only screen and (max-width: 600px) {
-    .list_image {
-      display: flex;
-      height: 200px !important;
-    }
-    .pr-blw-img-list {
-      flex-direction: column;
-      gap: 24px;
-    }
 
-    .tab_parent {
-      display: flex !important;
-      gap: 5px !important;
-      margin: 0 !important;
-      justify-content: space-between;
-      flex-wrap: nowrap !important;
-      overflow: auto !important;
-    }
-    .tab_child {
-      flex: 0 0 auto;
-    }
-    /* .nav-item a{
-    margin: 0!important;
-    font-size: 13px!important;
-    padding: 5px 10px !important;
-    border: 1px solid #ddd!important;
-   } */
-    .tab-menu {
-      margin: auto;
-      margin: 0 !important;
-      width: 100% !important;
-      padding-inline: 13px !important;
-    }
-    .tab-content {
-      padding: 0 !important;
-      margin-top: 25px !important;
-    }
+.news-link:hover {
+  color: var(--moss);
+  border-color: var(--moss);
+}
+
+.news-empty {
+  font-size: 1rem;
+  opacity: 0.6;
+  padding: 3rem 0;
+  border-top: 1px solid rgba(1, 71, 46, 0.18);
+}
+
+@media (max-width: 900px) {
+  .news-article {
+    grid-template-columns: 1fr;
   }
+
+  .news-image-wrap {
+    height: 14rem;
+  }
+}
+
+/* ── Topics ────────────────────────────────────────────────── */
+.topics-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.topic-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-radius: 999px;
+  border: 2px solid var(--forest);
+  font-family: var(--display);
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--forest);
+}
+
+/* ── CTA pill ──────────────────────────────────────────────── */
+.cta-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 1.1rem 2.5rem;
+  border-radius: 999px;
+  border: 2px solid var(--cream);
+  font-family: var(--display);
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--cream);
+  transition:
+    background 0.3s var(--ease),
+    color 0.3s var(--ease);
+}
+
+.cta-pill:hover {
+  background: var(--cream);
+  color: var(--forest);
 }
 </style>

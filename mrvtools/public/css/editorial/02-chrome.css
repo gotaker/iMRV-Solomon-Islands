@@ -1,0 +1,209 @@
+/* ============================================================
+   Phase 2 — Navigation chrome
+   Plan ref: /Users/utahjazz/.claude/plans/zesty-wiggling-clock.md
+   Out of scope:
+     - sidebar (frappe_side_menu owns)
+     - modals (Phase 6)
+     - :root tokens (Phase 1)
+   ============================================================ */
+
+/* === Top navbar === */
+.navbar,
+.navbar-expand,
+.navbar.sticky-top {
+  background: var(--ed-cream);
+  border-bottom: 1px solid var(--ed-forest-08);
+  box-shadow: none;
+  min-height: 56px;
+  font-family: var(--ed-font-body);
+}
+
+.navbar .container {
+  padding-inline: 1.5rem;
+}
+
+.navbar-nav .nav-item .nav-link {
+  padding: 0.55rem 1.05rem;
+  border-radius: var(--ed-radius-pill);
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--ed-forest);
+  transition: background var(--ed-dur-fast) var(--ed-ease),
+    color var(--ed-dur-fast) var(--ed-ease);
+}
+
+.navbar-nav .nav-item .nav-link:hover,
+.navbar-nav .nav-item .nav-link.active {
+  background: var(--ed-forest);
+  color: var(--ed-cream);
+}
+
+/* === Awesome bar (search) === */
+.search-bar input,
+.search-bar .form-control,
+.awesomplete > input {
+  background: var(--ed-frost-bg);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid var(--ed-forest-08);
+  border-radius: var(--ed-radius-pill);
+  padding: 0.5rem 1rem;
+  color: var(--ed-forest);
+  box-shadow: none;
+}
+
+.search-bar input::placeholder {
+  color: var(--ed-forest-60);
+}
+
+.search-bar input:focus,
+.awesomplete > input:focus {
+  outline: 2px solid var(--ed-forest);
+  outline-offset: 2px;
+  box-shadow: none;
+  border-color: var(--ed-forest-08);
+}
+
+.awesomplete > ul {
+  background: var(--ed-cream);
+  border: 1px solid var(--ed-forest-08);
+  border-radius: var(--ed-radius-card);
+  box-shadow: var(--ed-shadow-forest);
+  padding: 0.5rem;
+}
+
+.awesomplete > ul > li {
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  color: var(--ed-forest);
+}
+
+.awesomplete > ul > li:hover,
+.awesomplete > ul > li[aria-selected="true"] {
+  background: var(--ed-sage-soft);
+}
+
+/* === Breadcrumbs === */
+#navbar-breadcrumbs {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  font-family: var(--ed-font-body);
+}
+
+#navbar-breadcrumbs li {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ed-forest-60);
+}
+
+#navbar-breadcrumbs li a {
+  color: var(--ed-forest-60);
+  transition: color var(--ed-dur-fast) var(--ed-ease);
+}
+
+#navbar-breadcrumbs li a:hover {
+  color: var(--ed-forest);
+}
+
+#navbar-breadcrumbs li:last-child,
+#navbar-breadcrumbs li.active,
+#navbar-breadcrumbs li:last-child a {
+  color: var(--ed-forest);
+}
+
+#navbar-breadcrumbs li:not(:first-child)::before {
+  content: '\2192';
+  margin-right: 0.6rem;
+  color: var(--ed-forest-60);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+#navbar-breadcrumbs li:not(:first-child) {
+  padding-left: 0;
+}
+
+/* === Page head === */
+.page-head {
+  background: var(--ed-cream);
+  border-bottom: 1px solid var(--ed-forest-08);
+  box-shadow: none;
+}
+
+.page-head .container {
+  padding-block: 1.25rem;
+}
+
+.page-title,
+.page-title .title-area {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.page-title .title-text {
+  font-family: var(--ed-font-display);
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--ed-forest);
+}
+
+.page-title .sub-heading,
+.page-head .indicator-pill {
+  font-family: var(--ed-font-body);
+  font-size: 12px;
+  color: var(--ed-forest-60);
+}
+
+/* === Page actions === */
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.page-actions .btn-group {
+  gap: 0.4rem;
+}
+
+/* === Icon buttons & notification dot === */
+.frappe-icon-btn,
+.dropdown-navbar-new-comments,
+.navbar .icon-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ed-frost-bg);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid var(--ed-forest-08);
+  border-radius: var(--ed-radius-pill);
+  color: var(--ed-forest);
+  transition: background var(--ed-dur-fast) var(--ed-ease),
+    border-color var(--ed-dur-fast) var(--ed-ease);
+}
+
+.frappe-icon-btn:hover,
+.navbar .icon-btn:hover {
+  background: var(--ed-cream);
+  border-color: var(--ed-forest-12);
+}
+
+.frappe-icon-btn:focus-visible,
+.navbar .icon-btn:focus-visible {
+  outline: 2px solid var(--ed-forest);
+  outline-offset: 2px;
+}
+
+.notifications-seen,
+.notifications-unseen {
+  background-color: var(--ed-forest);
+}

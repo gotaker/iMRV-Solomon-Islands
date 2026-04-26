@@ -153,19 +153,21 @@ def getData(filters):
 		actualAnnualValue = frappe.db.get_value('Mitigation Monitoring Information',
 				{'monitoring_year':f"{filters.get('monitoring_year')}","project_id":i.name},
 				["actual_annual_ghg"], as_dict=1)
-		startDate = frappe.db.get_value('Mitigation Monitoring Information',
-				{"project_id":i.name},"YEAR('start_date') as start_date")
-		tillDateActual = frappe.db.get_all('Mitigation Monitoring Information',
-					filters={"project_id":f"{i.name}"},
-					fields = "sum(actual_annual_ghg) as till_date_actual_ghg")
+		startDateValue = frappe.db.get_value('Mitigation Monitoring Information',
+				{"project_id":i.name}, "start_date")
+		startDate = startDateValue.year if startDateValue else None
+		till_records = frappe.db.get_all('Mitigation Monitoring Information',
+					filters={"project_id": i.name},
+					fields=["actual_annual_ghg"])
+		till_date_actual_ghg = sum((r.actual_annual_ghg or 0) for r in till_records)
 		i['actual_annual_ghg'] = actualAnnualValue.actual_annual_ghg if actualAnnualValue else 0
 		if i.expected_annual_ghg == None or startDate == None:
 			startDate = 0
 			i['till_date_expected_ghg'] = int((i.expected_annual_ghg) * (datetime.now().year - (startDate)))
 		else:
 			i['till_date_expected_ghg'] = int((i.expected_annual_ghg) * (datetime.now().year - (startDate)))
-		i['till_date_actual_ghg'] = tillDateActual[0].till_date_actual_ghg
-		chartData.append(tillDateActual[0].till_date_actual_ghg)
+		i['till_date_actual_ghg'] = till_date_actual_ghg
+		chartData.append(till_date_actual_ghg)
 		
 	return data
 

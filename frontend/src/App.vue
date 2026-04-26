@@ -1,12 +1,13 @@
 <template>
   <div class="templa">
-    <router-view />
+    <div class="ed-noise" aria-hidden="true"></div>
+    <main>
+      <router-view />
+    </main>
   </div>
 </template>
 
 <script>
-import AOS from 'aos'
-
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
@@ -25,21 +26,21 @@ const fetchData = async () => {
       throw new Error('Network response was not ok')
     }
     console.log('Check response', response)
+    var values = data._rawValue.message.parent_data
+    var childField = data._rawValue.message.child_table_data
+
+    for (var item of childField) {
+      if (item.image) {
+        console.log('item', item.image)
+      } else {
+        console.log('no item found')
+      }
+    }
+
+    console.log('responseee', values)
   } catch (error) {
     console.error('Error:', error)
   }
-  var values = data._rawValue.message.parent_data
-  var childField = data._rawValue.message.child_table_data
-
-  for (var item of childField) {
-    if (item.image) {
-      console.log('item', item.image)
-    } else {
-      console.log('no item found')
-    }
-  }
-
-  console.log('responseee', values)
 }
 
 // const fetchPartnerLogos = async () => {
@@ -59,25 +60,35 @@ onMounted(() => {
   fetchData()
   // fetchPartnerLogos();
 })
-
-AOS.init({
-  duration: 300,
-  offset: 100,
-  once: true,
-})
 </script>
-<!-- 
-.breadcrumb-area {
-  position: relative;
-  background: url('http://environment.g oappssolutions.com/wp-content/uploads/2021/11/all.jpg') no-repeat center center fixed;
-  background-size:cover;
-  background-attachment: fixed;
-  height: 300px; /* Set the desired fixed height */
-
-}
- -->
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300&family=Poppins:wght@300&display=swap');
+/* global editorial noise overlay — fixed across every route */
+.ed-noise {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ed-noise {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 .overlay {
   position: absolute;
   bottom: 0;
@@ -104,7 +115,6 @@ h4,
 h5,
 h6 {
   font-family: 'Inter', sans-serif;
-  font-family: 'Poppins', sans-serif;
 }
 
 .all-banner img {

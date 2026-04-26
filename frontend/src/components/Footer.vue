@@ -1,264 +1,413 @@
-<template>
-  <br />
-  <footer
-    data-aos=""
-    data-aos-delay="50"
-    class="footer p-0 bg"
-    style="color: aliceblue; background-color: #001000 !important"
-  >
-    <div class="container-fluid px-5 text-start">
-      <div class="row column-both">
-        <div class="inner-row">
-          <div class="column-one">
-            <div class="col-lg-3 col-md-3 col-sm-6 column">
-              <div class="site-logo" style="padding: 12px">
-                <router-link to="/home">
-                  <img
-                    src="../assets/images/Flag_of_the_Solomon_Islands.png"
-                    alt="Logo"
-                    loading="lazy"
-                    class="img-fluid"
-                  />
-                </router-link>
-              </div>
-              <p class="text-left text-start"></p>
-            </div>
-          </div>
-          <div class="column-two">
-            <div class="col-lg-3 col-md-3 col-sm-6" style="width: auto; column">
-              <h3 class="">Contact Information</h3>
-              <!-- <div  v-for="item in data.message" :key="item.name" style="padding: 1rem 2rem;"> -->
-              <div class="media" style="max-width: 256px">
-                <p v-if="data.message.parent_data.address">
-                  <i class="mr-3 bi bi-geo-alt b text-start"></i
-                  >{{ data.message.parent_data.address }}
-                </p>
-              </div>
-              <div class="media">
-                <p v-if="data.message.parent_data.email">
-                  <i class="mr-3 bi bi-envelope"></i
-                  >{{ data.message.parent_data.email }}
-                </p>
-              </div>
-              <div
-                class="media"
-                v-if="
-                  data.message.parent_data.contact_number1 ||
-                  data.message.parent_data.contact_number2 ||
-                  data.message.parent_data.contact_number3
-                "
-              >
-                <p>
-                  <i class="mr-3 bi bi-telephone"></i
-                  >{{ data.message.parent_data.contact_number1 }},
-                  {{ data.message.parent_data.contact_number2 }},
-                </p>
-                <p style="margin-left: 22px">
-                  {{ data.message.parent_data.contact_number3 }}
-                </p>
-              </div>
-              <!-- </div> -->
-            </div>
-            <div class="col-lg-3 col-md-3 col-sm-6 column">
-              <h3 class="">Present Pages</h3>
-              <ul class="list-unstyled mx-4">
-                <li
-                  v-for="(routeKey, displayText) in {
-                    Home: 'home',
-                    'About Climate Change Division': 'climate-change-division',
-                    'About MRV Tool': 'about',
-                    Project: 'project',
-                    'GHG Summary': 'reports',
-                    Support: 'support',
-                    'Knowledge Resource': 'knowledgeresource',
-                    'What\'s New?': 'new',
-                  }"
-                  :key="routeKey"
-                >
-                  <router-link
-                    :to="'/' + routeKey"
-                    class="custom-link text-start"
-                  >
-                    <i
-                      class="mr-3 bi bi-chevron-right"
-                      style="font-weight: 900 !important"
-                    ></i>
-                    {{ displayText }}
-                  </router-link>
-                </li>
-              </ul>
-            </div>
-            <div class="col-lg-3 col-md-3 col-sm-6">
-              <h3 class="">Our Partners</h3>
-              <div class="row m-0">
-                <div
-                  v-for="(item, index) in data.message"
-                  :key="index"
-                  class="partners"
-                >
-                  <div
-                    class="col-6 col-sm-5 mb-4 partner-img"
-                    v-if="item.partner1"
-                  >
-                    <img
-                      :src="item.partner1"
-                      alt=""
-                      class="img-fluid partner-logo"
-                    />
-                  </div>
-                  <div
-                    class="col-6 col-sm-5 mb-4 partner-img"
-                    v-if="item.partner2"
-                  >
-                    <img
-                      :src="item.partner2"
-                      alt=""
-                      class="bg-white img-fluid partner-logo"
-                    />
-                  </div>
-                  <div
-                    class="col-6 col-sm-5 mb-4 partner-img"
-                    v-if="item.partner3"
-                  >
-                    <img
-                      :src="item.partner3"
-                      alt=""
-                      class="img-fluid partner-logo"
-                    />
-                  </div>
-                  <div
-                    class="col-6 col-sm-5 mb-4 partner-img"
-                    v-if="item.partner4"
-                  >
-                    <img
-                      :src="item.partner4"
-                      alt=""
-                      class="bg-white img-fluid partner-logo"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <br />
-    <hr />
-    <div class="copyright text-center pt-4">
-      <!-- Copyright © 2024 <a href="#" class="text-light"><strong>mrvtools.com</strong></a> All Rights Reserved -->
-      Copyright © 2024 <strong>Solomon Islands Government</strong> - All Rights
-      Reserved
-    </div>
-    <br />
-  </footer>
-</template>
-<script>
-export default {
-  props: {
-    data: {
-      type: Array,
-      required: true,
-    },
-  },
+<script setup>
+// `data` accepted to keep parity with legacy `<Footer :data="..." />` callers.
+// `flush` lets legacy pages opt out of the editorial overlap (negative margin + radius).
+defineProps({
+  data: { type: [Object, Array], default: () => ({}) },
+  flush: { type: Boolean, default: false },
+})
+
+const onSubscribe = (e) => {
+  const input = e.target.querySelector('input')
+  input.value = ''
+  input.placeholder = 'Subscribed →'
 }
 </script>
+
+<template>
+  <footer class="ed-footer" :class="{ 'is-flush': flush }">
+    <div class="ed-footer-grid">
+      <div class="ed-news">
+        <span class="ed-eyebrow">Field Dispatch</span>
+        <h3>Slow news. From the islands.</h3>
+        <form class="ed-signup" @submit.prevent="onSubscribe">
+          <label class="ed-sr-only" for="ed-news-email">Email address</label>
+          <input
+            id="ed-news-email"
+            type="email"
+            aria-label="Email address"
+            placeholder="Your email address"
+            required
+          />
+          <button type="submit" aria-label="Subscribe">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="square"
+            >
+              <path d="M5 12h14M13 5l7 7-7 7" />
+            </svg>
+          </button>
+        </form>
+      </div>
+
+      <div
+        v-if="
+          data?.message?.parent_data?.address ||
+          data?.message?.parent_data?.email ||
+          data?.message?.parent_data?.contact_number1 ||
+          data?.message?.parent_data?.contact_number2 ||
+          data?.message?.parent_data?.contact_number3
+        "
+        class="ed-contact"
+      >
+        <span class="ed-eyebrow">Contact</span>
+        <h4 class="ed-contact-heading">Honiara</h4>
+        <p v-if="data?.message?.parent_data?.address" class="ed-contact-line">
+          {{ data.message.parent_data.address }}
+        </p>
+        <p v-if="data?.message?.parent_data?.email" class="ed-contact-line">
+          <span class="ed-contact-label">Email</span>
+          <a :href="`mailto:${data.message.parent_data.email}`">{{
+            data.message.parent_data.email
+          }}</a>
+        </p>
+        <p
+          v-if="data?.message?.parent_data?.contact_number1"
+          class="ed-contact-line"
+        >
+          <span class="ed-contact-label">Tel</span>
+          <a :href="`tel:${data.message.parent_data.contact_number1}`">{{
+            data.message.parent_data.contact_number1
+          }}</a>
+        </p>
+        <p
+          v-if="data?.message?.parent_data?.contact_number2"
+          class="ed-contact-line"
+        >
+          <span class="ed-contact-label">Tel</span>
+          <a :href="`tel:${data.message.parent_data.contact_number2}`">{{
+            data.message.parent_data.contact_number2
+          }}</a>
+        </p>
+        <p
+          v-if="data?.message?.parent_data?.contact_number3"
+          class="ed-contact-line"
+        >
+          <span class="ed-contact-label">Tel</span>
+          <a :href="`tel:${data.message.parent_data.contact_number3}`">{{
+            data.message.parent_data.contact_number3
+          }}</a>
+        </p>
+      </div>
+
+      <div class="ed-links">
+        <h4>Index</h4>
+        <router-link to="/project">Programs</router-link>
+        <router-link to="/reports">Inventory</router-link>
+        <router-link to="/reports">Finance Ledger</router-link>
+        <router-link to="/new">Field Notes</router-link>
+        <router-link to="/knowledgeresource">Issue Archive</router-link>
+      </div>
+
+      <div class="ed-links">
+        <h4>The Office</h4>
+        <router-link to="/climate-change-division"
+          >Climate Division</router-link
+        >
+        <router-link to="/about">MECDM Honiara</router-link>
+        <router-link to="/support">Press &amp; Inquiries</router-link>
+        <a href="#">Open Data API</a>
+        <a href="#">Methodology</a>
+      </div>
+    </div>
+
+    <div class="ed-mega" aria-hidden="true">iMRV</div>
+
+    <div class="ed-mark">
+      <span>© 2026 Government of Solomon Islands · MECDM</span>
+      <div class="ed-legal">
+        <a href="#">Privacy</a>
+        <a href="#">Accessibility</a>
+        <a href="#">Source</a>
+      </div>
+    </div>
+  </footer>
+</template>
+
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
-.custom-link {
-  color: aliceblue;
-  margin-right: 4px;
-  line-height: 40px;
-  font-size: 14px !important;
-  transition: 0.2s;
+.ed-footer {
+  position: relative;
+  background: #01472e;
+  color: #ccd5ae;
+  padding: 7rem 2rem 2rem;
+  margin-top: -5rem;
+  border-radius: 5rem 5rem 0 0;
+  overflow: hidden;
+  font-family: 'Inter', system-ui, sans-serif;
 }
-.partner-img {
-  width: 50% !important;
+.ed-footer.is-flush {
+  margin-top: 0;
+  border-radius: 0;
 }
-.partner-logo {
-  max-width: 100%;
-  height: auto;
-  aspect-ratio: 4 / 4.5;
-  object-fit: contain;
-  background-color: #fff;
+.ed-footer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 80% 0%,
+    rgba(204, 213, 174, 0.08),
+    transparent 50%
+  );
+  pointer-events: none;
 }
-.custom-link:hover {
-  color: red !important;
+
+.ed-footer-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 3rem;
+}
+.ed-news {
+  grid-column: span 5;
+}
+.ed-contact {
+  grid-column: span 3;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ed-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: #c1cba4;
+  margin-bottom: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.ed-eyebrow::before {
+  content: '';
+  width: 28px;
+  height: 1px;
+  background: #c1cba4;
+}
+.ed-news h3 {
+  font-family: 'Anton', 'Helvetica Neue', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: #fefae0;
+  text-transform: uppercase;
+  max-width: 11ch;
+  margin: 0 0 2rem;
+  font-weight: 400;
+}
+
+.ed-contact-heading {
+  font-family: 'Anton', 'Helvetica Neue', sans-serif;
+  font-size: clamp(1.75rem, 2.4vw, 2.4rem);
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  color: #fefae0;
+  text-transform: uppercase;
+  margin: 0 0 1.25rem;
+  font-weight: 400;
+}
+.ed-contact-line {
+  font-size: 12px;
+  line-height: 1.55;
+  color: #fefae0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.ed-contact-line a {
+  color: #fefae0;
   text-decoration: none;
-  transition: 0.2s;
-  font-size: 14px !important;
-  font-weight: 600;
+  transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.inner-row {
+.ed-contact-line a:hover {
+  color: #c1cba4;
+}
+.ed-contact-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: #c1cba4;
+}
+
+.ed-signup {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5rem;
+  max-width: 540px;
+}
+.ed-signup input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgba(204, 213, 174, 0.4);
+  padding: 0.85rem 0;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #fefae0;
+  outline: none;
+  transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ed-signup input::placeholder {
+  color: rgba(204, 213, 174, 0.6);
+  letter-spacing: 0.3em;
+}
+.ed-signup input:focus {
+  border-color: #fefae0;
+}
+.ed-signup input:focus-visible {
+  border-bottom-color: #fefae0;
+}
+.ed-signup button {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: #fefae0;
+  color: #01472e;
+  border: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ed-signup button:hover {
+  transform: rotate(-45deg);
+  background: white;
+}
+.ed-signup button:focus-visible,
+.ed-links a:focus-visible {
+  outline: 2px solid #fefae0;
+  outline-offset: 4px;
+}
+.ed-signup button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.ed-links {
+  grid-column: span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.ed-links h4 {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: #c1cba4;
+  margin: 0 0 1rem;
+}
+.ed-links a {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #fefae0;
+  text-decoration: none;
+  transition:
+    color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    padding-left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  width: fit-content;
+}
+.ed-links a:hover {
+  padding-left: 1rem;
+  color: #c1cba4;
+}
+.ed-links a:hover::before {
+  content: '\2192';
+  position: absolute;
+  left: 0;
+  transform: translateX(-4px);
+}
+
+.ed-mega {
+  position: relative;
+  font-family: 'Anton', 'Helvetica Neue', sans-serif;
+  font-size: 33vw;
+  line-height: 0.75;
+  letter-spacing: -0.05em;
+  color: #fefae0;
+  text-transform: uppercase;
+  text-align: center;
+  margin: 4rem 0 -1rem;
+  opacity: 0.95;
+  pointer-events: none;
+  user-select: none;
+}
+
+.ed-mark {
+  position: relative;
+  margin-top: 6rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(204, 213, 174, 0.2);
   display: flex;
   justify-content: space-between;
-  gap: 70px;
-  width: 100%;
-  height: auto;
-  height: aotu !important;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(204, 213, 174, 0.6);
 }
-
-.column-two {
+.ed-mark a {
+  color: inherit;
+  text-decoration: none;
+}
+.ed-mark a:hover {
+  color: #fefae0;
+}
+.ed-legal {
   display: flex;
-  justify-content: space-around;
-}
-@media (min-width: 700px) {
-  .column {
-    width: 33% !important;
-  }
-}
-@media (max-width: 400px) {
-  .column {
-    width: 100% !important;
-  }
-}
-p,
-li {
-  line-height: 1.6;
-  color: rgba(240, 248, 255, 0.884);
-  font-size: 14px;
-  text-align: left;
-  font-family: 'Poppins', sans-serif;
-  font-weight: lighter;
-}
-h3 {
-  font-weight: 600;
-  font-size: 18px;
-  color: aliceblue;
-}
-img {
-  border-radius: 5px;
-}
-.site-logo {
-  width: 121px !important;
-  /* background-color: #fff; */
-}
-.bg {
-  background-image: url('../assets/images/footer.png');
-  padding: 0 !important;
-}
-img {
-  background-color: none !important;
+  gap: 2rem;
 }
 
-@media (max-width: 576px) {
-  .inner-row {
-    display: flex;
-    gap: 7px;
-    width: 100%;
-    height: auto !important;
-    flex-direction: column;
+.ed-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 900px) {
+  .ed-news,
+  .ed-links,
+  .ed-contact {
+    grid-column: span 12;
   }
-  .column-one {
-    display: flex;
+  .ed-mark {
     flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
   }
-  .partners {
-    display: contents;
+  .ed-mega {
+    font-size: 45vw;
   }
-  .column-two {
-    display: flex;
-    flex-direction: column;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ed-footer,
+  .ed-signup input,
+  .ed-signup button,
+  .ed-links a {
+    transition: none !important;
+    animation: none !important;
   }
 }
 </style>
