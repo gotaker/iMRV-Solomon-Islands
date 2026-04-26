@@ -563,19 +563,22 @@ onUnmounted(() => {
 /* ---------- info cards (inside narrative / Index 01) ---------- */
 .info-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  margin-top: 4rem;
-  max-width: 1100px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
 }
 .info-card {
   background: var(--cream);
   border-radius: 2rem;
-  padding: 2.25rem 2rem;
+  padding: 1.5rem 1.75rem 1.75rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.5rem;
   box-shadow: 0 25px 60px -25px var(--forest-shadow);
+}
+.info-card .block-num {
+  margin-bottom: 0;
+  line-height: 0.9;
 }
 .card-title {
   font-family: var(--display);
@@ -583,14 +586,17 @@ onUnmounted(() => {
   line-height: 1.1;
   letter-spacing: -0.01em;
   color: var(--forest);
-  margin: 0;
+  margin: 0 0 0.25rem;
 }
 .info-card .prose {
   font-size: 15px;
-  line-height: 1.55;
+  line-height: 1.5;
 }
 .info-card .prose :deep(p) {
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.35rem;
+}
+.info-card .prose :deep(p:empty) {
+  display: none;
 }
 .info-card .prose :deep(p:last-child) {
   margin-bottom: 0;
@@ -787,11 +793,10 @@ onUnmounted(() => {
     padding-top: 2rem;
   }
   .info-cards {
-    grid-template-columns: 1fr;
     margin-top: 2.5rem;
   }
   .info-card {
-    padding: 2rem 1.75rem;
+    padding: 1.5rem 1.5rem 1.75rem;
   }
   .photo-grid {
     grid-template-columns: 1fr;
