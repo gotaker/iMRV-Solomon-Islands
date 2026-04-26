@@ -4,7 +4,11 @@ $(document).ready(function() {
     // Guard on the wizard route, not `setup_complete === 0`: this project's
     // `on_session_creation` sends users to /app/main-dashboard and bypasses
     // the wizard, so the flag can stay 0 on an otherwise-provisioned site.
-    if (window.location.pathname.startsWith('/app/setup-wizard')) return;
+    if ((window.location.pathname.startsWith('/app/setup-wizard') || window.location.pathname.startsWith('/desk/setup-wizard'))) return;
+
+    // Floating drawer: inject trigger + backdrop synchronously so the user
+    // sees an open-menu affordance during the get_menulist round-trip.
+    fsmInjectTrigger();
 
     $('[class="app-logo"]').css({
         "display": "block"
@@ -34,6 +38,7 @@ $(document).ready(function() {
             else
                 roles = '';
             $('body').prepend(r.message.template_html);
+            fsmAttachDrawer();
         }
     });
 
@@ -325,7 +330,11 @@ $(document).ready(function() {
 
 
     $(document).on("form-refresh", function(e, frm) {
-        
+        // Cache for drawer-open re-run; the side-effects (record list visibility,
+        // search box, treeview hide/show) are invisible while the drawer is closed.
+        fsmLastFrm = frm;
+        fsmRerunRefresh = handleFormRefresh;
+
         // $('[id="filterTab"]').click()
         if(frm.meta.issingle != 1){
             frappe.call({
@@ -432,26 +441,38 @@ $('[class="search"]').css("display", "none");
 $('[id="recordListContainer"]').css("display", "none");
 
 
+// Unified accordion: toggles `.fsm-expanded` on the parent <li class="treeview drop-down">.
+// Handles both .treeview-menu (side_menu1.html) and .submenu (drill_down variants).
+// Single-open: collapsing siblings before expanding the clicked one.
 function toggleSubMenu(element) {
-    const parentListItem = element.parentNode;
-    const submenu = parentListItem.querySelector(".submenu");
-    const isSubMenuOpen = submenu.style.maxHeight === "0px" || submenu.style.maxHeight === "";
+    const parentLi = element.closest('li.treeview.drop-down');
+    if (!parentLi) return;
 
-    const allSubMenus = document.querySelectorAll(".treeview.drop-down .submenu"); 
-    allSubMenus.forEach((sub) => {
-        sub.style.maxHeight = "0";
-        const menuIcon = sub.previousElementSibling.querySelector("i.fa-angle-down");
-        if (menuIcon) {
-            menuIcon.classList.replace("fa-angle-down", "fa-angle-right");
-        }
+    const childPanel = parentLi.querySelector(':scope > .submenu, :scope > .side-menu > .treeview-menu, :scope > .treeview-menu');
+    if (!childPanel) return;
+
+    const isOpen = parentLi.classList.contains('fsm-expanded');
+
+    // Collapse all siblings first
+    document.querySelectorAll('li.treeview.drop-down.fsm-expanded').forEach(function(li) {
+        if (li === parentLi) return;
+        li.classList.remove('fsm-expanded');
+        const sibPanel = li.querySelector(':scope > .submenu, :scope > .side-menu > .treeview-menu, :scope > .treeview-menu');
+        if (sibPanel) sibPanel.style.maxHeight = '0px';
+        const sibIcon = li.querySelector('i.fa-angle-down');
+        if (sibIcon) sibIcon.classList.replace('fa-angle-down', 'fa-angle-right');
     });
 
-    if (isSubMenuOpen) {
-        submenu.style.maxHeight = submenu.scrollHeight + "px";
-        element.querySelector("i.fa-angle-right").classList.replace("fa-angle-right", "fa-angle-down");
+    if (isOpen) {
+        parentLi.classList.remove('fsm-expanded');
+        childPanel.style.maxHeight = '0px';
+        const icon = parentLi.querySelector('i.fa-angle-down');
+        if (icon) icon.classList.replace('fa-angle-down', 'fa-angle-right');
     } else {
-        submenu.style.maxHeight = "0px";
-        element.querySelector("i.fa-angle-down").classList.replace("fa-angle-down", "fa-angle-right");
+        parentLi.classList.add('fsm-expanded');
+        childPanel.style.maxHeight = childPanel.scrollHeight + 'px';
+        const icon = parentLi.querySelector('i.fa-angle-right');
+        if (icon) icon.classList.replace('fa-angle-right', 'fa-angle-down');
     }
 }
 
@@ -498,7 +519,7 @@ function gotodashboard(e) {
 
 $(window).ready(function(){
     setTimeout(function() {
-        windloc = window.location.pathname 
+        windloc = window.location.pathname
         frappe.db.get_single_value("Side Menu Settings", "post_login_landing_route").then(function(r){
             if (windloc== `/app`) {
             var updateroute = windloc + "/"+ r
@@ -512,6 +533,225 @@ $(window).ready(function(){
     });
 
 })
+
+
+// =====================================================================
+// FSM Floating Drawer
+// ---------------------------------------------------------------------
+// Owns the trigger button, backdrop, and drawer state machine. The
+// drawer DOM (.main-sidebar) is injected by the get_menulist callback
+// above; this code wires it once it lands.
+// =====================================================================
+
+var fsmTriggerEl = null;
+var fsmBackdropEl = null;
+var fsmDrawerEl = null;
+var fsmCloseBtnEl = null;
+var fsmLastFrm = null;
+var fsmRerunRefresh = null;
+
+function fsmMakeIconButton(className, ariaLabel, iconClass) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = className;
+    btn.setAttribute('aria-label', ariaLabel);
+    var icon = document.createElement('i');
+    icon.className = iconClass;
+    icon.setAttribute('aria-hidden', 'true');
+    btn.appendChild(icon);
+    return btn;
+}
+
+function fsmInjectTrigger() {
+    if (document.querySelector('.fsm-trigger')) return;
+
+    fsmTriggerEl = fsmMakeIconButton('fsm-trigger', 'Open navigation menu', 'fi fi-rr-menu-burger');
+    fsmTriggerEl.setAttribute('aria-expanded', 'false');
+    fsmTriggerEl.setAttribute('aria-controls', 'fsm-drawer');
+    fsmTriggerEl.addEventListener('click', fsmOpenDrawer);
+    document.body.appendChild(fsmTriggerEl);
+
+    fsmBackdropEl = document.createElement('div');
+    fsmBackdropEl.className = 'fsm-backdrop';
+    fsmBackdropEl.setAttribute('aria-hidden', 'true');
+    fsmBackdropEl.addEventListener('click', fsmCloseDrawer);
+    document.body.appendChild(fsmBackdropEl);
+
+    document.documentElement.style.setProperty(
+        '--fsm-scrollbar-w',
+        (window.innerWidth - document.documentElement.clientWidth) + 'px'
+    );
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && document.body.classList.contains('fsm-open')) {
+            fsmCloseDrawer();
+        }
+    });
+
+    window.addEventListener('hashchange', function() {
+        if (document.body.classList.contains('fsm-open')) fsmCloseDrawer();
+    });
+
+    // Auto-close when any Frappe Bootstrap modal opens — modals (z-index 1050)
+    // would otherwise sit above the drawer (z-index 1040) but the dimming and
+    // focus would feel wrong. Closing first restores normal modal interaction.
+    // Pass returnFocus:false so the trigger doesn't steal focus from the modal.
+    // Frappe v16 fires `show` on the modal element (jQuery-only); older
+    // Bootstrap fires `show.bs.modal`. Listen for both, gate on .modal class.
+    $(document).on('show.bs.modal show', function(e) {
+        var t = e.target;
+        if (e.type === 'show' && (!t || !t.classList || !t.classList.contains('modal'))) return;
+        if (document.body.classList.contains('fsm-open')) {
+            fsmCloseDrawer({ returnFocus: false });
+        }
+    });
+
+    // Hide the floating trigger on the setup wizard route (covers SPA navigation
+    // from a non-wizard page to /app/setup-wizard, which the $(document).ready
+    // guard at the top of this file does not catch).
+    if (frappe && frappe.router && typeof frappe.router.on === 'function') {
+        frappe.router.on('change', fsmSyncWizardVisibility);
+    }
+    fsmSyncWizardVisibility();
+}
+
+function fsmSyncWizardVisibility() {
+    var p = window.location.pathname;
+    var onWizard = p.indexOf('/app/setup-wizard') === 0 || p.indexOf('/desk/setup-wizard') === 0;
+    if (fsmTriggerEl) fsmTriggerEl.style.display = onWizard ? 'none' : '';
+    if (fsmBackdropEl) fsmBackdropEl.style.display = onWizard ? 'none' : '';
+    if (onWizard && document.body.classList.contains('fsm-open')) {
+        fsmCloseDrawer({ returnFocus: false });
+    }
+}
+
+function fsmAttachDrawer() {
+    fsmDrawerEl = document.querySelector('.main-sidebar');
+    if (!fsmDrawerEl) return;
+    if (fsmDrawerEl.id === 'fsm-drawer') return; // idempotent — already wired
+
+    fsmDrawerEl.id = 'fsm-drawer';
+    fsmDrawerEl.setAttribute('role', 'dialog');
+    fsmDrawerEl.setAttribute('aria-modal', 'true');
+    fsmDrawerEl.setAttribute('aria-label', 'Navigation');
+    fsmDrawerEl.setAttribute('aria-hidden', 'true');
+    fsmDrawerEl.removeAttribute('style');
+
+    fsmCloseBtnEl = fsmMakeIconButton('fsm-close', 'Close navigation', 'fi fi-rr-cross-small');
+    fsmCloseBtnEl.addEventListener('click', fsmCloseDrawer);
+    fsmDrawerEl.insertBefore(fsmCloseBtnEl, fsmDrawerEl.firstChild);
+
+    fsmDedupeUserInfo();
+
+    fsmDrawerEl.addEventListener('click', function(e) {
+        var a = e.target.closest('a');
+        if (!a) return;
+
+        // side_menu1.html's parent <a class="link menu"> has no onclick, so we
+        // delegate the accordion toggle here for ANY anchor that is a direct
+        // child of <li class="treeview drop-down"> AND that li has a panel.
+        var parentLi = a.parentElement;
+        if (parentLi && parentLi.classList.contains('treeview') && parentLi.classList.contains('drop-down')) {
+            var hasPanel = parentLi.querySelector(
+                ':scope > .submenu, :scope > .side-menu > .treeview-menu, :scope > .treeview-menu'
+            );
+            if (hasPanel) {
+                e.preventDefault();
+                toggleSubMenu(a);
+                return;
+            }
+        }
+
+        var onclickAttr = a.getAttribute('onclick') || '';
+        if (onclickAttr.indexOf('toggleSubMenu') !== -1) return;
+        // Treat any other anchor (go_to_page, gotodashboard, href) as nav.
+        setTimeout(fsmCloseDrawer, 80);
+    });
+
+    fsmDrawerEl.addEventListener('keydown', fsmTrapFocus);
+
+    document.body.classList.add('fsm-ready');
+}
+
+// Move the first .treeview-menu .user-info into a single drawer footer block,
+// hide the rest. side_menu1.html embeds .user-info inside every .treeview-menu
+// so without this it would render once per expanded parent.
+function fsmDedupeUserInfo() {
+    if (!fsmDrawerEl) return;
+    var infos = fsmDrawerEl.querySelectorAll('.treeview-menu .user-info');
+    if (!infos.length) return;
+
+    var footer = document.createElement('div');
+    footer.className = 'fsm-user-footer';
+    // Clone children of the first user-info node into the footer (preserves
+    // server-rendered escaped DOM without re-parsing as HTML).
+    var children = infos[0].childNodes;
+    for (var i = 0; i < children.length; i++) {
+        footer.appendChild(children[i].cloneNode(true));
+    }
+    fsmDrawerEl.appendChild(footer);
+
+    infos.forEach(function(node) {
+        node.classList.add('fsm-user-info-clone-hidden');
+    });
+}
+
+function fsmOpenDrawer() {
+    if (!fsmDrawerEl) return;
+    document.body.classList.add('fsm-open');
+    if (fsmTriggerEl) fsmTriggerEl.setAttribute('aria-expanded', 'true');
+    fsmDrawerEl.setAttribute('aria-hidden', 'false');
+
+    // Re-run the per-doctype form-refresh handler so the record list / search /
+    // treeview hide-show state matches the current page when the drawer opens.
+    if (fsmLastFrm && typeof fsmRerunRefresh === 'function') {
+        try { fsmRerunRefresh(fsmLastFrm); } catch (err) { /* swallow */ }
+    }
+
+    setTimeout(function() {
+        if (!fsmDrawerEl) return;
+        var focusable = fsmDrawerEl.querySelector('a[href], a[onclick], button:not([disabled])');
+        if (focusable) focusable.focus();
+    }, 50);
+}
+
+function fsmCloseDrawer(opts) {
+    if (!fsmDrawerEl) return;
+    document.body.classList.remove('fsm-open');
+    if (fsmTriggerEl) {
+        fsmTriggerEl.setAttribute('aria-expanded', 'false');
+        // Skip focus return when closure is involuntary (e.g., modal opening).
+        // Otherwise we'd steal focus from the modal that's about to render.
+        if (!opts || opts.returnFocus !== false) {
+            fsmTriggerEl.focus();
+        }
+    }
+    fsmDrawerEl.setAttribute('aria-hidden', 'true');
+}
+
+function fsmTrapFocus(e) {
+    if (e.key !== 'Tab' || !document.body.classList.contains('fsm-open')) return;
+    if (!fsmDrawerEl) return;
+
+    var nodes = fsmDrawerEl.querySelectorAll(
+        'a[href], a[onclick], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    var focusable = Array.prototype.filter.call(nodes, function(el) {
+        return el.offsetWidth > 0 && el.offsetHeight > 0;
+    });
+    if (!focusable.length) return;
+
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+
+    if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+    }
+}
 
 
 // function toggleSidebar() {

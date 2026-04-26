@@ -1,18 +1,18 @@
 <div class="page-content"  style="width: {% if side_menu_type == 'Side Menu' %}80px{% else %}195px{% endif %};">
-   <aside class="main-sidebar" style="z-index: 1040;">
+   <aside class="main-sidebar">
       <section class="sidebar">
 
          <div class="menu-content">
 
             {% if side_menu_settings.set_width %}
-            <ul class="sidebar-menu" id="sideMenu" style="overflow-x: hidden; min-width:150px !important; padding: 0; width: {{ side_menu_settings.set_width }}px !important; margin-top: 0 !important;">
+            <ul class="sidebar-menu" id="sideMenu">
             {% endif %}
             <li class="app-logo"style=" display: block; width: 100% !important; overflow: hidden; z-index: 100; position: sticky; top: 0;">
                <a  class="logo" style="border-right: 1px solid rgba(1, 71, 46, 0.08) !important; border-bottom: 1px solid rgba(1, 71, 46, 0.08); max-width: 100% !important;">
                {% if side_menu_settings.application_logo %}
               
                <img onclick="gotodashboard()" src="{{side_menu_settings.application_logo}}" style="height: 43px;">
-               <button class="sidebar-toggle-button" style="display: flex; margin: 10px 11px 0px -30px; transform: 1s; float: right; border: none; outline: none; background: none; font-size: 14px;" onclick="toggleSidebar()">
+               <button class="sidebar-toggle-button" style="display: none;" aria-hidden="true">
                   <svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
               </button>
                {% else %}
@@ -105,41 +105,16 @@
 
         <script>
          
-            var menuButton = document.createElement('button');
-            menuButton.innerHTML = '<i class="fa fa-bars"  onclick="toggleSidebar()"></i>';
-            menuButton.className = 'custom-menu-button';
-            var logoImage = document.createElement('img');
-            logoImage.src = '{{side_menu_settings.application_logo}}';
-            logoImage.style.height = '43px';
-            logoImage.style.margin = '0px -80px 0px 53px';
-
-            var container = document.querySelector('.container');
-            container.insertBefore(logoImage, container.firstChild);
-            container.insertBefore(menuButton, container.firstChild);
+            // drawer mode: legacy menu-button injection disabled.
+            // The .fsm-trigger button injected by frappe_side_menu.js owns drawer open/close.
+            var menuButton = null;
+            var logoImage = null;
             var is_loaded = 0;
             var margin_left_value = 0;
             
             function toggleSidebar() {
-               var list_id_name = document.getElementById(`page-List/${frappe.get_route()[1]}/List`);
-               var form_id_name = document.getElementById(`page-${frappe.get_route()[1]}`);
-               var x = document.getElementById("sideMenu");
-               var mainSection = $(".layout-main-section-wrapper");
-
-               if (x.style.display === "none" || is_loaded === 0){
-                  x.style.display = "block";
-                  margin_left_value = "{{ side_menu_settings.set_width }}px";
-                  is_loaded = 1;
-               } else {
-                  x.style.display = "none";
-                  margin_left_value = "0px";
-                  // awsbar = "110px";
-                  is_loaded = 0;
-               }
-
-               $(".layout-main-section-wrapper").css("margin-left", margin_left_value);
-               $(".page-title").css("margin-left", margin_left_value);
-               // $(".search-bar").css("max-width", awsbar);
-
+               // drawer mode owns open/close — see frappe_side_menu.js
+               return;
             }
 
             // if((list_id_name.id).includes(`${frappe.get_route()[1]}`)){
@@ -217,22 +192,13 @@
             p, a, h1,h2,h3,h4,h5,h6,li{
                font-family: Inter;
             }
+            /* drawer mode owns layout — no margin-left shift, no fixed rail geometry */
             .col.layout-main-section-wrapper,
             .col-md-4.col-sm-6.col-xs-8.page-title,
             .navbar .navbar-brand,
             .col-md-12.layout-main-section-wrapper {
-            margin-left: {{ side_menu_settings.set_width }}px;
+            margin-left: 0;
             }
-            .main-sidebar .sidebar-menu {
-            background: #01472e !important;
-            font-family: 'Inter', sans-serif;
-            min-width: 195px !important;
-            padding: 0;
-            width: 95px !important;
-            margin-top: 0 !important;
-            left: 0 !important;
-            z-index: 1024;
-               }
                .sidebar--menu{
                   overflow-x: hidden;
                   min-width: 150px !important;
@@ -488,13 +454,9 @@
             display: block;
             height: var(--container-height);
          }
+            /* drawer mode: rail geometry handled by external CSS */
             .sidebar-menu {
-            margin-bottom: 0px !important;
-            height: 100%;
-            position: fixed;
-            border: 1px solid #00000014;
-            background: #fefae0;
-            overflow-y: hidden;
+            margin-bottom: 0 !important;
             }
             .routeLink{
                float: left;

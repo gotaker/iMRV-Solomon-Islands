@@ -1,10 +1,10 @@
 <div class="page-content" style="width: {% if side_menu_type == 'Side Menu' %}80px{% else %}195px{% endif %};">
-  <aside class="main-sidebar" style="z-index: 1040;">
+  <aside class="main-sidebar">
      <section class="sidebar">
         {% if side_menu_settings.set_width %}
         {% endif %}
         {% if side_menu_settings.set_width %}
-        <ul class="sidebar-menu" style="min-width:150px !important; padding: 0; width: {{ side_menu_settings.set_width }}px !important; margin-top: 0 !important;">
+        <ul class="sidebar-menu">
            {% endif %}
            <li class="app-logo" style=" display: block; width: 100% !important; overflow: hidden; z-index: 100; position: sticky; top: 0;">
               <a onclick="gotodashboard()" class="logo" style="max-width: 100% !important;">
@@ -69,52 +69,14 @@
            </li>
            {% endfor %}
         </ul>
-        <script>
-           function toggleSubMenu(element) {
-             const parentListItem = element.parentNode;
-             const submenu = parentListItem.querySelector(".submenu");
-             const isSubMenuOpen = submenu.style.maxHeight === "0px" || submenu.style.maxHeight === "";
-           
-             const allSubMenus = document.querySelectorAll(".treeview.drop-down .submenu");
-             allSubMenus.forEach((sub) => {
-               sub.style.maxHeight = "0";
-               const menuIcon = sub.previousElementSibling.querySelector("i.fa-angle-down");
-               if (menuIcon) {
-                 menuIcon.classList.replace("fa-angle-down", "fa-angle-right");
-               }
-             });
-           
-             if (isSubMenuOpen) {
-               submenu.style.maxHeight = submenu.scrollHeight + "px";
-               element.querySelector("i.fa-angle-right").classList.replace("fa-angle-right", "fa-angle-down");
-               // element.style.backgroundColor = "{{ side_menu_settings.side_bar_hover_color }}";
-             } else {
-               submenu.style.maxHeight = "0px";
-               element.querySelector("i.fa-angle-down").classList.replace("fa-angle-down", "fa-angle-right");
-               element.style.backgroundColor = "{{ side_menu_settings.side_bar_background_color }}";
-             }
-           
-           }
-        </script>
         <style>
+           /* drawer mode owns layout — no margin-left shift, no fixed rail geometry */
            .col.layout-main-section-wrapper,
            .col-md-4.col-sm-6.col-xs-8.page-title,
            .navbar .navbar-brand,
-           .col-md-12.layout-main-section-wrapper {
-           margin-left: {{ side_menu_settings.set_width }}px !important;
-           }
-           .main-sidebar .sidebar-menu {
-           background: #01472e !important;
-           font-family: 'Inter', sans-serif;
-           min-width: 195px !important;
-           padding: 0;
-           width: 95px !important;
-           margin-top: 0 !important;
-           left: 0 !important;
-           z-index: 1024;
-           }
+           .col-md-12.layout-main-section-wrapper,
            .navbar {
-           margin-left: 95px;
+           margin-left: 0;
            }
            .submenu {
            background-color: {{side_menu_settings.sub_menu_background_color}};
@@ -138,14 +100,9 @@
            width: 100%;
            font-size: 13px;
            }
+           /* drawer mode: rail geometry handled by external CSS */
            .sidebar-menu {
-           margin-bottom: 0px !important;
-           height: 100%;
-           position: fixed;
-           /* min-width: 80px; */
-           width: 280px;
-           background: #fefae0;
-           overflow-y: auto;
+           margin-bottom: 0 !important;
            }
            .menu {
            text-decoration: none;

@@ -1,6 +1,6 @@
-<aside class="main-sidebar" style="z-index: 1040;">
+<aside class="main-sidebar">
     <section class="sidebar">   
-        <ul class="sidebar-menu"  style="margin-bottom: 0px !important; left: -40px !important; height: 100%; position: fixed;min-width: 95px !important;">
+        <ul class="sidebar-menu">
             <li class="app-logo" style="box-shadow: 4px 0px 5px -1px #9d9fa2; display: block; width: 100% !important; overflow: hidden; z-index: 100; border: none; position: sticky; top: 0;">
                 <a onclick="gotodashboard()" class="logo" style="width: 95px; padding: 8.9px 0px;"> 
                     {% if side_menu_settings.application_logo %}
@@ -22,7 +22,7 @@
                         <span style="font-size: 15px;">{{ u.label }}</span>
                     </a>
                 <div class="side-menu">
-                    <ul class="treeview-menu" id="submenu-tree" style="height: 100vh !important;">
+                    <ul class="treeview-menu" id="submenu-tree">
                    
                         {% if user_info %}
                         <li class="user-info" style="z-index: 100; position: sticky; top: 0;">
@@ -198,17 +198,16 @@
            {%endfor%}
         </ul>
         <style>
+            /* drawer mode owns layout — no margin-left shift */
             .col.layout-main-section-wrapper,
             .col-md-4.col-sm-6.col-xs-8.page-title,
             .navbar .navbar-brand,
-            .col-md-12.layout-main-section-wrapper{
-                margin-left: 95px;
-            }
-            .col-md-12.layout-main-section-wrapper{
-                max-width: calc(100% - 95px);
-            }
+            .col-md-12.layout-main-section-wrapper,
             .navbar {
-                margin-left: -100px;
+                margin-left: 0;
+            }
+            .col-md-12.layout-main-section-wrapper{
+                max-width: 100%;
             }
             ul.submenu li:hover {
                     background-color:#a7caeb;

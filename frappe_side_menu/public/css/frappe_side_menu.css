@@ -43,8 +43,11 @@
     display: none !important;
 }
 
-.layout-side-section,.page-title .sidebar-toggle-btn{
-    display: none;
+.layout-side-section,
+.page-title .sidebar-toggle-btn,
+.sidebar-toggle-button,
+#sideMenu .sidebar-toggle-button {
+    display: none !important;
 }
 
 /* Hide v16's workspace sidebar — frappe_side_menu replaces it entirely.
@@ -161,9 +164,6 @@ li.treeview.drop-down:hover .treeview-menu{
 a.navbar-brand.navbar-home {
     display: none;
 }
-ul#navbar-breadcrumbs {
-    margin-left: 95px;
-}
 ul#navbar-breadcrumbs li:first-child a::before{
    display: none;
 }
@@ -231,4 +231,306 @@ ul#navbar-breadcrumbs li:first-child a::before{
 .main-sidebar .sidebar-menu .treeview-menu > li > a.active {
     background: var(--ed-forest);
     color: var(--ed-cream);
+}
+
+/* =====================================================================
+   FSM Floating Drawer
+   ---------------------------------------------------------------------
+   Converts the legacy fixed left-rail sidebar into an off-canvas drawer
+   that overlays the desk on demand. Triggered by .fsm-trigger button.
+   State driven by `body.fsm-open`. All rules prefixed `.fsm-*` or
+   scoped under `.main-sidebar` so nothing leaks into the rest of the
+   desk when the drawer is closed.
+   ===================================================================== */
+
+/* Defense-in-depth: zero out any margin-left shift that legacy template
+   inline <style> blocks try to apply to desk chrome. Even if a template
+   edit is missed or assets are stale, the desk content stays put. */
+.col.layout-main-section-wrapper,
+.col-md-12.layout-main-section-wrapper,
+.col-md-4.col-sm-6.col-xs-8.page-title,
+.navbar .navbar-brand,
+.navbar {
+    margin-left: 0 !important;
+}
+.col-md-12.layout-main-section-wrapper {
+    max-width: 100% !important;
+}
+
+/* Floating trigger button (always visible) */
+.fsm-trigger {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 1041;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: var(--ed-radius-pill);
+    background: var(--ed-forest);
+    color: var(--ed-cream);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    line-height: 1;
+    box-shadow: var(--ed-shadow-forest);
+    transition: background var(--ed-dur-fast) var(--ed-ease),
+                transform var(--ed-dur-fast) var(--ed-ease);
+}
+.fsm-trigger:hover {
+    background: var(--ed-forest-dark);
+    transform: scale(1.05);
+}
+.fsm-trigger:focus-visible {
+    outline: 2px solid var(--ed-moss);
+    outline-offset: 2px;
+}
+.fsm-trigger i {
+    pointer-events: none;
+}
+
+/* Translucent backdrop */
+.fsm-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1035;
+    background: rgba(1, 71, 46, 0.4);
+    -webkit-backdrop-filter: blur(4px) saturate(140%);
+    backdrop-filter: blur(4px) saturate(140%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--ed-dur-mid) var(--ed-ease);
+}
+body.fsm-open .fsm-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Drawer panel (the legacy <aside class="main-sidebar">) */
+.main-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100dvh;
+    width: min(320px, 90vw);
+    max-width: 320px;
+    z-index: 1040 !important;
+    transform: translateX(-100%);
+    transition: transform var(--ed-dur-mid) var(--ed-ease);
+    background: var(--ed-frost-bg) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    backdrop-filter: blur(20px) saturate(140%);
+    box-shadow: 8px 0 40px -8px rgba(1, 71, 46, 0.3);
+    overflow-y: auto;
+    overflow-x: hidden;
+    visibility: hidden;
+}
+body.fsm-ready .main-sidebar {
+    visibility: visible;
+}
+body.fsm-open .main-sidebar {
+    transform: translateX(0);
+}
+
+/* Reset legacy fixed-rail geometry so .sidebar-menu becomes a normal
+   vertical list inside the drawer. */
+.main-sidebar .sidebar-menu {
+    position: static !important;
+    left: auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: auto !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0;
+}
+
+/* Make every rail item full-width with comfortable inner spacing */
+.main-sidebar .sidebar-menu > li > a {
+    text-align: left;
+    padding: 12px 16px !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    color: var(--ed-forest);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.main-sidebar .sidebar-menu > li > a span {
+    text-align: left !important;
+    letter-spacing: 0.04em;
+    color: inherit;
+}
+.main-sidebar .sidebar-menu > li > a .navbar-icon,
+.main-sidebar .sidebar-menu > li > a .navbar-image {
+    flex: 0 0 auto;
+}
+
+/* App logo cell: drawer-friendly styling */
+.main-sidebar .sidebar-menu > li.app-logo {
+    box-shadow: none !important;
+    border-bottom: 1px solid var(--ed-forest-08);
+}
+.main-sidebar .sidebar-menu > li.app-logo a.logo {
+    background: transparent !important;
+    width: 100% !important;
+    padding: 12px 16px !important;
+}
+.main-sidebar .sidebar-menu > li.app-logo a.logo img {
+    height: 40px;
+}
+
+/* Hover/active legibility on the cream-frost surface */
+.main-sidebar .sidebar-menu > li:not(.app-logo) > a:hover,
+.main-sidebar .sidebar-menu > li:not(.app-logo).fsm-expanded > a {
+    background: var(--ed-forest-12) !important;
+    color: var(--ed-forest-dark) !important;
+    border-left-color: var(--ed-moss);
+}
+.main-sidebar .sidebar-menu > li:not(.app-logo).active > a {
+    background: var(--ed-forest) !important;
+    color: var(--ed-cream) !important;
+    border-left-color: var(--ed-moss);
+}
+
+/* Kill the legacy hover reveal — drawer now uses click accordion */
+li.treeview.drop-down:hover .treeview-menu {
+    display: none !important;
+}
+
+/* Inline-accordion for .treeview-menu (side_menu1.html).
+   Uses .main-sidebar .sidebar-menu .treeview-menu specificity (3 classes)
+   to outweigh the legacy `display: none` rule above. */
+.main-sidebar .sidebar-menu .treeview-menu,
+.main-sidebar .treeview-menu {
+    display: block !important;
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: 0;
+    overflow: hidden;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: var(--ed-olive) !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--ed-forest-08);
+    box-shadow: none !important;
+    transition: max-height var(--ed-dur-mid) var(--ed-ease);
+}
+.main-sidebar li.treeview.drop-down.fsm-expanded > .side-menu > .treeview-menu,
+.main-sidebar li.treeview.drop-down.fsm-expanded > .treeview-menu {
+    /* JS sets exact scrollHeight in pixels; cap is fallback only */
+    max-height: 4000px;
+}
+.main-sidebar .treeview-menu > li > a {
+    padding: 10px 16px 10px 44px !important;
+    font-size: 13px;
+}
+.main-sidebar .treeview-menu .treeview-head {
+    padding: 8px 16px;
+}
+
+/* Inline-accordion for .submenu (drill_down_menu.html, drill_down_tab.html) */
+.main-sidebar .submenu {
+    max-height: 0;
+    overflow: hidden;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    background: var(--ed-olive);
+    transition: max-height var(--ed-dur-mid) var(--ed-ease);
+}
+.main-sidebar li.treeview.drop-down.fsm-expanded > .submenu {
+    max-height: 4000px;
+}
+.main-sidebar .submenu li {
+    padding-left: 44px !important;
+    list-style: none;
+}
+.main-sidebar .submenu li:hover {
+    background: var(--ed-forest-08);
+    padding-left: 48px !important;
+}
+.main-sidebar .submenu li a {
+    color: var(--ed-forest);
+    text-decoration: none;
+}
+
+/* Hide per-submenu user-info; JS moves a single instance to the footer */
+.main-sidebar .treeview-menu .user-info,
+.main-sidebar .fsm-user-info-clone-hidden {
+    display: none !important;
+}
+.fsm-user-footer {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    padding: 12px 16px;
+    background: var(--ed-forest);
+    color: var(--ed-cream);
+    border-top: 1px solid var(--ed-forest-dark);
+    font-size: 12px;
+    line-height: 1.4;
+}
+.fsm-user-footer .uname {
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+.fsm-user-footer .email {
+    opacity: 0.85;
+}
+
+/* Close button inside drawer */
+.fsm-close {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    align-self: flex-end;
+    margin: 8px 8px 0 auto;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: var(--ed-radius-pill);
+    background: transparent;
+    color: var(--ed-forest);
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--ed-dur-fast) var(--ed-ease);
+}
+.fsm-close:hover {
+    background: var(--ed-forest-08);
+}
+.fsm-close:focus-visible {
+    outline: 2px solid var(--ed-moss);
+    outline-offset: 2px;
+}
+
+/* Body scroll-lock + scrollbar gutter compensation while drawer is open */
+body.fsm-open {
+    overflow: hidden;
+    padding-right: var(--fsm-scrollbar-w, 0px);
+}
+
+/* Mobile: drawer fills viewport */
+@media (max-width: 480px) {
+    .main-sidebar {
+        width: 100vw;
+        max-width: 100vw;
+    }
+    .fsm-trigger {
+        top: 8px;
+        left: 8px;
+    }
 }
