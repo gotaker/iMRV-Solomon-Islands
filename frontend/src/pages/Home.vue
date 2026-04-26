@@ -278,7 +278,7 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <Footer :data="homeResource.data" mega-text="Climate" />
+    <Footer :data="homeResource.data" mega-text="Climate Change Division" />
   </div>
 </template>
 

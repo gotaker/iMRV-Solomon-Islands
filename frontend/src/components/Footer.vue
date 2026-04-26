@@ -413,12 +413,13 @@ const onSubscribe = (e) => {
 .ed-mega {
   position: relative;
   font-family: 'Anton', 'Helvetica Neue', sans-serif;
-  font-size: 33vw;
-  line-height: 0.75;
-  letter-spacing: -0.05em;
+  font-size: clamp(2.5rem, 9vw, 9rem);
+  line-height: 0.85;
+  letter-spacing: -0.04em;
   color: #fefae0;
   text-transform: uppercase;
   text-align: center;
+  text-wrap: balance;
   margin: 4rem 0 -1rem;
   opacity: 0.95;
   pointer-events: none;
@@ -473,9 +474,6 @@ const onSubscribe = (e) => {
     flex-direction: column;
     gap: 1rem;
     align-items: flex-start;
-  }
-  .ed-mega {
-    font-size: 45vw;
   }
   .ed-partners {
     align-items: flex-start;
