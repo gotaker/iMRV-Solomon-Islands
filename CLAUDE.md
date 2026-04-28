@@ -78,6 +78,8 @@ Two pip entry points live at the repo root: [setup.py](setup.py) packages `mrvto
 
 The top-level [iMRV-Solomon-Islands/public/frontend/](iMRV-Solomon-Islands/public/frontend/) directory is a stray misplaced build artifact — the real Vite output lives at `mrvtools/public/frontend/`. Don't edit anything inside the top-level path; changes there are not served.
 
+The [scripts/](scripts/) directory holds repo-utility scripts (not packaged with either Frappe app). Currently: `graphify_augment_hooks.py`, run after `/graphify` to wire Frappe `hooks.py` string-dispatch entries that the AST extractor misses.
+
 **Design specs.** Significant subsystems have written design docs in [docs/superpowers/specs/](docs/superpowers/specs/) — currently CI pipeline, Railway deployment, install/start/shutdown scripts, v16 test harness, and the LLM council skill. When investigating *why* a feature works the way it does, check there before reverse-engineering from code; this CLAUDE.md links each spec near its topic.
 
 ## Build and run
@@ -98,7 +100,7 @@ Dev-server: `yarn dev` runs Vite on :8080. The plugin's `frappeProxy` reads `com
 
 [frontend/src/main.js](frontend/src/main.js) wires Frappe-UI with `frappeRequest` as the resource fetcher and registers `Button`/`Card`/`Input` globally; AOS (animate-on-scroll) is initialized in `App.vue`. If a Frappe-UI component looks unresolved, it needs registering here.
 
-There is no CI (`.github/workflows/` is absent) and no enforced linting — only [frontend/.prettierrc.json](frontend/.prettierrc.json) exists and nothing runs it automatically.
+Linting and formatting are enforced in CI (Prettier `--check` against `frontend/src/`, ruff against both Frappe apps) but not via local pre-commit hooks — see the **Continuous integration** section below. [frontend/.prettierrc.json](frontend/.prettierrc.json) is the only formatter config.
 
 Day-to-day stack lifecycle on an already-installed bench: [start.sh](start.sh) and [shutdown.sh](shutdown.sh) at the repo root. `./start.sh --dev` brings up MariaDB/Redis (if needed), `bench start` in the background, and Vite on :8080; `./start.sh --prod` skips Vite. `./shutdown.sh` stops bench + Vite (sweeps orphan listeners on the bench's actual ports, read from `common_site_config.json`); `./shutdown.sh --full` also stops MariaDB/Redis. Both honour `BENCH_DIR`, `SITE_NAME`, and `DRY_RUN=1`. Spec: [docs/superpowers/specs/2026-04-19-start-shutdown-scripts-design.md](docs/superpowers/specs/2026-04-19-start-shutdown-scripts-design.md).
 
@@ -184,6 +186,8 @@ All three use `ignore_permissions=True` and swallow exceptions into `frappe.log_
 **Doctype conventions.** Doctypes ending in `_childtable` are Frappe child tables and must be embedded in a parent doctype; they are not independently listable. Doctypes ending in `_master_list` are reference/lookup tables seeded by `load_master_data`. The `edited_*` doctypes (e.g. `edited_project_details`, `edited_ghg_inventory_details`) appear to be revision/draft variants of their base doctypes — treat them as paired.
 
 **Frontend data layer (in flight, untracked).** [frontend/src/main.js](frontend/src/main.js) imports `./router`, so [frontend/src/router.js](frontend/src/router.js) is the live router — its `beforeEach` only sets `document.title`, there is currently no auth guard and no `/account/login` route. A parallel set of files exists but is **not yet wired in**: `frontend/src/routes.js` (alternate route table with Login + Landing), `frontend/src/pages/Login.vue`, `frontend/src/pages/Landing.vue`, and `frontend/src/data/{session,user}.js` (Frappe UI `createResource` for login/logout/`frappe.auth.get_logged_user`). All five are untracked. When you touch auth/redirect flow: confirm whether the work has been wired into `main.js`/`router.js` yet, or whether you're meant to finish wiring it.
+
+One frappe-ui idiom that catches new contributors: `createResource(...).data` is already unwrapped from the `{message: ...}` envelope Frappe returns. Access fields directly (`data?.parent_data`), not `data?.message?.parent_data` — the latter silently resolves to `undefined`.
 
 **Two hooks.py files.** `mrvtools/hooks.py` and `frappe_side_menu/hooks.py` are independent — each is read by Frappe for its own app. Don't consolidate.
 
