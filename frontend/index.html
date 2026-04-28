@@ -39,6 +39,14 @@
     <meta property="og:image:type" content="image/png" />
   </head>
   <body>
+    <script>
+      // Guard frappe-ui dependencies that read `frappe` at script scope on
+      // guest SPA routes. Frappe injects `window.frappe` via its boot block
+      // for authenticated sessions, but `boot` is empty for guests, so the
+      // bundle would otherwise hit ReferenceError on every public page.
+      var frappe = window.frappe = window.frappe || {}
+      var csrf_token = window.csrf_token = window.csrf_token || ''
+    </script>
     <div id="app"></div>
     <div id="modals"></div>
     <div id="popovers"></div>

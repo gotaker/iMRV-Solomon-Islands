@@ -37,10 +37,18 @@
     <meta property="og:image:width" content="150" />
     <meta property="og:image:height" content="150" />
     <meta property="og:image:type" content="image/png" />
-    <script type="module" crossorigin src="/assets/mrvtools/frontend/assets/index-BNyA5P9G.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/mrvtools/frontend/assets/index-B42fJODr.css">
+    <script type="module" crossorigin src="/assets/mrvtools/frontend/assets/index-i89LHq0c.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/mrvtools/frontend/assets/index-BPZ2X_mt.css">
   </head>
   <body>
+    <script>
+      // Guard frappe-ui dependencies that read `frappe` at script scope on
+      // guest SPA routes. Frappe injects `window.frappe` via its boot block
+      // for authenticated sessions, but `boot` is empty for guests, so the
+      // bundle would otherwise hit ReferenceError on every public page.
+      var frappe = window.frappe = window.frappe || {}
+      var csrf_token = window.csrf_token = window.csrf_token || ''
+    </script>
     <div id="app"></div>
     <div id="modals"></div>
     <div id="popovers"></div>

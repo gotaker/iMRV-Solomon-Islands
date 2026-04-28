@@ -147,6 +147,12 @@ const isActive = (path) => route.path === path
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  transition:
+    background 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .ed-logo::before {
   content: '—';
@@ -154,6 +160,14 @@ const isActive = (path) => route.path === path
   font-size: 18px;
   line-height: 1;
   transform: translateY(-1px);
+}
+/* Past the hero, lift the logo onto the same frosted-glass surface the
+ * .ed-pill / .ed-cart use so prose doesn't bleed through the wordmark. */
+.ed-nav.scrolled .ed-logo {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border-color: rgba(1, 71, 46, 0.08);
 }
 
 .ed-pill {

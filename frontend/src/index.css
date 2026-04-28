@@ -3,6 +3,10 @@
 
 @import './assets/Anton/anton.css';
 
+body {
+  background: #fefae0;
+}
+
 .breadcrumb-area {
   /* background: url('../src/assets/images/hero-banner.png');  */
   background-size: cover !important;
@@ -14,7 +18,7 @@ p {
   font-family: 'Inter', sans-serif;
 }
 h2 {
-  color: #000;
+  color: #01472e;
   font-weight: 700;
   font-size: 3rem;
   font-family: Inter;

@@ -77,6 +77,12 @@ const routes = [
       title: 'Knowledge Resource',
     },
   },
+  // Catch-all: unknown SPA routes silently rendered nothing (white screen)
+  // because <router-view> had no fallback. Redirect to home instead.
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: { path: '/home' },
+  },
 ]
 
 let router = createRouter({
