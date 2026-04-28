@@ -317,7 +317,7 @@ onUnmounted(() => {
       <span class="eyebrow eyebrow-light" data-reveal
         >(Index 03) Learn More</span
       >
-      <h2 class="division-title" data-reveal>The<br /><em>Division.</em></h2>
+      <h2 class="division-title" data-reveal>The<br /><em>Platform.</em></h2>
       <div class="division-body">
         <p data-reveal data-reveal-delay="1">
           Learn more about iMRV's platform and the broader climate

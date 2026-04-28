@@ -2,6 +2,68 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 1. Think Before Coding
+
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
+
+Before implementing:
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them - don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
+
+## 2. Simplicity First
+
+**Minimum code that solves the problem. Nothing speculative.**
+
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+## 3. Surgical Changes
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it - don't delete it.
+
+When your changes create orphans:
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: Every changed line should trace directly to the user's request.
+
+## 4. Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
+```
+- Execute in parallel where feasible.
+-Stress test convergence
+
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+---
+
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+
 ## Repository shape
 
 This repo contains **two Frappe apps** side-by-side plus a **Vue 3 SPA**:
@@ -76,6 +138,8 @@ Legacy doctype tests (every `test_*.py` next to a doctype) depend on Frappe's te
 
 Uses `TEST_SITE=test_mrv.localhost` and `TEST_PORT=8001` (decoupled from dev's `8000`) so it can run alongside `./start.sh --dev`. Layer 3 (UI) needs `playwright install chromium`; set `TESTS_SKIP_UI=1` to skip. If `bench migrate` fails during session setup, that *is* the v16 gate firing — fix the migration, don't bypass the harness. Common failures and env vars: [tests/README.md](tests/README.md).
 
+For browser-based manual QA outside the harness, [.mcp.json](.mcp.json) registers `chrome-devtools` and `playwright` MCP servers — useful for driving the SPA against a running `./start.sh --dev` without writing a Playwright test.
+
 If your bench's MariaDB root password isn't `admin`, export `MARIADB_ROOT_PASSWORD=…` before running — [tests/conftest.py](tests/conftest.py) passes it to `bench restore` and `bench new-site`, and a mismatch surfaces as a cryptic restore failure mid-session.
 
 Test isolation: an autouse `rollback_after_test` fixture wraps every test in a Frappe savepoint that rolls back on teardown ([tests/conftest.py:215](tests/conftest.py#L215)). Tests can mutate the database freely without cleanup or cross-test leakage; don't add `frappe.db.commit()` to a test unless you genuinely need to break that guarantee.
@@ -119,7 +183,7 @@ All three use `ignore_permissions=True` and swallow exceptions into `frappe.log_
 
 **Doctype conventions.** Doctypes ending in `_childtable` are Frappe child tables and must be embedded in a parent doctype; they are not independently listable. Doctypes ending in `_master_list` are reference/lookup tables seeded by `load_master_data`. The `edited_*` doctypes (e.g. `edited_project_details`, `edited_ghg_inventory_details`) appear to be revision/draft variants of their base doctypes — treat them as paired.
 
-**Frontend data layer.** The SPA uses Frappe UI's resource pattern; `session` lives at [frontend/src/data/session.js](frontend/src/data/session.js) and is consulted by the router guard in [frontend/src/router.js](frontend/src/router.js) to gate `/account/login`. Note the router guard references `userResource` without importing it — bugs in auth redirect flow likely originate here.
+**Frontend data layer (in flight, untracked).** [frontend/src/main.js](frontend/src/main.js) imports `./router`, so [frontend/src/router.js](frontend/src/router.js) is the live router — its `beforeEach` only sets `document.title`, there is currently no auth guard and no `/account/login` route. A parallel set of files exists but is **not yet wired in**: `frontend/src/routes.js` (alternate route table with Login + Landing), `frontend/src/pages/Login.vue`, `frontend/src/pages/Landing.vue`, and `frontend/src/data/{session,user}.js` (Frappe UI `createResource` for login/logout/`frappe.auth.get_logged_user`). All five are untracked. When you touch auth/redirect flow: confirm whether the work has been wired into `main.js`/`router.js` yet, or whether you're meant to finish wiring it.
 
 **Two hooks.py files.** `mrvtools/hooks.py` and `frappe_side_menu/hooks.py` are independent — each is read by Frappe for its own app. Don't consolidate.
 
