@@ -9,8 +9,10 @@ const props = defineProps({
   megaText: { type: String, default: 'iMRV' },
 })
 
+// frappe-ui's createResource (with frappeRequest) auto-unwraps the response
+// .message envelope, so `props.data` is already the inner object.
 const partnerLogos = computed(() => {
-  const p = props.data?.message?.parent_data
+  const p = props.data?.parent_data
   if (!p) return []
   return [1, 2, 3, 4, 5, 6]
     .map((n) => p[`partner${n}`])
@@ -55,50 +57,50 @@ const onSubscribe = (e) => {
 
       <div
         v-if="
-          data?.message?.parent_data?.address ||
-          data?.message?.parent_data?.email ||
-          data?.message?.parent_data?.contact_number1 ||
-          data?.message?.parent_data?.contact_number2 ||
-          data?.message?.parent_data?.contact_number3
+          data?.parent_data?.address ||
+          data?.parent_data?.email ||
+          data?.parent_data?.contact_number1 ||
+          data?.parent_data?.contact_number2 ||
+          data?.parent_data?.contact_number3
         "
         class="ed-contact"
       >
         <span class="ed-eyebrow">Contact</span>
         <h4 class="ed-contact-heading">Honiara</h4>
-        <p v-if="data?.message?.parent_data?.address" class="ed-contact-line">
-          {{ data.message.parent_data.address }}
+        <p v-if="data?.parent_data?.address" class="ed-contact-line">
+          {{ data.parent_data.address }}
         </p>
-        <p v-if="data?.message?.parent_data?.email" class="ed-contact-line">
+        <p v-if="data?.parent_data?.email" class="ed-contact-line">
           <span class="ed-contact-label">Email</span>
-          <a :href="`mailto:${data.message.parent_data.email}`">{{
-            data.message.parent_data.email
+          <a :href="`mailto:${data.parent_data.email}`">{{
+            data.parent_data.email
           }}</a>
         </p>
         <p
-          v-if="data?.message?.parent_data?.contact_number1"
+          v-if="data?.parent_data?.contact_number1"
           class="ed-contact-line"
         >
           <span class="ed-contact-label">Tel</span>
-          <a :href="`tel:${data.message.parent_data.contact_number1}`">{{
-            data.message.parent_data.contact_number1
+          <a :href="`tel:${data.parent_data.contact_number1}`">{{
+            data.parent_data.contact_number1
           }}</a>
         </p>
         <p
-          v-if="data?.message?.parent_data?.contact_number2"
+          v-if="data?.parent_data?.contact_number2"
           class="ed-contact-line"
         >
           <span class="ed-contact-label">Tel</span>
-          <a :href="`tel:${data.message.parent_data.contact_number2}`">{{
-            data.message.parent_data.contact_number2
+          <a :href="`tel:${data.parent_data.contact_number2}`">{{
+            data.parent_data.contact_number2
           }}</a>
         </p>
         <p
-          v-if="data?.message?.parent_data?.contact_number3"
+          v-if="data?.parent_data?.contact_number3"
           class="ed-contact-line"
         >
           <span class="ed-contact-label">Tel</span>
-          <a :href="`tel:${data.message.parent_data.contact_number3}`">{{
-            data.message.parent_data.contact_number3
+          <a :href="`tel:${data.parent_data.contact_number3}`">{{
+            data.parent_data.contact_number3
           }}</a>
         </p>
       </div>
@@ -124,6 +126,8 @@ const onSubscribe = (e) => {
       </div>
     </div>
 
+    <div class="ed-mega" aria-hidden="true">{{ megaText }}</div>
+
     <div v-if="partnerLogos.length" class="ed-partners">
       <span class="ed-eyebrow">In Partnership With</span>
       <div class="ed-partners-row">
@@ -136,8 +140,6 @@ const onSubscribe = (e) => {
         </div>
       </div>
     </div>
-
-    <div class="ed-mega" aria-hidden="true">{{ megaText }}</div>
 
     <div class="ed-mark">
       <span>© 2026 Government of Solomon Islands · MECDM</span>
@@ -357,14 +359,12 @@ const onSubscribe = (e) => {
 }
 
 .ed-partners {
-  position: relative;
-  margin-top: 5rem;
+  /* Centered band below the "Climate Change Division" mega text. */
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 1.5rem;
-  padding-top: 3rem;
-  border-top: 1px solid rgba(204, 213, 174, 0.18);
+  margin-top: 2.5rem;
 }
 .ed-partners .ed-eyebrow {
   margin-bottom: 0;
@@ -373,23 +373,26 @@ const onSubscribe = (e) => {
   display: flex;
   flex-wrap: wrap;
   gap: 1.25rem;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
 }
 .ed-partner {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 116px;
-  height: 60px;
-  padding: 0.5rem 0.85rem;
-  border: 1px solid rgba(204, 213, 174, 0.22);
-  border-radius: 14px;
-  background: rgba(254, 250, 224, 0.04);
+  width: 120px;
+  height: 120px;
+  padding: 1rem;
+  border: 1px solid rgba(1, 71, 46, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  box-shadow: 0 12px 32px -16px rgba(1, 71, 46, 0.35);
   transition:
-    border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
     background 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .ed-partner img {
   max-width: 100%;
@@ -397,17 +400,11 @@ const onSubscribe = (e) => {
   width: auto;
   height: auto;
   object-fit: contain;
-  filter: brightness(0) invert(1);
-  opacity: 0.82;
-  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .ed-partner:hover {
-  border-color: rgba(254, 250, 224, 0.55);
-  background: rgba(254, 250, 224, 0.09);
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 18px 44px -16px rgba(1, 71, 46, 0.5);
   transform: translateY(-2px);
-}
-.ed-partner:hover img {
-  opacity: 1;
 }
 
 .ed-mega {
