@@ -7,5 +7,5 @@ no_cache = True
 
 def get_context(context):
 	if frappe.session.user != "Guest":
-		frappe.local.flags.redirect_location = "/" if frappe.session.data.user_type=="Website User" else "/desk"
+		frappe.local.flags.redirect_location = "/app/main-dashboard"
 		raise frappe.Redirect

@@ -497,42 +497,44 @@ function go_to_page(e) {
 }
 
 function gotodashboard(e) {
-
-    frappe.db.get_single_value("Side Menu Settings", "post_login_landing_route").then(function(r){
-        console.log(frappe.boot.allowed_workspaces);
-        for(wrk of frappe.boot.allowed_workspaces){
-            console.log(wrk);
-            if(wrk == 'users'){
-                console.log("logged");
-            }
-            else{
-                console.log("no");
-            }
-        } 
-
-        console.log("R", r);
-        frappe.set_route(r);
-    })
+    frappe.set_route("main-dashboard");
 }
 
 // Defining Default dynamic workspace
 
 $(window).ready(function(){
     setTimeout(function() {
-        windloc = window.location.pathname
-        frappe.db.get_single_value("Side Menu Settings", "post_login_landing_route").then(function(r){
-            if (windloc== `/app`) {
-            var updateroute = windloc + "/"+ r
-            frappe.set_route(updateroute)
-            }
-            else if(windloc== `/app/`){
-                var updateroute = windloc + r
-                frappe.set_route(updateroute)
-            }
-        })
+        var windloc = window.location.pathname;
+        if (windloc === "/app" || windloc === "/app/") {
+            frappe.set_route("main-dashboard");
+        }
     });
-
 })
+
+// Breadcrumb home icon → main-dashboard. v16 ships the first breadcrumb
+// <li><a href="/desk"> on a <ul class="navbar-breadcrumbs"> (class, not id).
+// The breadcrumb is rendered async after document.ready and after the first
+// router 'change' fires, so retry up to 2s until the element appears.
+function setBreadcrumbHome(retries) {
+    if (typeof retries === "undefined") retries = 20;
+    var $home = $(".navbar-breadcrumbs li:first-child a");
+    if (!$home.length) {
+        if (retries > 0) setTimeout(function () { setBreadcrumbHome(retries - 1); }, 100);
+        return;
+    }
+    $home.attr("href", "/app/main-dashboard");
+    if ($home.data("fsm-home-wired")) return;
+    $home.data("fsm-home-wired", true);
+    $home.on("click", function (e) {
+        e.preventDefault();
+        gotodashboard();
+    });
+}
+
+$(document).ready(function () { setBreadcrumbHome(); });
+if (window.frappe && frappe.router && frappe.router.on) {
+    frappe.router.on("change", function () { setBreadcrumbHome(); });
+}
 
 
 // =====================================================================
