@@ -132,6 +132,10 @@ const isActive = (path) => route.path === path
 }
 .ed-nav.scrolled {
   padding: 1rem 2rem;
+  background: rgba(254, 250, 224, 0.85);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  box-shadow: 0 1px 0 rgba(1, 71, 46, 0.06);
 }
 .ed-nav-spacer {
   height: 5.5rem;
