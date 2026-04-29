@@ -16,12 +16,16 @@ class NdcReport {
 		this.page.sidebar.html(
 			`<ul class="standard-sidebar ndc_report-sidebar overlay-sidebar"></ul>`
 		);
-		this.$sidebar_list = this.page.sidebar.find("ul");	
+		this.$sidebar_list = this.page.sidebar.find("ul");
 		this.datatable=null;
 		this.set_default_secondary_action();
 		this.ndc_filter_fields();
-		
-		
+		// Without these, the page renders only the filter bar — no chart, no
+		// table — until the user changes the filter. The other working report
+		// pages (SDG, Mitigation, Adaptation, Finance) call them on init for
+		// exactly this reason.
+		this.render_datatable();
+		this.make();
 	}
 
 	set_default_secondary_action() {

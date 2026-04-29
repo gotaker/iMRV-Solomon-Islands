@@ -143,6 +143,17 @@ class MRVReport {
 	}
 	make() {
 		$('.all_html').remove();
+		if (!this.project) {
+			// MRV is project-scoped; without a selection there's nothing to
+			// render. Show a placeholder instead of leaving the page blank.
+			$(`
+				<div class="all_html mrv-empty-state" style="padding: 4rem 2rem; text-align: center; color: var(--ed-forest, #01472e);">
+					<b style="font-family: 'Anton', 'Helvetica Neue', sans-serif; font-size: 28px; letter-spacing: 0.04em; text-transform: uppercase;">Select a project</b>
+					<p style="margin-top: 0.75rem; font-family: 'Inter', system-ui, sans-serif; font-size: 14px; opacity: 0.7;">Pick a project from the filter above to view its MRV report.</p>
+				</div>
+			`).appendTo(this.page.main);
+			return;
+		}
 		if (this.project){
 			this.$container = $(`
 			<div class = "all_html" style="margin:0;">

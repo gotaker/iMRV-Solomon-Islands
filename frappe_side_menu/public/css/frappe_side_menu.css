@@ -164,6 +164,19 @@ body.full-width .layout-main-section-wrapper,
     margin-left: 60px !important;
 }
 
+/* Unify the last breadcrumb segment across page types. v16 doctype list
+   pages wrap it as <a class="title-text"> (gets Anton uppercase via Frappe
+   defaults), but custom desk pages emit a plain <a> that falls through to
+   Inter sentence-case at 16px — same line, different look. Force the
+   editorial display treatment on the deepest segment regardless of class. */
+.navbar-breadcrumbs li:last-child a {
+    font-family: var(--ed-font-display) !important;
+    font-size: 24px !important;
+    font-weight: 500 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.02em;
+}
+
 /* Floating trigger button (always visible) */
 .fsm-trigger {
     position: fixed;

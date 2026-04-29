@@ -513,28 +513,48 @@ $(window).ready(function(){
 
 // Breadcrumb home icon → main-dashboard. v16 ships the first breadcrumb
 // <li><a href="/desk"> on a <ul class="navbar-breadcrumbs"> (class, not id).
-// The breadcrumb is rendered async after document.ready and after the first
-// router 'change' fires, so retry up to 2s until the element appears.
-function setBreadcrumbHome(retries) {
-    if (typeof retries === "undefined") retries = 20;
+// Doctype list controllers re-render the breadcrumb DOM AFTER frappe.router's
+// `change` event fires, wiping any href/onclick set from a router callback
+// (verified Round-2 QA 2026-04-28: home icon on /desk/project went to /desk
+// raw root → Frappe workspace switcher). A MutationObserver re-applies the
+// rewrite on every breadcrumb insertion/replacement so no re-render escapes.
+function setBreadcrumbHome() {
     var $home = $(".navbar-breadcrumbs li:first-child a");
-    if (!$home.length) {
-        if (retries > 0) setTimeout(function () { setBreadcrumbHome(retries - 1); }, 100);
-        return;
-    }
+    if (!$home.length) return;
+    if ($home.attr("href") === "/app/main-dashboard" && $home.data("fsm-home-wired")) return;
     $home.attr("href", "/app/main-dashboard");
-    if ($home.data("fsm-home-wired")) return;
     $home.data("fsm-home-wired", true);
-    $home.on("click", function (e) {
+    $home.off("click.fsm").on("click.fsm", function (e) {
         e.preventDefault();
         gotodashboard();
     });
 }
 
-$(document).ready(function () { setBreadcrumbHome(); });
-if (window.frappe && frappe.router && frappe.router.on) {
-    frappe.router.on("change", function () { setBreadcrumbHome(); });
-}
+(function wireBreadcrumbHome() {
+    // Initial rewrite for the first paint.
+    setBreadcrumbHome();
+
+    // Re-wire whenever Frappe replaces the breadcrumb subtree.
+    var target = document.querySelector("header, .navbar, body") || document.body;
+    if (window.MutationObserver && target) {
+        new MutationObserver(function () { setBreadcrumbHome(); })
+            .observe(target, { childList: true, subtree: true });
+    }
+
+    // Belt-and-suspenders for the router transition itself.
+    if (window.frappe && frappe.router && frappe.router.on) {
+        frappe.router.on("change", function () { setBreadcrumbHome(); });
+    }
+})();
+
+// /desk raw root renders the Frappe workspace switcher (Framework / Settings /
+// Tools) which is a confusing dead-end for iMRV users. Redirect to the iMRV
+// main-dashboard whenever someone lands on bare `/desk` or `/desk/`.
+(function redirectDeskRoot() {
+    if (location.pathname === "/desk" || location.pathname === "/desk/") {
+        location.replace("/desk/main-dashboard");
+    }
+})();
 
 
 // =====================================================================

@@ -24,8 +24,10 @@ class GHGInventory {
 		this.set_default_secondary_action();
 		this.ghg_from_year();
 		this.ghg_unit_filter();
-		// this.render_datatable();
-		// this.make();
+		// Render the chart container + data table on load. Without these the
+		// page sat blank below the filter row until the user changed a filter.
+		this.render_datatable();
+		this.make();
 
 		// this.create_date_range_field();
 	}
