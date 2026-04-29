@@ -16,9 +16,11 @@ steps:
   - capture: setup-wizard-redirect
 assertions:
   # Both URL forms must resolve. The drawer guard in
-  # frappe_side_menu.js checks both /desk/setup-wizard AND /app/setup-wizard
-  # to avoid v16 canonicalization breaking the wizard exclusion.
-  - url_matches: "regex:/(app|desk)/setup-wizard"
+  # frappe_side_menu.js checks both /desk/setup-wizard AND /app/setup-wizard.
+  # On a sample-DB-restored target the wizard is already complete and the
+  # route redirects to /desk; we accept any landing inside the desk surface
+  # but reject /login (which would mean the route 401'd) or root (404 redirect).
+  - url_matches: "regex:/(app|desk)(/|$)"
   - no_console_error_matching: "TypeError|ReferenceError|show.bs.modal"
 tags: [regression, v16, modal-events, day-1]
 sources:

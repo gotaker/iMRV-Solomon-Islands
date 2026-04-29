@@ -1,0 +1,51 @@
+# Typo deny-list — patterns that must NOT appear in rendered page text.
+#
+# One regex per line. Lines starting with # are ignored. Matching is
+# case-insensitive. Word-boundaries (\b) recommended to avoid false positives
+# on substrings inside longer words ("resorce" inside "resorcement" is unlikely
+# but be safe).
+#
+# When a real typo is reported, add the misspelling here AND fix it in the
+# source. The deny-list is permanent; the source-fix is the actual remediation.
+
+# --- Reported by user 2026-04-29 ---
+\bresorce\b
+\bresorces\b
+\bresoruce\b
+
+# --- Common misspellings of domain terms ---
+\bmittigation\b
+\bmittigations\b
+\bclimatte\b
+\binvenotry\b
+\binvenrory\b
+\baprover\b
+\bapprov(ee|or)s?\b              # approver vs approvor
+\bsumitter\b
+\bsubmiter\b
+\benvironmnent\b
+\benvironmnetal\b
+\boccurence\b
+\bocurrence\b
+\bcomittee\b
+\bcommitee\b
+\bcommitee\b
+\baccomodate\b
+\baccomodation\b
+\boccurence\b
+\bseperate\b
+\bseperated\b
+\bdepedency\b
+\bdepedant\b
+\baquire\b
+\baquired\b
+\bsuccesful\b
+\bsuccesfully\b
+\baddress(es|ed)?[:.,]\s+([a-z])  # placeholder pattern — disabled until we tune
+
+# --- Obvious lazy strings that shouldn't ship ---
+\bTODO\b
+\bFIXME\b
+\bXXX\b
+\bdebug me\b
+\blorem ipsum\b

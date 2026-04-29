@@ -1,0 +1,45 @@
+id: regression_no_typos_in_visible_text
+title: "Visible text on key pages does not contain known typos / debug strings"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+
+# Captures rendered text from the dashboard + drawer-open state and runs it
+# through the typo deny-list. New typos are added to bench/fixtures/typo_denylist.txt
+# the moment they're observed, so the same misspelling can never re-ship.
+steps:
+  - login_as: Administrator
+  - navigate: /app/main-dashboard
+  - wait_for_selector:
+      selector: ".layout-main-section, .page-head"
+      timeout_ms: 15000
+  - click: ".fsm-trigger"
+  - wait_for_selector:
+      selector: "#fsm-drawer a[href]"
+      timeout_ms: 5000
+  - capture_text: dashboard-with-drawer-open
+  # Drawer renders a *display label*; the underlying record `name` may carry
+  # typos that the rendered HTML hides. Pull master-data record names via API
+  # and concatenate into the captured text so the deny-list scans them too.
+  - scan_master_data:
+      doctypes:
+        - "Side Menu"
+        - "Sub Menu"
+        - "Sub Menu Group"
+        - "Knowledge Resource"
+  - capture: dashboard-with-drawer-open
+
+assertions:
+  - no_text_matching:
+      denylist_file: bench/fixtures/typo_denylist.txt
+  - no_text_matching:
+      patterns:
+        - "\\bundefined\\b"        # raw JS undefined leaking into UI
+        - "\\bnull\\b\\s*\\bnull\\b"  # template-literal corner cases
+
+rubric:
+  visual_integrity: true
+
+tags: [regression, content, typos, day-1]
+sources:
+  - memory: feedback_qa_clickthrough_required.md
+  - bug: "screenshot 2026-04-29 contained 'document resorce tool' typo"

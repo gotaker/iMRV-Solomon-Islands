@@ -1,0 +1,42 @@
+id: regression_drawer_clickthrough_admin
+title: "Every drawer entry from Administrator session resolves to a healthy page"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+
+# This scenario is the automation of feedback_qa_clickthrough_required.md.
+# Visual capture alone misses 404s, blank pages, broken routes — so we walk
+# every drawer link and assert each destination is structurally healthy.
+#
+# When a new drawer entry is added (e.g., a sector module or master-data link),
+# this scenario picks it up automatically — the corpus does not need to grow
+# to cover the new entry.
+steps:
+  - login_as: Administrator
+  - walk_drawer:
+      link_selector: "#fsm-drawer a[href]"
+      settle_timeout_ms: 8000
+      skip_patterns: [logout, "mailto:", "tel:"]
+  - capture: drawer-walked
+
+assertions:
+  - drawer_destinations_healthy:
+      min_body_text_length: 100
+      require_heading: true
+      allowed_4xx_for_paths: []
+  # Catches the class where drawer text *looks* like a nav link but renders
+  # as <a> / <button> with no href, no data-route, no click handler — i.e.
+  # 39 dead "MITIGATION" / "SDG ASSESSMENTS" / "REPORTS" entries that go
+  # nowhere. Allowlist specific labels that are *intentionally* decorative
+  # (section headers); everything else must be navigable.
+  - drawer_no_dead_links:
+      decorative_text_allowlist: []
+  - no_console_error_matching: "TypeError|ReferenceError"
+
+rubric:
+  navigation_correctness: true
+  visual_integrity: true
+
+tags: [regression, drawer, clickthrough, day-1]
+sources:
+  - memory: feedback_qa_clickthrough_required.md
+  - bug: "screenshot 2026-04-29 showed Mitigation/SDG/Climate Finance/Reports/Master DB/Users entries; bench had no clickthrough check"

@@ -1,0 +1,26 @@
+id: regression_drawer_clickthrough_approver
+title: "Every drawer entry from Approver session resolves to a healthy page"
+perspective: { role: Adaptation Approver, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Adaptation Approver, cache: warm }
+
+# Cross-references the drawer perm-filter regression: an Approver should see
+# their approval-relevant entries AND those entries should not 404. Both halves
+# matter — perm-filter only stops leakage; clickthrough verifies destinations.
+steps:
+  - login_as: Adaptation Approver
+  - walk_drawer: { settle_timeout_ms: 8000 }
+  - capture: drawer-walked-approver
+
+assertions:
+  - drawer_destinations_healthy:
+      min_body_text_length: 100
+      require_heading: true
+  - no_console_error_matching: "TypeError|PermissionError|ReferenceError"
+
+rubric:
+  navigation_correctness: true
+
+tags: [regression, drawer, clickthrough, approver, day-1]
+sources:
+  - memory: feedback_qa_clickthrough_required.md
+  - memory: reference_drawer_perm_filter.md

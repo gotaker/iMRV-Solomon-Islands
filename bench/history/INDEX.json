@@ -6,6 +6,54 @@
       "a_tier_rate": 0.8571428571428571,
       "b_tier_composite": null,
       "b_tier_rubrics": {}
+    },
+    {
+      "run_id": "20260429T181510Z-9d38f23",
+      "a_tier_rate": 1.0,
+      "b_tier_composite": null,
+      "b_tier_rubrics": {}
+    },
+    {
+      "run_id": "20260429T181525Z-9d38f23",
+      "a_tier_rate": 1.0,
+      "b_tier_composite": null,
+      "b_tier_rubrics": {}
+    },
+    {
+      "run_id": "20260429T181532Z-9d38f23",
+      "a_tier_rate": 0.8235294117647058,
+      "b_tier_composite": null,
+      "b_tier_rubrics": {}
+    },
+    {
+      "run_id": "20260429T181746Z-9d38f23",
+      "a_tier_rate": 1.0,
+      "b_tier_composite": null,
+      "b_tier_rubrics": {}
+    },
+    {
+      "run_id": "20260429T182027Z-9d38f23",
+      "a_tier_rate": 0.0,
+      "b_tier_composite": null,
+      "b_tier_rubrics": {}
+    },
+    {
+      "run_id": "20260429T182222Z-9d38f23",
+      "a_tier_rate": 0.0,
+      "b_tier_composite": null,
+      "b_tier_rubrics": {}
+    },
+    {
+      "run_id": "20260429T182234Z-9d38f23",
+      "a_tier_rate": 0.8823529411764706,
+      "b_tier_composite": null,
+      "b_tier_rubrics": {}
+    },
+    {
+      "run_id": "20260429T182639Z-9d38f23",
+      "a_tier_rate": 0.8823529411764706,
+      "b_tier_composite": null,
+      "b_tier_rubrics": {}
     }
   ]
 }

@@ -75,9 +75,14 @@ steps:
       selector: "css selector"
       timeout_ms: 15000
   - capture: name-of-screenshot     # writes history/<run-id>/screenshots/...
+  - capture_text: name-of-text      # writes history/<run-id>/text/<name>.txt
   - login_as: <role>                # uses fixtures/role_credentials.yaml
   - fill: { selector: "...", value: "..." }
   - click: "css selector"
+  - walk_drawer:                    # opens drawer, clicks every entry, captures
+      link_selector: "#fsm-drawer a[href]"
+      settle_timeout_ms: 8000
+      skip_patterns: [logout, mailto:, tel:]
 
 assertions:                          # A-tier (deterministic, hard gate)
   - selector:
@@ -87,6 +92,11 @@ assertions:                          # A-tier (deterministic, hard gate)
   - no_console_error_matching: "regex pattern"
   - no_network_4xx_for_path: "/files/*"
   - url_matches: "regex:/(app|desk)/"
+  - drawer_destinations_healthy:    # asserts each drawer entry walked is healthy
+      min_body_text_length: 100
+      require_heading: true
+  - no_text_matching:               # typo / banned-string deny-list
+      denylist_file: bench/fixtures/typo_denylist.txt
   - design_system: { fonts: enforced, ... }   # Phase 2
 
 rubric:                              # B-tier (LLM-judged, observability)

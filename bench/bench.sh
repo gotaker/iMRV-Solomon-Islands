@@ -167,5 +167,11 @@ if [[ $DRY_RUN -eq 0 && -f "$RUN_DIR/scorecard.json" ]]; then
     --output "$RUN_DIR/score_summary.json" >/dev/null || true
 fi
 
+# --- Step 9: human-readable report (always) ---
+if [[ $DRY_RUN -eq 0 && -f "$RUN_DIR/scorecard.json" ]]; then
+  python3 -m bench.runner.report --run-dir "$RUN_DIR" || true
+fi
+
 echo "[bench] run_id=$RUN_ID exit=$A_TIER_EXIT"
+echo "[bench] report: $RUN_DIR/report.md"
 exit "$A_TIER_EXIT"
