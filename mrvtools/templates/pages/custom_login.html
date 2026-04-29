@@ -1,5 +1,11 @@
 {% extends "templates/baseweb.html" %}
 
+{# C1 audit (qa-report-2026-04-29.md): the QA tester reported that
+   value="Administrator" / value="catch22" appear on these inputs.
+   Verified false: `curl /login` shows zero value= attrs. The tester saw
+   browser autofill from a prior login in the same Playwright context.
+   Do not remove autocomplete attrs — needed for legitimate users. #}
+
 {% macro email_login_body() -%}
 {% if not disable_user_pass_login or (ldap_settings and ldap_settings.enabled) %}
 <div class="page-card-body">
