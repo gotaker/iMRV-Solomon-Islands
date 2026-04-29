@@ -41,7 +41,14 @@
   margin-bottom: 0.4rem;
 }
 
-/* === Field inputs === */
+/* === Field inputs ===
+   Frappe sets `.form-control { height: var(--input-height) }` (~28px). Our
+   editorial padding (0.55rem top+bottom = ~17.6px) inside a 28px border-box
+   left only ~10px of content area — too small for a 21px line-height, so
+   single-line text in selects/inputs got vertically clipped (top half cut on
+   "Ongoing", bottom half cut on "Sub-national"). Override height to auto with
+   a min-height that comfortably fits padding + line-height.
+*/
 .frappe-control .control-input input,
 .frappe-control .control-input select,
 .frappe-control .control-input textarea,
@@ -50,6 +57,9 @@
   border: 1px solid var(--ed-forest-08);
   border-radius: 6px;
   padding: 0.55rem 0.75rem;
+  height: auto;
+  min-height: 2.5rem;
+  line-height: 1.4;
   color: var(--ed-forest);
   font-family: var(--ed-font-body);
   transition:

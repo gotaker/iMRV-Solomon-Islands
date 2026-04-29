@@ -1,1 +1,2 @@
 mrvtools.patches.v1_0.fix_document_resource_tool_typo
+mrvtools.patches.v1_0.fix_ippu_emission_factors_sub_menu_is_single
