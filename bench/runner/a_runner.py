@@ -643,6 +643,66 @@ def _assert_no_text_matching(page, value: dict | str) -> AssertionResult:
     )
 
 
+def _assert_form_inputs_not_clipped(page, options: dict | None) -> AssertionResult:
+    """Catch form inputs whose content area is too small for their line-height.
+
+    Editorial padding (0.55rem top+bottom = ~17.6px) plus a 28px Frappe default
+    `--input-height` left ~10px of content area for a 21px line-height — text
+    in <select> values got vertically clipped (top half of "Ongoing", bottom
+    half of "Sub-national"). We assert content_area_height >= line_height for
+    every form input on the page.
+    """
+    options = options or {}
+    selector = options.get("selector", "input.form-control, select.form-control, .input-with-feedback")
+    bad = page.evaluate(
+        """(sel) => {
+            const out = [];
+            document.querySelectorAll(sel).forEach(el => {
+                if (el.type === 'hidden') return;
+                const rect = el.getBoundingClientRect();
+                if (rect.height < 1) return;  // not rendered
+                const cs = window.getComputedStyle(el);
+                const padTop = parseFloat(cs.paddingTop) || 0;
+                const padBot = parseFloat(cs.paddingBottom) || 0;
+                const borderTop = parseFloat(cs.borderTopWidth) || 0;
+                const borderBot = parseFloat(cs.borderBottomWidth) || 0;
+                let lineHeight = parseFloat(cs.lineHeight);
+                if (Number.isNaN(lineHeight)) {
+                    lineHeight = parseFloat(cs.fontSize) * 1.2;
+                }
+                let contentHeight;
+                if (cs.boxSizing === 'border-box') {
+                    contentHeight = rect.height - padTop - padBot - borderTop - borderBot;
+                } else {
+                    contentHeight = rect.height;
+                }
+                // Need at least line-height content area (allow 1px slop for sub-pixel rounding)
+                if (contentHeight + 1 < lineHeight) {
+                    out.push({
+                        tag: el.tagName,
+                        name: el.name || el.id || '',
+                        height: rect.height,
+                        contentHeight: Math.round(contentHeight * 10) / 10,
+                        lineHeight: Math.round(lineHeight * 10) / 10,
+                        padding: padTop + '/' + padBot,
+                    });
+                }
+            });
+            return out;
+        }""",
+        selector,
+    )
+    return AssertionResult(
+        "form_inputs_not_clipped",
+        passed=not bad,
+        detail=(
+            f"{len(bad)} input(s) with content area smaller than line-height: "
+            + "; ".join(f"{b['tag']}({b['name'] or '?'}) {b['contentHeight']}px<{b['lineHeight']}px" for b in bad[:3])
+            if bad else f"all matched inputs have content area >= line-height"
+        ),
+    )
+
+
 def _glob_to_regex(glob: str) -> str:
     """Convert a simple URL glob (e.g. /files/*) to a regex. * → [^?#]*."""
     parts = glob.split("*")
@@ -682,6 +742,8 @@ def _evaluate_assertions(
                 ds_results = check_page(page, aspects)
                 passed, detail = summarize(ds_results)
                 results.append(AssertionResult("design_system", passed, detail))
+            elif kind == "form_inputs_not_clipped":
+                results.append(_assert_form_inputs_not_clipped(page, value if isinstance(value, dict) else None))
             else:
                 results.append(AssertionResult(kind, False, f"unknown assertion kind '{kind}'"))
         except Exception as exc:  # noqa: BLE001 — explicit assertion-level error reporting

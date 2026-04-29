@@ -1,0 +1,24 @@
+id: regression_form_inputs_not_clipped
+title: "Form selects/inputs render text without vertical clipping"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+steps:
+  - login_as: Administrator
+  # The Adaptation new-doc form has the AREA / PROGRAMME STATUS / FOCUS
+  # selects that surfaced the bug — editorial padding of 0.55rem inside a
+  # 28px Frappe default --input-height left ~10px of content area for a
+  # 21px line-height, so single-line select values were vertically clipped
+  # (top half of "Ongoing" cut, bottom half of "Sub-national" cut).
+  - navigate: /app/adaptation/new
+  - wait_for_selector:
+      selector: ".frappe-control .control-input select, .frappe-control .control-input input"
+      timeout_ms: 15000
+  - capture: adaptation-new-form
+assertions:
+  - form_inputs_not_clipped:
+      selector: ".frappe-control .control-input select, .frappe-control .control-input input.form-control, .input-with-feedback"
+  - no_console_error_matching: "TypeError|ReferenceError"
+tags: [regression, design-system, form, layout]
+sources:
+  - { bug: "Editorial padding shrunk content area below line-height; selects clipped vertically" }
+  - { commit: "this PR" }
