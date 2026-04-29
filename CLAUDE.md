@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 0. Operating Mode
+
+**Default to autonomous execution. Suppress narration. Report only the final outcome.**
+
+- Do not announce plans, intermediate steps, or what you're "about to do." No running commentary.
+- Do not ask clarifying questions for routine work. Pick the most reasonable interpretation and proceed; surface ambiguities only when blocked or when the action is hard to reverse.
+- End-of-turn output is a brief outcome statement: what changed, what's verified, and (only if relevant) what's next. No section headers, no bullets restating work, no preamble.
+- §1 ("If unclear, stop and ask") still applies to **hard-to-reverse actions** (destructive git ops, deletions, force-pushes, sending external messages, deploys) — confirm those before acting. Routine reads, edits, builds, tests, and shell commands proceed silently.
+- §4 success criteria still apply: convert the task into something verifiable, then loop until verified — just don't narrate the loop.
+
 ## 1. Think Before Coding
 
 **Don't assume. Don't hide confusion. Surface tradeoffs.**
