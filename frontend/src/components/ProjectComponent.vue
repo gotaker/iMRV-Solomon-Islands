@@ -69,9 +69,8 @@
                   id="pills-home-tab"
                   href="#p-view-2"
                   role="tab"
-                  data-toggle="tab"
-                  aria-controls="pills-home"
                   aria-selected="true"
+                  @click.prevent="onTabClick($event)"
                   >Adaptation
                 </a>
               </li>
@@ -81,9 +80,8 @@
                   id="pills-profile-tab"
                   href="#p-view-5"
                   role="tab"
-                  data-toggle="tab"
-                  aria-controls="pills-profile"
                   aria-selected="false"
+                  @click.prevent="onTabClick($event)"
                   >Mitigation
                 </a>
               </li>
@@ -93,9 +91,8 @@
                   id="pills-contact-tab"
                   href="#p-view-6"
                   role="tab"
-                  data-toggle="tab"
-                  aria-controls="pills-contact"
                   aria-selected="false"
+                  @click.prevent="onTabClick($event)"
                   >Cross cutting</a
                 >
               </li>
@@ -105,9 +102,8 @@
                   id="pills-contact-tab"
                   href="#p-view-7"
                   role="tab"
-                  data-toggle="tab"
-                  aria-controls="pills-contact"
                   aria-selected="false"
+                  @click.prevent="onTabClick($event)"
                   >Enablers</a
                 >
               </li>
@@ -117,9 +113,8 @@
                   id="pills-contact-tab"
                   href="#p-view-8"
                   role="tab"
-                  data-toggle="tab"
-                  aria-controls="pills-contact"
                   aria-selected="false"
+                  @click.prevent="onTabClick($event)"
                   >Transparency</a
                 >
               </li>
@@ -129,9 +124,8 @@
                   id="pills-contact-tab"
                   href="#p-view-9"
                   role="tab"
-                  data-toggle="tab"
-                  aria-controls="pills-contact"
                   aria-selected="false"
+                  @click.prevent="onTabClick($event)"
                   >Support</a
                 >
               </li>
@@ -2384,6 +2378,28 @@ export default {
     },
   },
   methods: {
+    onTabClick(e) {
+      const a = e.currentTarget
+      const href = a.getAttribute('href')
+      if (!href || !href.startsWith('#')) return
+      const paneId = href.slice(1)
+      const li = a.closest('.tab_child')
+      if (li && li.parentElement) {
+        li.parentElement
+          .querySelectorAll('.tab_child')
+          .forEach((s) => s.classList.remove('active'))
+        li.classList.add('active')
+      }
+      const content = document.querySelector('.tab-content')
+      if (content) {
+        content
+          .querySelectorAll('.tab-pane')
+          .forEach((p) => p.classList.remove('active'))
+        const target = content.querySelector('#' + paneId)
+        if (target) target.classList.add('active')
+      }
+      history.replaceState(null, '', href)
+    },
     sortList1(sortBy) {
       if (this.sortedbyASC1) {
         // Sort in ascending order
