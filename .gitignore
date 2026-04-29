@@ -33,3 +33,10 @@ tests/.screenshots/
 # UI/UX sweep test artifacts (not tracked)
 screenshots/
 .playwright-mcp/
+
+# Editor / IDE / local tooling state
+.claude/
+.obsidian/
+
+# /graphify skill output (regenerated; not source)
+graphify-out/
