@@ -138,6 +138,12 @@
       "a_tier_rate": 0.0,
       "b_tier_composite": null,
       "b_tier_rubrics": {}
+    },
+    {
+      "run_id": "20260429T204212Z-83ee7a0",
+      "a_tier_rate": 1.0,
+      "b_tier_composite": null,
+      "b_tier_rubrics": {}
     }
   ]
 }
