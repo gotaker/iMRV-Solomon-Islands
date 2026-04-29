@@ -16,15 +16,11 @@ def execute():
 				"Side Menu", "Document Resorce Tool", "Document Resource Tool",
 				force=True, merge=False, rebuild_search=True,
 			)
-			# rename_doc updates Link fields but not the implicit child-table
-			# parent column. Backfill Sub Menu / Sub Menu Group rows so child
-			# rows whose parent='Document Resorce Tool' don't become orphans.
+			# Backfill the Sub Menu child-table parent column in case rename_doc
+			# missed any rows. Sub Menu Group is a Link target (not a child of
+			# Side Menu) so it has no parent column to update.
 			frappe.db.sql(
 				"UPDATE `tabSub Menu` SET parent=%s WHERE parent=%s",
-				("Document Resource Tool", "Document Resorce Tool"),
-			)
-			frappe.db.sql(
-				"UPDATE `tabSub Menu Group` SET parent=%s WHERE parent=%s",
 				("Document Resource Tool", "Document Resorce Tool"),
 			)
 			frappe.db.set_value(
