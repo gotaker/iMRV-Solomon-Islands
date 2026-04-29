@@ -121,8 +121,8 @@ const onSubscribe = (e) => {
         >
         <router-link to="/about">MECDM Honiara</router-link>
         <router-link to="/support">Press &amp; Inquiries</router-link>
-        <a href="#">Open Data API</a>
-        <a href="#">Methodology</a>
+        <a href="mailto:admin@imrv.netzerolabs.io?subject=Open%20Data%20API%20Inquiry">Open Data API</a>
+        <a href="mailto:admin@imrv.netzerolabs.io?subject=Methodology%20Inquiry">Methodology</a>
       </div>
     </div>
 
@@ -144,9 +144,9 @@ const onSubscribe = (e) => {
     <div class="ed-mark">
       <span>© 2026 Government of Solomon Islands · MECDM</span>
       <div class="ed-legal">
-        <a href="#">Privacy</a>
-        <a href="#">Accessibility</a>
-        <a href="#">Source</a>
+        <a href="mailto:admin@imrv.netzerolabs.io?subject=Privacy%20Policy%20Inquiry">Privacy</a>
+        <a href="mailto:admin@imrv.netzerolabs.io?subject=Accessibility%20Inquiry">Accessibility</a>
+        <a href="mailto:admin@imrv.netzerolabs.io?subject=Source%20Code%20Inquiry">Source</a>
       </div>
     </div>
   </footer>
