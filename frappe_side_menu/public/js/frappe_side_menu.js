@@ -461,6 +461,8 @@ function toggleSubMenu(element) {
         if (sibPanel) sibPanel.style.maxHeight = '0px';
         const sibIcon = li.querySelector('i.fa-angle-down');
         if (sibIcon) sibIcon.classList.replace('fa-angle-down', 'fa-angle-right');
+        const sibToggle = li.querySelector(':scope > a[role="button"]');
+        if (sibToggle) sibToggle.setAttribute('aria-expanded', 'false');
     });
 
     if (isOpen) {
@@ -473,6 +475,9 @@ function toggleSubMenu(element) {
         childPanel.style.maxHeight = childPanel.scrollHeight + 'px';
         const icon = parentLi.querySelector('i.fa-angle-right');
         if (icon) icon.classList.replace('fa-angle-right', 'fa-angle-down');
+    }
+    if (element.getAttribute('role') === 'button') {
+        element.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
     }
 }
 
@@ -691,6 +696,18 @@ function fsmAttachDrawer() {
     });
 
     fsmDrawerEl.addEventListener('keydown', fsmTrapFocus);
+
+    // Keyboard activation for role="button" accordion toggles (Enter / Space).
+    // Without this, tab-focused screen-reader users can't open submenus.
+    fsmDrawerEl.addEventListener('keydown', function(e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        var target = e.target;
+        if (!target || target.getAttribute('role') !== 'button') return;
+        var parentLi = target.parentElement;
+        if (!parentLi || !parentLi.classList.contains('treeview') || !parentLi.classList.contains('drop-down')) return;
+        e.preventDefault();
+        toggleSubMenu(target);
+    });
 
     document.body.classList.add('fsm-ready');
 }

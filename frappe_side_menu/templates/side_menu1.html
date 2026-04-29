@@ -13,7 +13,7 @@
             {%for u in menulist%}
                {% if u.has_sub_menu==1 and u.has_sublist >= 1%}
                   <li class="treeview drop-down">
-                    <a class="link menu" style="border-left-color: #fefae0 !important;">
+                    <a class="link menu" role="button" tabindex="0" aria-expanded="false" aria-controls="fsm-submenu-{{ loop.index }}" style="border-left-color: #fefae0 !important;">
                         {% if u.icon_image %}
                             <img src="{{ u.icon_image }}" alt="{{ u.label }}" class="navbar-image" style="width: 30px;">
                         {% else %}
@@ -22,7 +22,7 @@
                         <span style="font-size: 15px;">{{ u.label }}</span>
                     </a>
                 <div class="side-menu">
-                    <ul class="treeview-menu" id="submenu-tree">
+                    <ul class="treeview-menu" id="fsm-submenu-{{ loop.index }}">
                    
                         {% if user_info %}
                         <li class="user-info" style="z-index: 100; position: sticky; top: 0;">

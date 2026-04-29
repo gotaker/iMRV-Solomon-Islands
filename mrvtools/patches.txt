@@ -1,0 +1,1 @@
+mrvtools.patches.v1_0.fix_document_resource_tool_typo
