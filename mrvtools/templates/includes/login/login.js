@@ -5,6 +5,11 @@ window.disable_signup = {{ disable_signup and "true" or "false" }};
 
 window.login = {};
 
+// H6: tracks the form selector that triggered the most recent submit so
+// login.set_status can scope its message to that form's primary button
+// instead of leaking into every visible section's button.
+login.active_form = null;
+
 window.verify = {};
 
 login.bind_events = function () {
@@ -15,6 +20,7 @@ login.bind_events = function () {
 
 	$(".form-login").on("submit", function (event) {
 		event.preventDefault();
+		login.active_form = ".form-login";
 		var args = {};
 		args.cmd = "login";
 		args.usr = frappe.utils.xss_sanitise(($("#login_email").val() || "").trim());
@@ -30,6 +36,7 @@ login.bind_events = function () {
 
 	$(".form-signup").on("submit", function (event) {
 		event.preventDefault();
+		login.active_form = ".form-signup";
 		var args = {};
 		args.cmd = "frappe.core.doctype.user.user.sign_up";
 		args.email = ($("#signup_email").val() || "").trim();
@@ -45,6 +52,7 @@ login.bind_events = function () {
 
 	$(".form-forgot").on("submit", function (event) {
 		event.preventDefault();
+		login.active_form = ".form-forgot";
 		var args = {};
 		args.cmd = "frappe.core.doctype.user.user.reset_password";
 		args.user = ($("#forgot_email").val() || "").trim();
@@ -58,6 +66,7 @@ login.bind_events = function () {
 
 	$(".form-login-with-email-link").on("submit", function (event) {
 		event.preventDefault();
+		login.active_form = ".form-login-with-email-link";
 		var args = {};
 		args.cmd = "frappe.www.login.send_login_link";
 		args.email = ($("#login_with_email_link_email").val() || "").trim();
@@ -88,6 +97,7 @@ login.bind_events = function () {
 
 	{% if ldap_settings and ldap_settings.enabled %}
 	$(".btn-ldap-login").on("click", function () {
+		login.active_form = ".form-login";
 		var args = {};
 		args.cmd = "{{ ldap_settings.method }}";
 		args.usr = ($("#login_email").val() || "").trim();
@@ -123,6 +133,13 @@ login.reset_sections = function (hide) {
 		$(this).removeClass().addClass('indicator').addClass('blue')
 			.text($(this).attr('data-text'));
 	});
+	// H6: restore any primary/login/forgot button text from its
+	// data-default-text so a stale "Invalid Login. Try again." can't
+	// follow the user to a different section.
+	$('section .btn-primary, section .btn-login, section .btn-forgot').each(function () {
+		var d = $(this).attr('data-default-text');
+		if (d) $(this).text(d);
+	});
 }
 
 login.login = function () {
@@ -147,6 +164,11 @@ login.forgot = function () {
 	if ($("#login_email").val()) {
 		$("#forgot_email").val($("#login_email").val());
 	}
+	// H6: explicitly restore .btn-forgot text in case reset_sections ran
+	// before data-default-text was readable (defensive belt-and-braces).
+	var $btn = $('.btn-forgot');
+	var dt = $btn.attr('data-default-text');
+	if (dt) $btn.text(dt);
 	$(".for-forgot").toggle(true);
 	$("#forgot_email").focus();
 }
@@ -181,7 +203,14 @@ login.call = function (args, callback) {
 }
 
 login.set_status = function (message, color) {
-	$('section:visible .btn-primary').text(message)
+	// H6: scope status to the active form's primary button if known and
+	// visible; otherwise fall back to every visible section's primary
+	// button (preserves prior behaviour for code paths that don't set
+	// login.active_form, e.g. OTP verify).
+	var $btn = (login.active_form && $(login.active_form).is(':visible'))
+		? $(login.active_form).find('.btn-primary')
+		: $('section:visible .btn-primary');
+	$btn.text(message);
 	if (color == "red") {
 		$('section:visible .page-card-body').addClass("invalid");
 	} else {
