@@ -1,0 +1,79 @@
+# bench/crawler.yaml — per-role crawler configuration.
+#
+# Each role gets a `start_urls` list, a depth bound, and a list of selectors
+# from which to extract follow-targets. The crawler is per-origin only — it
+# never follows links to a different host.
+
+crawl:
+  guest:
+    start_urls:
+      - /frontend/home
+      - /frontend/about
+      - /frontend/projects
+      - /frontend/reports
+      - /frontend/knowledge-resource
+    max_depth: 4
+    follow_selectors:
+      - 'a[href]'
+      - 'button[data-route]'
+    skip_patterns:
+      - logout
+      - mailto:
+      - tel:
+      - .pdf
+      - .zip
+      - .docx
+
+  Administrator:
+    start_urls:
+      - /app/main-dashboard
+      - /app/side-menu-settings
+    max_depth: 4
+    follow_selectors:
+      - 'a[href^="/app"]'
+      - 'a[href^="/desk"]'
+      - '.fsm-drawer a'
+      - '.list-row-name'
+      - '.report-link'
+      - '[data-toggle="tab"]'
+    skip_patterns:
+      - logout
+      - mailto:
+      - tel:
+      - .pdf
+      - .zip
+
+  # Submitter / Approver crawls require fixture credentials. They auto-skip if
+  # the credential entry is missing.
+  Adaptation Submitter:
+    start_urls: [/app/main-dashboard, /app/adaptation]
+    max_depth: 3
+    follow_selectors:
+      - 'a[href^="/app/adaptation"]'
+      - '.fsm-drawer a'
+      - '.list-row-name'
+    skip_patterns: [logout, mailto:, tel:]
+
+  Adaptation Approver:
+    start_urls: [/app/main-dashboard, /app/my-approval]
+    max_depth: 3
+    follow_selectors:
+      - 'a[href^="/app/my-approval"]'
+      - 'a[href^="/app/adaptation"]'
+      - '.fsm-drawer a'
+    skip_patterns: [logout, mailto:, tel:]
+
+global:
+  max_pages_per_role: 250
+  dedupe_by: canonical_url
+  cache_unchanged_pages: true     # Phase 2.5: skip pages whose page_hash matches prior run
+
+baseline_checks:
+  - http_status: 200
+  - no_console_error_matching: 'TypeError|ReferenceError|CSRFTokenError|404'
+  - no_unhandled_promise_rejection: true
+  - design_system: enforced       # delegated to design_system_checks.py
+  - axe_critical_count: 0         # Phase 4: requires axe-core injection
+  - lighthouse_perf_min: 70       # Phase 4
+  - reveal_health: 'no_stuck_opacity_zero_after_2s'
+  - render_settled_within_ms: 5000

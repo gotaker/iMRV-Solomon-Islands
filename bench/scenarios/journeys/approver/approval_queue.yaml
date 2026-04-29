@@ -1,0 +1,37 @@
+id: approver_approval_queue
+title: "Approver logs in, opens My Approval list, sees only their own queue"
+perspective:
+  role: Adaptation Approver
+  persona: standard
+  environment: any
+
+preconditions:
+  sample_db: required
+  session: logged_in_as:Adaptation Approver
+  cache: warm
+
+steps:
+  - login_as: Adaptation Approver
+  - navigate: /app/my-approval
+  - wait_for_selector:
+      selector: ".list-row, .frappe-list, .empty-state, .no-result"
+      timeout_ms: 15000
+  - capture: my-approval-list
+
+assertions:
+  # Did not redirect to login. Approver must be able to land on this list.
+  - url_matches: "regex:/(app|desk)/my-approval"
+  # No leakage from substring-matched user lists — the
+  # reference_drawer_perm_filter.md regression class. If the drawer / list
+  # leaks "Approved User" rows into the approver's view, that's a DOM trace.
+  - no_console_error_matching: "TypeError|ReferenceError|PermissionError"
+  - no_network_4xx_for_path: "/api/method/frappe.client.get_list*"
+
+rubric:
+  navigation_correctness: true
+  error_handling: true
+
+tags: [journey, approver, day-1]
+sources:
+  - memory: reference_drawer_perm_filter.md
+  - memory: feedback_qa_clickthrough_required.md

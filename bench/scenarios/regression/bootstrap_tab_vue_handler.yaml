@@ -1,0 +1,24 @@
+id: regression_bootstrap_tab_vue_handler
+title: "Knowledge Resource tabs activate via Vue handler (not stuck on data-toggle)"
+perspective: { role: guest, persona: standard, environment: any }
+preconditions: { sample_db: required, session: anonymous, cache: warm }
+steps:
+  - navigate: /frontend/knowledge-resource
+  - wait_for_selector:
+      selector: "[data-v-app]"
+      timeout_ms: 15000
+  - capture: knowledge-initial-tab
+  # Click the second tab (whichever Knowledge Resource page exposes); a Vue
+  # @click handler should swap content. data-toggle="tab" alone won't fire
+  # without correctly-wired aria-controls — and that's the bug class.
+  - click: ".nav-link:nth-of-type(2), [role='tab']:nth-of-type(2)"
+  - capture: knowledge-second-tab
+assertions:
+  - selector:
+      selector: "[data-v-app]"
+      count: { min: 1 }
+  # The page didn't 4xx and the SPA didn't crash on the click.
+  - no_console_error_matching: "TypeError|ReferenceError|aria-controls"
+  - no_network_4xx_for_path: "/frontend/knowledge-resource"
+tags: [regression, tabs, vue, day-1]
+sources: [{ memory: feedback_bootstrap_tab_override.md }]

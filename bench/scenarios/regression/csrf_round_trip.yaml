@@ -1,0 +1,18 @@
+id: regression_csrf_round_trip
+title: "Guest home page loads without CSRFTokenError on mrvfrontend.get_all"
+perspective: { role: guest, persona: standard, environment: any }
+preconditions: { sample_db: required, session: anonymous, cache: warm }
+steps:
+  - navigate: /frontend/home
+  - wait_for_selector:
+      selector: "[data-v-app]"
+      timeout_ms: 15000
+  - capture: home-after-fetch
+assertions:
+  # The exact symptom of QA C3 — token mismatch on guest createResource calls.
+  # ignore_csrf=1 in dev keeps this green; the proxy round-trips it in prod.
+  - no_console_error_matching: "CSRFTokenError|csrf"
+  - no_network_4xx_for_path: "/api/method/mrvtools.mrvfrontend*"
+  - selector: { selector: "[data-v-app]", count: { min: 1 } }
+tags: [regression, csrf, day-1]
+sources: [{ memory: reference_csrf_retry_interceptor.md }]

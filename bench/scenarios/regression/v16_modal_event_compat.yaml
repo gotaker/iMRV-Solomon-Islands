@@ -1,0 +1,26 @@
+id: regression_v16_modal_event_compat
+title: "Wizard guard fires on /desk/setup-wizard (v16 canonical desk URL)"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+steps:
+  - login_as: Administrator
+  - navigate: /desk/setup-wizard
+  - wait_for_selector:
+      selector: "body"
+      timeout_ms: 10000
+  - capture: setup-wizard-canonical
+  - navigate: /app/setup-wizard
+  - wait_for_selector:
+      selector: "body"
+      timeout_ms: 10000
+  - capture: setup-wizard-redirect
+assertions:
+  # Both URL forms must resolve. The drawer guard in
+  # frappe_side_menu.js checks both /desk/setup-wizard AND /app/setup-wizard
+  # to avoid v16 canonicalization breaking the wizard exclusion.
+  - url_matches: "regex:/(app|desk)/setup-wizard"
+  - no_console_error_matching: "TypeError|ReferenceError|show.bs.modal"
+tags: [regression, v16, modal-events, day-1]
+sources:
+  - memory: reference_frappe_v16_modal_events.md
+  - memory: project_frappe_v16_desk_url.md

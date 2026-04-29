@@ -178,6 +178,32 @@ Secrets needed: `SAMPLE_DB_URL` (URL to a `sample-db-YYYYMMDD` GitHub release as
 
 Secrets needed: `MARIADB_ROOT_PASSWORD` (any strong password — only used inside the ephemeral MariaDB service container).
 
+## Test bench
+
+A second, deploy-verification-oriented test layer lives at [bench/](bench/), separate from the pytest harness at `tests/`. The pytest harness owns code-level integration against a fresh `bench serve` on port 8001; the test bench owns deploy-verification + quality scoring against deployed targets (local Docker replica, Railway preview, Railway live). Full design: [`~/.claude/plans/despite-diffrent-and-multiple-sharded-frost.md`](file://~/.claude/plans/despite-diffrent-and-multiple-sharded-frost.md). Quick reference: [bench/README.md](bench/README.md).
+
+Two-tier model: A-tier (deterministic Playwright YAMLs in `bench/scenarios/`) is a hard gate — any failure blocks the deploy. B-tier (LLM-judged rubric scoring, Phase 4) is observability only. The bench expands four user-type journey templates (`journeys/{guest,user,approver,admin}/`) over the role inventory discovered at runtime by `bench/runner/role_discovery.py`, and `bench/runner/permission_matrix.py` cross-checks every (actor_role × surface_owner_role) cell for substring-style perm leakage. Default target is the local Docker replica (`docker compose -f deploy/railway/docker-compose.local.yml`), never live by default — adversarial agents (Phase 3) only run against `local-docker`.
+
+```bash
+./bench/bench.sh --target=local-docker --tier=a --dry-run   # validate corpus only
+./bench/bench.sh --target=local-docker --tier=a             # run all A-tier
+./bench/bench.sh --target=local-docker --scenarios='scenarios/regression/*.yaml'
+```
+
+Phase 1 ships 4 journey templates + 10 regression scenarios derived from existing memory entries (`reference_csrf_retry_interceptor.md`, `reference_drawer_perm_filter.md`, `reference_v16_breadcrumb_selector.md`, etc.).
+
+**Phase 2-4 ship the following components**, all gated behind `--include-*` flags so the default bench run stays a deterministic Phase-1 A-tier:
+
+- **Crawler** (`bench/runner/crawler.py` + `bench/crawler.yaml`): per-role BFS walker with depth/dedupe/page-hash caching; emits `coverage.json`. Pages failing baseline_checks auto-write candidate stubs to `bench/candidates/crawled/`. Run with `--include-crawler`.
+- **Design-system-agent** (`bench/runner/design_system_checks.py`): asserts Anton/Inter typography, v16 selectors (`.navbar-breadcrumbs`, `.fsm-trigger`), reveal-health (no [data-reveal] stuck at opacity:0), drawer frosted-glass surface. Wired into the `design_system:` assertion in scenario YAMLs.
+- **Adversarial Wave 2** (4 agents — `fuzz_agent`, `race_agent`, `chaos_agent`, `permission_escalation_agent`): only fire when `--include-adversarial` is set AND the target's `safe_for_adversarial: true` (default `local-docker` only — refused for `railway-live`).
+- **B-tier judge** (`bench/runner/judge.py` + `bench/rubrics/*.md`): Claude Sonnet, prompt-cached. Loads each scenario's `rubric:` block, sends screenshots + metadata, scores 1-10 per dimension. Skips silently if `ANTHROPIC_API_KEY` is missing or `b_tier.enabled=false` in `config.yaml`.
+- **Convergence-agent** (`bench/runner/convergence_agent.py`): given the deploy diff + scorecard + judge results, drafts up to 5 candidate scenario stubs to `bench/candidates/convergence/`.
+- **Score** (`bench/runner/score.py`): composite math + 5-run rolling delta; flags any rubric Δ ≤ -0.5; writes `score_summary.json` + updates `bench/history/INDEX.json`.
+- **Slash commands**: `/bench add-scenario` ([.claude/skills/bench-add-scenario/SKILL.md](.claude/skills/bench-add-scenario/SKILL.md)) drafts a YAML from a bug report. `/bench triage` ([.claude/skills/bench-triage/SKILL.md](.claude/skills/bench-triage/SKILL.md)) walks `bench/candidates/` weekly with promote/reject/keep verdicts.
+
+Phases 5 (deploy integration / Railway webhook + auto-rollback) and 6 (self-improvement cadence) are project-specific wiring — design is in the plan file but no code lands without your Railway access. Run history at `bench/history/<run-id>/` is gitignored except for `INDEX.json` (small rolling index).
+
 ## Architecture notes worth knowing before editing
 
 **Routing handoff.** [mrvtools/hooks.py](mrvtools/hooks.py) defines `website_route_rules` mapping `/frontend/<path:app_path>` to the `frontend` web template, and redirects `/` → `/frontend/home`. Inside the SPA, `createWebHistory('/frontend')` takes over. A route that "doesn't work" may be failing at either the Frappe route-rule layer or the Vue router layer — check both. `/login` is also overridden to a `custom_login` web template.

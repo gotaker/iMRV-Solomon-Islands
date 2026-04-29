@@ -1,0 +1,45 @@
+id: user_submit_adaptation
+title: "Submitter logs in, navigates to Adaptation, opens new form, lands on /desk/*"
+perspective:
+  role: Adaptation Submitter
+  persona: standard
+  environment: any
+
+preconditions:
+  sample_db: required
+  session: logged_in_as:Adaptation Submitter
+  cache: warm
+
+steps:
+  - login_as: Adaptation Submitter
+  - capture: post-login-dashboard
+  - navigate: /app/adaptation/new?adaptation=new
+  - wait_for_selector:
+      selector: ".form-page, .page-form, .layout-main-section"
+      timeout_ms: 15000
+  - capture: new-adaptation-form
+
+assertions:
+  # We landed somewhere under /desk or /app and never bounced back to /login.
+  - url_matches: "regex:/(app|desk)/"
+  # The form actually rendered. Frappe v16 uses .layout-main-section as the
+  # form container; v15 used .page-form. We tolerate either.
+  - selector:
+      selector: ".layout-main-section, .page-form"
+      count: { min: 1 }
+  # No console errors — covers the can_read query bug from
+  # reference_frappe_perm_can_read.md and the v16 modal-event compat issue.
+  - no_console_error_matching: "TypeError|ReferenceError|CSRFTokenError"
+  # No 4xx for the doctype's API endpoint — catches missing perms / wrong
+  # doctype name / Custom DocPerm misconfig.
+  - no_network_4xx_for_path: "/api/resource/Adaptation*"
+
+rubric:
+  navigation_correctness: true
+  error_handling: true
+  visual_design: true
+
+tags: [journey, user, submitter, day-1]
+sources:
+  - memory: reference_drawer_perm_filter.md
+  - memory: project_frappe_v16_desk_url.md

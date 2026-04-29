@@ -1,0 +1,16 @@
+id: regression_post_login_redirect_to_desk
+title: "on_session_creation sends authenticated users to /app/* not /frontend"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: anonymous, cache: warm }
+steps:
+  - login_as: Administrator
+  - capture: post-login-target
+assertions:
+  # The frappe_side_menu/api.py:182 contract — System Users land on the desk
+  # via Side Menu Settings.route_logo (or /app/main-dashboard fallback), not
+  # the SPA. Regression here means anyone with desk access bounces to /frontend
+  # instead of seeing their dashboard.
+  - url_matches: "regex:/(app|desk)/"
+  - no_console_error_matching: "TypeError|ReferenceError"
+tags: [regression, login, redirect, day-1]
+sources: [{ memory: project_frappe_v16_desk_url.md }]

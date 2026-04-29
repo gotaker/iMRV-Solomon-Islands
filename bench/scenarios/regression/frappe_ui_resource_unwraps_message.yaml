@@ -1,0 +1,24 @@
+id: regression_frappe_ui_resource_unwraps_message
+title: "SPA home renders content (createResource auto-unwraps .message)"
+perspective: { role: guest, persona: standard, environment: any }
+preconditions: { sample_db: required, session: anonymous, cache: warm }
+steps:
+  - navigate: /frontend/home
+  - wait_for_selector:
+      selector: "[data-v-app]"
+      timeout_ms: 15000
+  - capture: home-with-data
+assertions:
+  # The trap: data?.message?.parent_data silently resolves to undefined
+  # because frappe-ui already unwraps. If the SPA reverts to .message access,
+  # all the home page sections render empty. Detect by asserting that at least
+  # one of the canonical home-page sections renders SOME child content.
+  # The SPA shell mount alone (above) doesn't catch this — we need to see
+  # rendered children inside it.
+  - selector:
+      selector: "[data-v-app] section, [data-v-app] main, [data-v-app] article, [data-v-app] .home-section, [data-v-app] [data-section]"
+      count: { min: 1 }
+  - no_console_error_matching: "TypeError|undefined.*parent_data"
+  - no_network_4xx_for_path: "/api/method/mrvtools*"
+tags: [regression, frappe-ui, day-1]
+sources: [{ memory: reference_frappeui_unwraps_message.md }]

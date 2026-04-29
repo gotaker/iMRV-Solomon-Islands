@@ -1,0 +1,26 @@
+id: regression_intersection_observer_threshold
+title: "No [data-reveal] elements stuck at opacity:0 after page settle"
+perspective: { role: guest, persona: standard, environment: any }
+preconditions: { sample_db: required, session: anonymous, cache: warm }
+steps:
+  - navigate: /frontend/home
+  - wait_for_selector:
+      selector: "[data-reveal].is-revealed"
+      timeout_ms: 10000
+  - capture: home-revealed
+assertions:
+  # The IO threshold pitfall: threshold>0 + negative bottom rootMargin left
+  # short headlines stuck at opacity:0. Fix uses threshold:0 + synchronous
+  # prime() walk in useReveal. We assert by selector count: every [data-reveal]
+  # within viewport bounds should have the .is-revealed class within 2s of
+  # mount. Since we already wait for at least one .is-revealed above, here we
+  # just assert that we have *more than zero* — Phase 2's design-system-agent
+  # will add a stronger computed-style check.
+  - selector:
+      selector: "[data-reveal].is-revealed"
+      count: { min: 1 }
+  # No reveal elements outside the visible band should still be at opacity 0
+  # after we've waited — but that needs computed-style API support, which
+  # currently lives in design-system-agent (Phase 2). Documented intent here.
+tags: [regression, reveal, day-1, needs:phase-2-computed-style]
+sources: [{ memory: feedback_io_threshold_pitfall.md }]

@@ -1,0 +1,29 @@
+id: regression_drawer_perm_filter_user_section
+title: "Approved User does NOT see USERS section in drawer (substring leak)"
+perspective: { role: Approved User, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Approved User, cache: warm }
+steps:
+  - login_as: Approved User
+  - wait_for_selector:
+      selector: ".fsm-trigger"
+      timeout_ms: 15000
+  - click: ".fsm-trigger"
+  - wait_for_selector:
+      selector: "#fsm-drawer.is-open, body.fsm-open #fsm-drawer"
+      timeout_ms: 5000
+  - capture: drawer-open
+assertions:
+  # The bug: substring match on permitted_docs SQL string allowed "User" to
+  # match '"User Registration","Approved User"' so USERS section leaked.
+  # We assert that no <a>/menu entry with text "User" or "Users" or "USER MGMT"
+  # is visible in the drawer for this role. Frappe drawer entries render as
+  # <a class="fsm-link"> or similar; we check the entire drawer's text content.
+  - selector:
+      selector: "#fsm-drawer a[href*='/user/']"
+      count: { max: 0 }
+  - selector:
+      selector: "#fsm-drawer .fsm-section-title:has-text('USER'), #fsm-drawer h3:has-text('USER')"
+      count: { max: 0 }
+  - no_console_error_matching: "PermissionError|TypeError"
+tags: [regression, drawer, perm-filter, day-1]
+sources: [{ memory: reference_drawer_perm_filter.md }]

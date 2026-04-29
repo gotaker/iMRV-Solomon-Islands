@@ -1,0 +1,41 @@
+id: admin_dashboard_and_settings
+title: "Administrator logs in, lands on dashboard, opens Side Menu Settings"
+perspective:
+  role: Administrator
+  persona: standard
+  environment: any
+
+preconditions:
+  sample_db: required
+  session: logged_in_as:Administrator
+  cache: warm
+
+steps:
+  - login_as: Administrator
+  - capture: admin-dashboard
+  - navigate: /app/side-menu-settings
+  - wait_for_selector:
+      selector: ".layout-main-section, .form-page"
+      timeout_ms: 15000
+  - capture: side-menu-settings-form
+
+assertions:
+  - url_matches: "regex:/(app|desk)/side-menu-settings"
+  - selector:
+      selector: ".layout-main-section, .form-page"
+      count: { min: 1 }
+  - no_console_error_matching: "TypeError|ReferenceError|CSRFTokenError"
+  # The page-title margin-left invariant — drawer trigger overlap class.
+  # Covered more deeply in the regression scenario; this is the smoke check.
+  - no_network_4xx_for_path: "/assets/frappe_side_menu/*"
+  - no_network_4xx_for_path: "/assets/mrvtools/*"
+
+rubric:
+  navigation_correctness: true
+  visual_integrity: true
+  visual_design: true
+
+tags: [journey, admin, day-1]
+sources:
+  - memory: reference_railway_container.md
+  - memory: feedback_editorial_fonts.md

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "runs": [
+    {
+      "run_id": "20260429T130350Z-0c99768",
+      "a_tier_rate": 0.8571428571428571,
+      "b_tier_composite": null,
+      "b_tier_rubrics": {}
+    }
+  ]
+}

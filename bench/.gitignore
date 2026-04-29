@@ -1,0 +1,8 @@
+history/*
+!history/INDEX.json
+!history/.gitkeep
+golden/*.diff.png
+fixtures/role_credentials.yaml
+__pycache__/
+*.pyc
+.pytest_cache/

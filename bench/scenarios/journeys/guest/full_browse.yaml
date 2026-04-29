@@ -1,0 +1,65 @@
+id: guest_full_browse
+title: "Guest browses public SPA end-to-end (home, about, projects, reports, knowledge)"
+perspective:
+  role: guest
+  persona: standard
+  environment: any
+
+preconditions:
+  sample_db: required
+  session: anonymous
+  cache: warm
+
+steps:
+  - navigate: /frontend/home
+  - wait_for_selector:
+      selector: "[data-v-app]"
+      timeout_ms: 15000
+  - capture: home-loaded
+  - navigate: /frontend/about
+  - wait_for_selector:
+      selector: "[data-v-app]"
+      timeout_ms: 10000
+  - capture: about-loaded
+  - navigate: /frontend/projects
+  - wait_for_selector:
+      selector: "[data-v-app]"
+      timeout_ms: 10000
+  - capture: projects-loaded
+  - navigate: /frontend/reports
+  - wait_for_selector:
+      selector: "[data-v-app]"
+      timeout_ms: 10000
+  - capture: reports-loaded
+  - navigate: /frontend/knowledge-resource
+  - wait_for_selector:
+      selector: "[data-v-app]"
+      timeout_ms: 10000
+  - capture: knowledge-loaded
+
+assertions:
+  # Vue SPA shell mounted on every public page — if any of these are 0 the
+  # bundle didn't load. Catches the Vite/base-URL drift class of bug.
+  - selector:
+      selector: "[data-v-app]"
+      count: { min: 1 }
+  # No JS-level errors anywhere in the journey. CSRF token-error specifically
+  # is the C3 bug class — should never appear for guest-only API calls now
+  # that ignore_csrf is on in dev and the proxy round-trips it in prod.
+  - no_console_error_matching: "CSRFTokenError|TypeError|ReferenceError|Failed to fetch"
+  # No image 404s — the seed-image recovery trap from
+  # reference_railway_container.md fires here.
+  - no_network_4xx_for_path: "/files/*"
+  - no_network_4xx_for_path: "/assets/*"
+
+rubric:
+  visual_integrity: true
+  visual_design: true
+  navigation_correctness: true
+  error_handling: true
+
+tags: [journey, guest, day-1, smoke]
+sources:
+  - bug: "Railway volume remount lost /files/, no automatic re-extract"
+  - memory: reference_railway_container.md
+  - memory: reference_csrf_retry_interceptor.md

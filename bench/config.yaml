@@ -1,0 +1,49 @@
+# bench/config.yaml — single source of truth for runner targets, models, thresholds
+#
+# Targets are URLs the runner navigates against. Pick one with `--target=<name>`.
+targets:
+  local-docker:
+    base_url: http://localhost:8080
+    description: "docker compose -f deploy/railway/docker-compose.local.yml up"
+    safe_for_adversarial: true     # fuzz/race/chaos OK here
+  local-bench:
+    base_url: http://mrv.localhost:8000
+    description: "./start.sh --dev — running on the developer's bench"
+    safe_for_adversarial: false    # mutating tests against dev bench polluted state
+  railway-live:
+    base_url_env: RAILWAY_LIVE_URL  # read from env at runtime
+    description: "production demo deploy — A-tier smoke only"
+    safe_for_adversarial: false    # never run mutating agents against live
+
+# A-tier hard-gate threshold. Any failure → exit nonzero → deploy blocked.
+# Per design: no partial credit, no weighting. Either passes 100% or fails.
+a_tier:
+  pass_threshold: 1.0              # must be exactly 1.0; any other value is a misconfiguration
+
+# B-tier rubric scoring (Phase 4+). Sustained drops flag in scorecard.
+b_tier:
+  enabled: false                   # flips true at Phase 4
+  rolling_window: 5                # 5-run delta tracking
+  flag_delta: -0.5                 # Δ ≤ this → flagged in scorecard
+  judge_model: claude-sonnet-4-6
+  prompt_caching: true
+
+# Wave 2 adversarial agents — Phase 3+
+adversarial:
+  enabled: false                   # flips true at Phase 3
+  default_target: local-docker     # never live
+  include_chaos_on_live_readonly: false
+
+# Run-level defaults
+defaults:
+  viewport: { width: 1440, height: 900 }
+  navigation_timeout_ms: 20000
+  settle_timeout_ms: 5000
+  screenshots: true                # capture on every scenario
+  per_role_subscores: true         # avoid cross-role pass-rate dilution
+
+# Where to write artifacts. Run-id is derived from $(date +%Y%m%dT%H%M%S)-$(git rev-parse --short HEAD).
+artifacts:
+  history_dir: bench/history
+  golden_dir: bench/golden
+  candidates_dir: bench/candidates

@@ -1,0 +1,25 @@
+id: regression_seed_images_after_volume_remount
+title: "/files/* assets serve 200 on cold container (D-perspective)"
+perspective: { role: guest, persona: standard, environment: cold_container }
+preconditions: { sample_db: required, session: anonymous, cache: cold }
+# This scenario is environment-conditional. The runner only invokes it when
+# the active target's `safe_for_adversarial: true` and the bench is launched
+# with --environment=cold_container. Without that overlay it's a no-op pass.
+steps:
+  - navigate: /frontend/home
+  - wait_for_selector:
+      selector: "[data-v-app]"
+      timeout_ms: 20000
+  - capture: home-cold-container
+assertions:
+  # The recovery trap from reference_railway_container.md: a missing physical
+  # file with a still-present DB record left seed images 404'ing on Railway
+  # after volume remount. Fix: load_default_files now decouples on-disk and
+  # DB checks; SINGLES_FORCE_SYNC=1 also re-extracts.
+  - no_network_4xx_for_path: "/files/*"
+  - selector:
+      selector: "img[src^='/files/']"
+      count: { min: 1 }
+      has_natural_width: true
+tags: [regression, environment, cold-container, day-1]
+sources: [{ memory: reference_railway_container.md }]

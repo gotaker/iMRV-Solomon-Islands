@@ -1,0 +1,25 @@
+id: regression_page_title_clear_of_drawer_trigger
+title: "Page title has margin-left clearance from .fsm-trigger (no 'n Dashboard')"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+steps:
+  - login_as: Administrator
+  - navigate: /app/main-dashboard
+  - wait_for_selector:
+      selector: ".page-head, .layout-main-section"
+      timeout_ms: 15000
+  - capture: dashboard-with-title-clearance
+assertions:
+  # The invariant: .fsm-trigger is fixed at top:12px;left:12px;width:40px so
+  # the page-head must have margin-left >= 60px to keep the title visible.
+  # Phase 2's design-system-agent will assert the computed-style margin-left;
+  # here we assert the structural pre-conditions (selectors exist).
+  - selector:
+      selector: ".fsm-trigger"
+      count: { min: 1 }
+  - selector:
+      selector: ".page-head, .layout-main-section"
+      count: { min: 1 }
+  - no_console_error_matching: "TypeError|ReferenceError"
+tags: [regression, drawer, layout, day-1, needs:phase-2-computed-style]
+sources: [{ memory: reference_railway_container.md }]

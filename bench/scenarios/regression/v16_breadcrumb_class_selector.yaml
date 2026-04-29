@@ -1,0 +1,23 @@
+id: regression_v16_breadcrumb_class_selector
+title: ".navbar-breadcrumbs (class, not id) resolves on every desk page"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+steps:
+  - login_as: Administrator
+  - navigate: /app/main-dashboard
+  - wait_for_selector:
+      selector: ".layout-main-section, .page-head"
+      timeout_ms: 15000
+  - capture: dashboard-with-breadcrumb
+assertions:
+  # The v16 selector contract: it's a CLASS now (.navbar-breadcrumbs), not an
+  # ID (#navbar-breadcrumbs). Existing rules using the id-selector silently
+  # fail-open on v16 — meaning the page-title-margin-left:60px rule from
+  # frappe_side_menu.css would not apply, putting "n Dashboard" under the
+  # floating .fsm-trigger.
+  - selector:
+      selector: ".navbar-breadcrumbs"
+      count: { min: 1 }
+  - no_console_error_matching: "TypeError|ReferenceError"
+tags: [regression, v16, breadcrumb, day-1]
+sources: [{ memory: reference_v16_breadcrumb_selector.md }]
