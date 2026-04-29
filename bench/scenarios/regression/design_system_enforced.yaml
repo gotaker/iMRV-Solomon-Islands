@@ -1,0 +1,35 @@
+id: regression_design_system_enforced
+title: "Forest-and-Sage design system enforced: Anton/Inter fonts + v16 selectors + reveal health + drawer surface"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+
+# Closes the gap flagged by the Rule-3 memory audit: design_system_checks
+# (typography/v16 selectors/reveal/drawer) was built but no A-tier scenario
+# was actually invoking it. Without this scenario, feedback_editorial_fonts.md
+# and feedback_forest_and_sage_adherence.md describe rules the bench could
+# enforce but doesn't.
+steps:
+  - login_as: Administrator
+  - navigate: /app/main-dashboard
+  - wait_for_selector:
+      selector: ".layout-main-section, .page-head"
+      timeout_ms: 15000
+  - capture: dashboard-design-system
+
+assertions:
+  - design_system:
+      fonts: enforced       # Anton on display selectors, Inter on body
+      selectors: enforced   # .navbar-breadcrumbs class + .fsm-trigger fixed pos + page-head margin-left>=60
+      reveal_health: enforced
+      drawer: enforced      # var(--ed-frost-bg) + blur+saturate backdrop-filter
+
+rubric:
+  visual_design: true
+  visual_integrity: true
+
+tags: [regression, design-system, day-1]
+sources:
+  - memory: feedback_editorial_fonts.md
+  - memory: feedback_forest_and_sage_adherence.md
+  - memory: feedback_discover_before_authoring.md
+  - memory: feedback_translate_memory_to_assertions.md

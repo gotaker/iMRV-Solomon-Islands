@@ -229,29 +229,37 @@ def main(argv: list[str] | None = None) -> int:
 
     client = Anthropic()
 
-    judgments: list[dict[str, Any]] = []
+    # Build the (scenario, rubric) work plan, then sort by rubric for KV-cache
+    # locality. Each cached-system block is (system_instruction + rubric); when
+    # consecutive calls share the same rubric, the second cached block hits.
+    # Loop order matters: rubric-outer keeps the rubric stable across scenarios,
+    # invalidating the rubric cache only `len(rubrics)` times per run instead of
+    # `len(scenarios)` × `len(rubrics)` times.
+    plan: list[tuple[dict, str]] = []
     for scenario in scenarios:
-        # The scenario YAML's `rubric:` block selects which rubrics to run.
         spec_path = REPO_ROOT / scenario["journey_path"]
         spec = _load_yaml(spec_path) if spec_path.exists() else {}
         rubric_flags = spec.get("rubric") or {}
-        chosen = [r for r in rubrics if rubric_flags.get(r)]
-        if not chosen:
-            continue
+        for rname in rubrics:
+            if rubric_flags.get(rname):
+                plan.append((scenario, rname))
 
+    # Stable, cache-friendly ordering: group by rubric, then by scenario_id.
+    plan.sort(key=lambda pair: (pair[1], pair[0].get("scenario_id", "")))
+
+    judgments: list[dict[str, Any]] = []
+    for scenario, rname in plan:
         screenshot_rel = scenario.get("screenshot_path")
         screenshot_path = REPO_ROOT / screenshot_rel if screenshot_rel else None
-
         metadata = {
             "duration_ms": scenario.get("duration_ms"),
             "console_error_count": 0,  # TODO: thread from a_runner output
             "network_4xx_count": 0,
             "dom_size_estimate": None,
         }
-        for rname in chosen:
-            judgments.append(_judge_one(
-                client, scenario, rname, rubrics[rname], screenshot_path, metadata, args.model,
-            ))
+        judgments.append(_judge_one(
+            client, scenario, rname, rubrics[rname], screenshot_path, metadata, args.model,
+        ))
 
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)

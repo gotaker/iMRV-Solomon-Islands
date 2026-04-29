@@ -262,8 +262,19 @@ def _step_walk_drawer(page, base_url: str, options: dict | None = None) -> None:
                     const href = el.getAttribute('href') || '';
                     const dataRoute = el.getAttribute('data-route') || '';
                     const onclick = el.getAttribute('onclick') || '';
+                    const role = el.getAttribute('role') || '';
+                    const tag = el.tagName;
+                    // Accordion toggles can legitimately be <a role="button"> with no
+                    // href — but ONLY when they sit inside the known accordion
+                    // container that has a sibling submenu panel. A bare <a role=button>
+                    // with no panel and no JS handler is still dead and should fire.
+                    const isAccordionToggle = role === 'button'
+                        && el.closest('li.treeview.drop-down')
+                        && (el.closest('li.treeview.drop-down').querySelector(':scope > .submenu, :scope > .side-menu > .treeview-menu, :scope > .treeview-menu') !== null);
                     const looksNavigable = (href && href !== '#' && !href.startsWith('javascript:'))
-                                           || dataRoute || onclick;
+                                           || dataRoute || onclick
+                                           || tag === 'BUTTON'
+                                           || isAccordionToggle;
                     return !looksNavigable;
                 })
                 .map(el => ({
@@ -309,6 +320,13 @@ def _step_walk_drawer(page, base_url: str, options: dict | None = None) -> None:
                     "h1, .page-title, [data-v-app], .layout-main-section",
                     timeout=settle_ms,
                     state="attached",
+                )
+            except Exception:
+                pass
+            try:
+                page.wait_for_function(
+                    "() => document.body && document.body.innerText.trim().length > 50",
+                    timeout=settle_ms,
                 )
             except Exception:
                 pass
@@ -848,6 +866,108 @@ def _render_terminal_summary(scorecard: dict) -> None:
     print(bar)
 
 
+# --- Parallel execution ----------------------------------------------------
+#
+# Playwright's sync API is NOT thread-safe across a shared browser instance —
+# threads race the single event loop and produce "Failed to find browser
+# context" protocol errors. Process-based parallelism is the supported pattern.
+#
+# Implementation: each worker is a separate `python3 -m bench.runner._worker`
+# subprocess that opens its own Chromium, runs its share of scenarios, and
+# writes results to a JSON file the parent reads back. No shared memory, no
+# IPC serialization — just filesystem handoff.
+
+def _run_parallel(
+    scenarios: list[Path],
+    target: dict,
+    run_dir: Path,
+    dry_run: bool,
+    parallel: int,
+) -> list[ScenarioResult]:
+    """Distribute scenarios round-robin across `parallel` worker subprocesses."""
+    import subprocess
+
+    n_workers = min(parallel, len(scenarios)) or 1
+    batches: list[list[Path]] = [[] for _ in range(n_workers)]
+    for i, scenario in enumerate(scenarios):
+        batches[i % n_workers].append(scenario)
+
+    print(f"[bench] running {len(scenarios)} scenarios across {n_workers} processes")
+
+    workers_dir = run_dir / "_workers"
+    workers_dir.mkdir(parents=True, exist_ok=True)
+
+    # Resolve credentials path used by this run so workers can reload it.
+    target_creds = BENCH_ROOT / "fixtures" / f"role_credentials.{target['name']}.yaml"
+    base_creds = BENCH_ROOT / "fixtures" / "role_credentials.yaml"
+    creds_path = target_creds if target_creds.exists() else base_creds
+
+    # Locate config path. We received the parsed dict but need the source file
+    # for workers; the config file lives at bench/config.yaml by convention.
+    config_path = BENCH_ROOT / "config.yaml"
+
+    procs: list[tuple[subprocess.Popen, Path, Path]] = []  # (proc, output_path, log_path)
+    for i, batch in enumerate(batches):
+        if not batch:
+            continue
+        assignment_path = workers_dir / f"assignment-{i}.json"
+        output_path = workers_dir / f"results-{i}.json"
+        log_path = workers_dir / f"log-{i}.txt"
+        assignment = {
+            "config_path": str(config_path),
+            "credentials_path": str(creds_path),
+            "target": target["name"],
+            "run_dir": str(run_dir),
+            "dry_run": dry_run,
+            "scenario_paths": [str(p) for p in batch],
+        }
+        assignment_path.write_text(json.dumps(assignment, indent=2))
+        log_handle = log_path.open("w")
+        proc = subprocess.Popen(
+            [
+                sys.executable, "-m", "bench.runner._worker",
+                "--assignment", str(assignment_path),
+                "--output", str(output_path),
+            ],
+            cwd=str(REPO_ROOT),
+            stdout=log_handle,
+            stderr=subprocess.STDOUT,
+            env={**os.environ},
+        )
+        procs.append((proc, output_path, log_path))
+
+    # Wait for all workers and stream a brief progress line as each finishes.
+    flat: list[ScenarioResult] = []
+    for proc, output_path, log_path in procs:
+        rc = proc.wait()
+        if rc != 0 or not output_path.exists():
+            log_excerpt = log_path.read_text()[-1500:] if log_path.exists() else "(no log)"
+            print(
+                f"[bench] worker exited rc={rc}, output_missing={not output_path.exists()}",
+                file=sys.stderr,
+            )
+            print(log_excerpt, file=sys.stderr)
+            continue
+        for d in json.loads(output_path.read_text()):
+            flat.append(ScenarioResult(
+                scenario_id=d["scenario_id"],
+                role=d["role"],
+                persona=d["persona"],
+                journey_path=d["journey_path"],
+                duration_ms=d["duration_ms"],
+                passed=d["passed"],
+                assertions=[
+                    AssertionResult(name=a["name"], passed=a["passed"], detail=a["detail"])
+                    for a in d["assertions"]
+                ],
+                error=d["error"],
+                screenshot_path=d["screenshot_path"],
+            ))
+            status = "PASS" if d["passed"] else "FAIL"
+            print(f"[bench] {d['journey_path']} -> {status} ({d['duration_ms']} ms)")
+    return flat
+
+
 # --- Entry point -----------------------------------------------------------
 
 def main(argv: list[str] | None = None) -> int:
@@ -861,6 +981,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--run-id", default=None,
                         help="explicit run-id (default = generated from now+sha)")
+    parser.add_argument("--parallel", type=int, default=1,
+                        help="run N scenarios concurrently in separate browser contexts (default 1)")
     args = parser.parse_args(argv)
 
     config = _load_yaml(Path(args.config))
@@ -910,20 +1032,36 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     results: list[ScenarioResult] = []
-    with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=True)
-        try:
-            for scenario in scenarios:
-                rel = scenario.relative_to(REPO_ROOT)
-                print(f"[bench] running {rel}")
-                result = _run_scenario(
-                    scenario, target, credentials, run_dir, config, browser, args.dry_run
-                )
-                results.append(result)
-                status = "PASS" if result.passed else "FAIL"
-                print(f"        -> {status} ({result.duration_ms} ms)")
-        finally:
-            browser.close()
+    parallel = max(1, args.parallel)
+
+    if parallel == 1:
+        with sync_playwright() as pw:
+            browser = pw.chromium.launch(headless=True)
+            try:
+                for scenario in scenarios:
+                    rel = scenario.relative_to(REPO_ROOT)
+                    print(f"[bench] running {rel}")
+                    result = _run_scenario(
+                        scenario, target, credentials, run_dir, config, browser, args.dry_run
+                    )
+                    results.append(result)
+                    status = "PASS" if result.passed else "FAIL"
+                    print(f"        -> {status} ({result.duration_ms} ms)")
+            finally:
+                browser.close()
+    else:
+        # Process-based parallelism: Playwright's sync API is NOT thread-safe
+        # across one browser instance, so each worker process opens its own
+        # `sync_playwright()` + Chromium, runs its share of scenarios, closes.
+        # Scenarios are partitioned by index so each worker gets ~equal load.
+        # Workers reload credentials + config from disk; we only pass target
+        # and run_dir which determine where they read/write.
+        results = _run_parallel(
+            scenarios, target, run_dir, args.dry_run, parallel,
+        )
+
+    # Stable order in scorecard regardless of completion order under parallelism.
+    results.sort(key=lambda r: r.journey_path)
 
     scorecard = _emit_scorecard(results, target, run_dir)
     _render_terminal_summary(scorecard)

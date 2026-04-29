@@ -180,10 +180,15 @@ def main(argv: list[str] | None = None) -> int:
     config = _load_yaml(Path(args.config))
     target = _load_target(config, args.target)
 
-    creds_path = BENCH_ROOT / "fixtures" / "role_credentials.yaml"
+    # Per-target credentials: prefer role_credentials.<target>.yaml, fall back
+    # to role_credentials.yaml. Same indirection as a_runner — keeps both
+    # modules in sync with multi-target deployments.
+    target_creds = BENCH_ROOT / "fixtures" / f"role_credentials.{args.target}.yaml"
+    base_creds = BENCH_ROOT / "fixtures" / "role_credentials.yaml"
+    creds_path = target_creds if target_creds.exists() else base_creds
     if not creds_path.exists():
         print(
-            f"[role_discovery] {creds_path.relative_to(REPO_ROOT)} missing — "
+            f"[role_discovery] no credentials file at {creds_path.relative_to(REPO_ROOT)}; "
             f"copy role_credentials.example.yaml and fill in real credentials.",
             file=sys.stderr,
         )

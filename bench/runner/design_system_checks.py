@@ -44,7 +44,13 @@ EXPECTED_BODY_FONT = "Inter"
 
 
 def _check_typography(page) -> dict[str, Any]:
-    """Verify --ed-font-display=Anton and --ed-font-body=Inter resolve correctly."""
+    """Verify --ed-font-display=Anton and --ed-font-body=Inter resolve correctly.
+
+    On desk pages the editorial display element is the breadcrumb leaf
+    (`.navbar-breadcrumbs li:last-child a`), not `.page-title` — Frappe's
+    `.page-title` falls through to Inter by design. On SPA / public pages,
+    `.ed-display` and `h1` are the display elements.
+    """
     try:
         result = page.evaluate(
             """
@@ -53,14 +59,20 @@ def _check_typography(page) -> dict[str, Any]:
                 const cs = window.getComputedStyle(root);
                 const display = cs.getPropertyValue('--ed-font-display').trim();
                 const body = cs.getPropertyValue('--ed-font-body').trim();
-                // Pick a heading and a body element to verify resolved fonts.
-                const heading = document.querySelector('h1, .page-title, .ed-display');
+                const url = window.location.pathname;
+                const isDeskPage = url.startsWith('/app') || url.startsWith('/desk');
+                // Pick the right display element per surface.
+                const headingSelector = isDeskPage
+                    ? '.navbar-breadcrumbs li:last-child a, .ed-display, h1'
+                    : '.ed-display, h1, .page-title';
+                const heading = document.querySelector(headingSelector);
                 const para = document.querySelector('p, .ed-body, body');
                 const headingFont = heading ? window.getComputedStyle(heading).fontFamily : '';
                 const bodyFont = para ? window.getComputedStyle(para).fontFamily : '';
                 return {
                     declared_display: display, declared_body: body,
                     resolved_display: headingFont, resolved_body: bodyFont,
+                    heading_found: !!heading,
                 };
             }
             """
@@ -90,23 +102,33 @@ def _check_v16_selectors(page) -> dict[str, Any]:
                 const isDeskPage = url.startsWith('/app') || url.startsWith('/desk');
                 const breadcrumb = document.querySelector('.navbar-breadcrumbs');
                 const trigger = document.querySelector('.fsm-trigger');
-                const pageHead = document.querySelector('.page-head, .layout-main-section');
-                let triggerStyle = null, pageHeadML = null;
+                // The 60px clearance rule applies to the page-title / title-area
+                // children inside .page-head. Some desk pages (list/form views)
+                // omit .page-head entirely; check breadcrumb margin separately.
+                const pageTitle = document.querySelector(
+                    '.page-head .page-title, .page-head .title-area'
+                );
+                let triggerStyle = null, pageTitleML = null, breadcrumbML = null;
                 if (trigger) {
                     const cs = window.getComputedStyle(trigger);
                     triggerStyle = {
                         position: cs.position, top: cs.top, left: cs.left, width: cs.width,
                     };
                 }
-                if (pageHead) {
-                    pageHeadML = parseFloat(window.getComputedStyle(pageHead).marginLeft) || 0;
+                if (pageTitle) {
+                    pageTitleML = parseFloat(window.getComputedStyle(pageTitle).marginLeft) || 0;
+                }
+                if (breadcrumb) {
+                    breadcrumbML = parseFloat(window.getComputedStyle(breadcrumb).marginLeft) || 0;
                 }
                 return {
                     is_desk: isDeskPage,
                     has_breadcrumb: !!breadcrumb,
+                    has_page_title: !!pageTitle,
                     has_trigger: !!trigger,
                     trigger_style: triggerStyle,
-                    page_head_margin_left_px: pageHeadML,
+                    page_title_margin_left_px: pageTitleML,
+                    breadcrumb_margin_left_px: breadcrumbML,
                 };
             }
             """
@@ -127,10 +149,18 @@ def _check_v16_selectors(page) -> dict[str, Any]:
         ts = info["trigger_style"]
         if ts.get("position") != "fixed":
             failures.append(f".fsm-trigger position={ts.get('position')!r} (expected fixed)")
-    if (info["page_head_margin_left_px"] or 0) < 60:
+    # Either .page-head .page-title OR .navbar-breadcrumbs (whichever is the
+    # leftmost titlebar element on this page) must clear the .fsm-trigger.
+    # Pages with neither are dialogs / unusual surfaces — skip silently.
+    if info["has_page_title"] and (info["page_title_margin_left_px"] or 0) < 60:
         failures.append(
-            f"page-head margin-left={info['page_head_margin_left_px']}px (expected >= 60)"
+            f".page-head .page-title margin-left={info['page_title_margin_left_px']}px (expected >= 60 to clear .fsm-trigger)"
         )
+    elif info["has_breadcrumb"] and not info["has_page_title"]:
+        if (info["breadcrumb_margin_left_px"] or 0) < 60:
+            failures.append(
+                f".navbar-breadcrumbs margin-left={info['breadcrumb_margin_left_px']}px (expected >= 60 to clear .fsm-trigger)"
+            )
 
     return {
         "passed": not failures,

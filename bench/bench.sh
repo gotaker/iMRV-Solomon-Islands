@@ -37,6 +37,7 @@ SCENARIOS_GLOB=""
 ROLES_FILTER=""
 UPDATE_GOLDEN=0
 DRY_RUN=0
+PARALLEL=1
 INCLUDE_DISCOVERY=0
 INCLUDE_PERM_MATRIX=0
 INCLUDE_CRAWLER=0
@@ -62,6 +63,8 @@ while [[ $# -gt 0 ]]; do
     --diff-since=*)             DIFF_SINCE="${1#*=}"; shift ;;
     --update-golden)            UPDATE_GOLDEN=1; shift ;;
     --dry-run)                  DRY_RUN=1; shift ;;
+    --parallel=*)               PARALLEL="${1#*=}"; shift ;;
+    --parallel)                 PARALLEL="$2"; shift 2 ;;
     -h|--help)
       sed -n '3,28p' "$0"
       exit 0
@@ -101,6 +104,7 @@ A_RUNNER_ARGS=(
 [[ -n "$ROLES_FILTER"   ]] && A_RUNNER_ARGS+=(--roles "$ROLES_FILTER")
 [[ $UPDATE_GOLDEN -eq 1 ]] && A_RUNNER_ARGS+=(--update-golden)
 [[ $DRY_RUN -eq 1 ]]       && A_RUNNER_ARGS+=(--dry-run)
+[[ $PARALLEL -gt 1 ]]      && A_RUNNER_ARGS+=(--parallel "$PARALLEL")
 
 A_TIER_EXIT=0
 if [[ "$TIER" != "b" ]]; then
