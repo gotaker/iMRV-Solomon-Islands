@@ -54,6 +54,36 @@
       "a_tier_rate": 0.8823529411764706,
       "b_tier_composite": null,
       "b_tier_rubrics": {}
+    },
+    {
+      "run_id": "20260429T184042Z-804d0ed",
+      "a_tier_rate": 1.0,
+      "b_tier_composite": null,
+      "b_tier_rubrics": {}
+    },
+    {
+      "run_id": "20260429T184100Z-804d0ed",
+      "a_tier_rate": 0.0,
+      "b_tier_composite": null,
+      "b_tier_rubrics": {}
+    },
+    {
+      "run_id": "20260429T184257Z-804d0ed",
+      "a_tier_rate": 0.0,
+      "b_tier_composite": null,
+      "b_tier_rubrics": {}
+    },
+    {
+      "run_id": "20260429T184318Z-804d0ed",
+      "a_tier_rate": 0.0,
+      "b_tier_composite": null,
+      "b_tier_rubrics": {}
+    },
+    {
+      "run_id": "20260429T184338Z-804d0ed",
+      "a_tier_rate": 0.6470588235294118,
+      "b_tier_composite": null,
+      "b_tier_rubrics": {}
     }
   ]
 }

@@ -3,6 +3,7 @@ history/*
 !history/.gitkeep
 golden/*.diff.png
 fixtures/role_credentials.yaml
+fixtures/role_credentials.*.yaml
 __pycache__/
 *.pyc
 .pytest_cache/

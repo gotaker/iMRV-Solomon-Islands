@@ -866,8 +866,16 @@ def main(argv: list[str] | None = None) -> int:
     config = _load_yaml(Path(args.config))
     target = _load_target(config, args.target)
 
-    creds_path = BENCH_ROOT / "fixtures" / "role_credentials.yaml"
+    # Per-target credentials: prefer role_credentials.<target>.yaml (e.g.,
+    # role_credentials.railway-live.yaml) and fall back to role_credentials.yaml.
+    # This lets the same bench corpus run against local Docker AND live targets
+    # without manual swapping.
+    target_creds = BENCH_ROOT / "fixtures" / f"role_credentials.{args.target}.yaml"
+    base_creds = BENCH_ROOT / "fixtures" / "role_credentials.yaml"
+    creds_path = target_creds if target_creds.exists() else base_creds
     credentials = _load_yaml(creds_path) if creds_path.exists() else {}
+    if creds_path == target_creds:
+        print(f"[bench] using target-specific credentials: {creds_path.relative_to(REPO_ROOT)}")
 
     scenarios = _discover_scenarios(args.scenarios)
     if not scenarios:
