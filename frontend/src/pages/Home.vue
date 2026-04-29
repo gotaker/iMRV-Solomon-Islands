@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted } from 'vue'
 import { createResource } from 'frappe-ui'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
+import { useReveal } from '@/composables/useReveal'
 import hero1 from '@/assets/images/editorial/hero-1.jpg'
 import hero2 from '@/assets/images/editorial/hero-2.jpg'
 import hero3 from '@/assets/images/editorial/hero-3.jpg'
@@ -94,8 +95,8 @@ const stats = computed(() =>
     : fallbackStats,
 )
 
-/* ----- intersection-observer reveals + parallax floats ----- */
-let io = null
+/* ----- parallax floats ----- */
+useReveal()
 const baseTransforms = new WeakMap()
 let ticking = false
 
@@ -120,24 +121,10 @@ onMounted(() => {
     baseTransforms.set(el, cs.transform === 'none' ? '' : cs.transform)
   })
 
-  io = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) {
-          e.target.classList.add('is-revealed')
-          io.unobserve(e.target)
-        }
-      })
-    },
-    { threshold: 0.12, rootMargin: '0px 0px -60px 0px' },
-  )
-  document.querySelectorAll('[data-reveal]').forEach((el) => io.observe(el))
-
   window.addEventListener('scroll', onScrollParallax, { passive: true })
 })
 
 onUnmounted(() => {
-  if (io) io.disconnect()
   window.removeEventListener('scroll', onScrollParallax)
 })
 </script>

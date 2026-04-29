@@ -218,10 +218,12 @@
 <script setup>
 import Footer from '@/components/Footer.vue'
 import Header from '@/components/Header.vue'
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
+import { useReveal } from '@/composables/useReveal'
 
 const data = ref({})
+const { observeAll } = useReveal()
 
 const supportItems = computed(() => {
   const m = data.value?.message
@@ -243,29 +245,9 @@ const fetchData = async () => {
   }
 }
 
-let observer = null
-
 onMounted(async () => {
   await fetchData()
-
-  observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-revealed')
-        }
-      })
-    },
-    { threshold: 0.1 },
-  )
-
-  document
-    .querySelectorAll('[data-reveal]')
-    .forEach((el) => observer.observe(el))
-})
-
-onUnmounted(() => {
-  if (observer) observer.disconnect()
+  observeAll()
 })
 </script>
 

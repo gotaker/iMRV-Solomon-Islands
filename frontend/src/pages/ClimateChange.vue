@@ -1,10 +1,12 @@
 <script setup>
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import axios from 'axios'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
+import { useReveal } from '@/composables/useReveal'
 
 const data = ref({})
+const { observeAll } = useReveal()
 
 const fetchData = async () => {
   try {
@@ -13,12 +15,8 @@ const fetchData = async () => {
     )
     if (response.status === 200) {
       data.value = response.data
-      // v-if elements gated on parentData.* are inserted now — observe them
-      // so the reveal animation actually fires.
       await nextTick()
-      if (io) {
-        document.querySelectorAll('[data-reveal]').forEach((el) => io.observe(el))
-      }
+      observeAll()
     } else {
       throw new Error('Network response was not ok')
     }
@@ -94,30 +92,8 @@ const goalsAndSupport = computed(() =>
   ),
 )
 
-/* ----- intersection-observer reveals ----- */
-let io = null
-
 onMounted(() => {
   fetchData()
-
-  io = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) {
-          e.target.classList.add('is-revealed')
-          io.unobserve(e.target)
-        }
-      })
-    },
-    { threshold: 0.12, rootMargin: '0px 0px -60px 0px' },
-  )
-  requestAnimationFrame(() => {
-    document.querySelectorAll('[data-reveal]').forEach((el) => io.observe(el))
-  })
-})
-
-onUnmounted(() => {
-  if (io) io.disconnect()
 })
 </script>
 

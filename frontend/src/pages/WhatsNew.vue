@@ -95,12 +95,14 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import axios from 'axios'
 import Footer from '@/components/Footer.vue'
 import Header from '@/components/Header.vue'
+import { useReveal } from '@/composables/useReveal'
 
 const data = ref({})
+const { observeAll } = useReveal()
 
 const newsItems = computed(() => data.value?.message?.add_new_content ?? [])
 
@@ -120,14 +122,8 @@ const fetchData = async () => {
         let date = new Date(data.value.message.add_new_content[i].date)
         data.value.message.add_new_content[i].creation = formatter.format(date)
       }
-      // v-if/v-for elements gated on data are inserted now — observe them
-      // so the reveal animation actually fires.
       await nextTick()
-      if (observer) {
-        document
-          .querySelectorAll('[data-reveal]')
-          .forEach((el) => observer.observe(el))
-      }
+      observeAll()
     } else {
       throw new Error('Network response was not ok')
     }
@@ -136,27 +132,8 @@ const fetchData = async () => {
   }
 }
 
-let observer = null
-
 onMounted(() => {
   fetchData()
-  observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-revealed')
-        }
-      })
-    },
-    { threshold: 0.1 },
-  )
-  document
-    .querySelectorAll('[data-reveal]')
-    .forEach((el) => observer.observe(el))
-})
-
-onUnmounted(() => {
-  if (observer) observer.disconnect()
 })
 </script>
 
