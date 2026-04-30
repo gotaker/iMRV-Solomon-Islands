@@ -32,15 +32,61 @@ def test_api_route_user(bench_server):
     assert r.status_code == 200
 
 
-def test_api_get_data_guest_readable(bench_server):
-    """get_data is allow_guest=True — verify it still responds under v16."""
+def test_api_get_data_requires_auth(bench_server):
+    """get_data was locked down 2026-04-29 — no longer allow_guest=True.
+
+    Black-box audit found the legacy guest-readable + fields=["*"] shape was
+    leaking active reset_password_key tokens for 66 users. The endpoint now
+    requires login + an allowlisted doctype (see mrvtools/api.py).
+    """
     r = requests.get(
         f"{bench_server}/api/method/mrvtools.api.get_data",
         params={"doctype": "Project Key Sector"},
         timeout=10,
     )
-    assert r.status_code == 200
+    # Guest must NOT receive a 200 with records.
+    assert r.status_code in (401, 403), f"guest still allowed: {r.status_code} {r.text[:200]}"
+
+
+def test_api_get_data_blocks_user_doctype_for_guest(bench_server):
+    """The headline leak — `?doctype=User` was returning 83 records incl.
+    reset_password_key. Verify it's now blocked at the auth layer."""
+    r = requests.get(
+        f"{bench_server}/api/method/mrvtools.api.get_data",
+        params={"doctype": "User"},
+        timeout=10,
+    )
+    assert r.status_code in (401, 403), f"User doctype still leakable: {r.status_code}"
+    body = r.text.lower()
+    for leak in ("reset_password_key", '"password":', "api_secret", "new_password"):
+        assert leak not in body, f"sensitive field {leak!r} present in error body"
+
+
+def test_api_get_data_authed_allowlist(bench_server):
+    """Logged-in caller can read allowlisted master-data doctypes."""
+    s = _admin_session(bench_server)
+    r = s.get(
+        f"{bench_server}/api/method/mrvtools.api.get_data",
+        params={"doctype": "Project Key Sector"},
+        timeout=10,
+    )
+    assert r.status_code == 200, f"allowlisted doctype rejected for admin: {r.status_code}"
     assert "message" in r.json()
+
+
+def test_api_get_data_authed_rejects_non_allowlisted(bench_server):
+    """Logged-in caller still gets 403 for non-allowlisted doctypes (User, Email Account)."""
+    s = _admin_session(bench_server)
+    for dt in ("User", "Email Account", "Communication", "File"):
+        r = s.get(
+            f"{bench_server}/api/method/mrvtools.api.get_data",
+            params={"doctype": dt},
+            timeout=10,
+        )
+        assert r.status_code in (401, 403), f"non-allowlisted doctype {dt!r} returned {r.status_code}"
+        body = r.text.lower()
+        for leak in ("reset_password_key", "api_secret", "smtp_password"):
+            assert leak not in body, f"sensitive field {leak!r} leaked for {dt!r}"
 
 
 # --- mrvtools/mrvtools/doctype/mrvfrontend/mrvfrontend.py -------------------
@@ -59,31 +105,35 @@ def test_mrvfrontend_get_all_guest(bench_server):
 
 # --- mrvtools/mrvtools/doctype/my_approval/my_approval.py -------------------
 
-def test_my_approval_insert_record_guest(bench_server):
-    """Contract pin — records current guest-callable behavior.
+def test_my_approval_insert_record_blocks_guest(bench_server):
+    """Hardened 2026-04-29 — was allow_guest=True (approval forgery).
 
-    The static sweep flagged this as BREAKING; hardening is a separate PR.
-    When the endpoint is locked down, flip this test from 200 to 403.
+    Guest must now hit the auth layer and never reach the (formerly)
+    ignore_permissions=True insert path.
     """
     r = requests.post(
         f"{bench_server}/api/method/mrvtools.mrvtools.doctype.my_approval.my_approval.insert_record",
-        data={"doctype": "Project", "docname": "NONEXISTENT"},
+        data={
+            "created_by": "attacker@example.com",
+            "date": "2026-04-29",
+            "reference_doctype": "Project",
+            "reference_name": "NONEXISTENT",
+        },
         timeout=10,
     )
-    # Current behavior: returns 200 (even on invalid input) because allow_guest=True
-    assert r.status_code != 500, f"server error on guest mutation — likely stack-trace leak: {r.text[:200]}"
-    assert r.status_code in (200, 400, 403, 417), f"unexpected status {r.status_code}"
+    assert r.status_code != 500, f"server error: {r.text[:200]}"
+    assert r.status_code in (401, 403), f"guest still allowed to forge approvals: {r.status_code}"
 
 
-def test_my_approval_delete_record_guest(bench_server):
-    """Contract pin — same shape."""
+def test_my_approval_delete_record_blocks_guest(bench_server):
+    """Hardened 2026-04-29 — was allow_guest=True (approval revocation forgery)."""
     r = requests.post(
         f"{bench_server}/api/method/mrvtools.mrvtools.doctype.my_approval.my_approval.delete_record",
-        data={"doctype": "Project", "docname": "NONEXISTENT"},
+        data={"reference_doctype": "Project", "reference_name": "NONEXISTENT"},
         timeout=10,
     )
-    assert r.status_code != 500, f"server error on guest mutation — likely stack-trace leak: {r.text[:200]}"
-    assert r.status_code in (200, 400, 403, 417), f"unexpected status {r.status_code}"
+    assert r.status_code != 500, f"server error: {r.text[:200]}"
+    assert r.status_code in (401, 403), f"guest still allowed to revoke approvals: {r.status_code}"
 
 
 # --- mrvtools/mrvtools/doctype/user_registration/user_registration.py ------

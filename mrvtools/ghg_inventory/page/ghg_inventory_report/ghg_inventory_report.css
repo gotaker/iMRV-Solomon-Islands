@@ -125,9 +125,25 @@
 
 .totalghg_inventory_report-graph, .totalorder_analytics-graph, .avgorder_analytics-graph {
     margin-bottom: 15px;
+    /* Reserve left gutter so 7-digit Y-axis tick labels (e.g. "1,000,000")
+       don't clip to ")00000" when the chart container has no internal
+       padding. Pairs with the `shortenYAxisNumbers: 1` chart option. */
+    padding-left: 24px;
+}
+.totalghg_inventory_report-graph2 {
+    margin-bottom: 15px;
+    padding-left: 24px;
 }
 .ghg_inventory_report.page-main-content {
     padding: 15px;
+}
+.ghg-empty-state {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--ed-forest-60, rgba(1, 71, 46, 0.6));
+    font-family: var(--ed-font-body, 'Inter', system-ui, sans-serif);
+    font-size: 13px;
+    font-style: italic;
 }
 
 .title{

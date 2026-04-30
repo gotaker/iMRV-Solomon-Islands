@@ -1,0 +1,45 @@
+id: regression_spa_footer_no_deadlinks
+title: "Global footer has no mailto: deadlinks for Privacy/Accessibility/Source/etc"
+perspective: { role: guest, persona: standard, environment: any }
+preconditions: { sample_db: required, session: anonymous, cache: warm }
+
+# Audit issues #9 and #17 — the footer carried mailto: hrefs for Privacy,
+# Accessibility, Source, Open Data API, and Methodology, plus a fake
+# Finance Ledger link that pointed at /reports (a GHG-only page). For a
+# government accountability portal these need real pages or real removal.
+# Resolution: dedicated stub pages /privacy /accessibility /source
+# /open-data /methodology, and Finance Ledger fully removed from the
+# footer until a real finance page exists.
+steps:
+  - navigate: /frontend/home
+  - wait_for_selector:
+      selector: "footer.ed-footer"
+      timeout_ms: 15000
+  - capture: home-footer
+
+assertions:
+  # No footer link should be a mailto: — the legal/governance links go to
+  # real SPA routes now. Mailto buttons live INSIDE the stub pages, where
+  # they're contextual instead of dead.
+  - attribute_matches:
+      selector: "footer.ed-footer a"
+      attribute: "href"
+      pattern: "^mailto:"
+      none: true
+  # Finance Ledger was rerouted away — the footer text shouldn't contain
+  # that label any more (its destination /reports was misleading).
+  - no_text_matching:
+      scope: "footer.ed-footer"
+      patterns:
+        - "Finance Ledger"
+  # The stub destinations are wired in (these are the four links on the
+  # right side of the footer that previously mailto'd).
+  - selector: { selector: "footer.ed-footer a[href*='/frontend/privacy']", count: { min: 1 } }
+  - selector: { selector: "footer.ed-footer a[href*='/frontend/accessibility']", count: { min: 1 } }
+  - selector: { selector: "footer.ed-footer a[href*='/frontend/source']", count: { min: 1 } }
+  - selector: { selector: "footer.ed-footer a[href*='/frontend/open-data']", count: { min: 1 } }
+  - selector: { selector: "footer.ed-footer a[href*='/frontend/methodology']", count: { min: 1 } }
+
+tags: [regression, footer, links, spa, accountability]
+sources:
+  - audit_id: "9, 17"

@@ -7,6 +7,7 @@ import { useReveal } from '@/composables/useReveal'
 
 const data = ref({})
 const modalSrc = ref(null)
+const modalLabel = ref('')
 const { observeAll } = useReveal()
 
 const fetchData = async () => {
@@ -27,6 +28,42 @@ const fetchData = async () => {
 }
 
 const parentData = computed(() => data.value?.message?.parent_data ?? {})
+
+// The Frappe single-doc carries up to 3 report image fields, but only an
+// image URL — no inherent title or year. Differentiate the cards in the UI
+// so visitors don't see three identical "GHG Inventory Report" buttons.
+// Cycle through the country's three reporting milestones in the order they
+// were authored (2019/2020 archive, 2023 update, 2026 latest).
+const REPORT_META = [
+  {
+    year: '2019/2020',
+    label: 'GHG Inventory · Archive',
+    scope: 'Initial National Communication',
+  },
+  {
+    year: '2023',
+    label: 'GHG Inventory · Update',
+    scope: 'Biennial Update Report',
+  },
+  {
+    year: '2026',
+    label: 'GHG Inventory · Latest',
+    scope: 'NDC Implementation Report',
+  },
+]
+
+const reportCards = computed(() => {
+  const pd = parentData.value
+  const sources = [pd.report_image, pd.report_image1, pd.report_image2]
+  return sources
+    .map((src, i) => (src ? { src, ...REPORT_META[i] } : null))
+    .filter(Boolean)
+})
+
+const openReport = (card) => {
+  modalSrc.value = card.src
+  modalLabel.value = `${card.label} — ${card.year}`
+}
 
 onMounted(() => {
   fetchData()
@@ -58,33 +95,17 @@ onMounted(() => {
 
       <div class="report-grid">
         <button
-          v-if="parentData.report_image"
+          v-for="(card, i) in reportCards"
+          :key="card.src"
           class="report-card"
-          @click="modalSrc = parentData.report_image"
+          @click="openReport(card)"
           data-reveal
-          data-reveal-delay="1"
+          :data-reveal-delay="i + 1"
         >
-          <img :src="parentData.report_image" alt="GHG Inventory Report" />
-          <span class="card-label">View Report →</span>
-        </button>
-        <button
-          v-if="parentData.report_image1"
-          class="report-card"
-          @click="modalSrc = parentData.report_image1"
-          data-reveal
-          data-reveal-delay="2"
-        >
-          <img :src="parentData.report_image1" alt="GHG Inventory Report" />
-          <span class="card-label">View Report →</span>
-        </button>
-        <button
-          v-if="parentData.report_image2"
-          class="report-card"
-          @click="modalSrc = parentData.report_image2"
-          data-reveal
-          data-reveal-delay="3"
-        >
-          <img :src="parentData.report_image2" alt="GHG Inventory Report" />
+          <img :src="card.src" :alt="`${card.label} — ${card.year}`" />
+          <span class="card-year">{{ card.year }}</span>
+          <span class="card-title">{{ card.label }}</span>
+          <span class="card-scope">{{ card.scope }}</span>
           <span class="card-label">View Report →</span>
         </button>
       </div>
@@ -147,10 +168,20 @@ onMounted(() => {
         class="modal-overlay"
         role="dialog"
         aria-modal="true"
+        :aria-label="modalLabel || 'Report full view'"
         @click="modalSrc = null"
         @keydown.escape="modalSrc = null"
       >
-        <img :src="modalSrc" class="modal-img" alt="Report full view" />
+        <figure class="modal-figure" @click.stop>
+          <img
+            :src="modalSrc"
+            class="modal-img"
+            :alt="modalLabel || 'Report full view'"
+          />
+          <figcaption v-if="modalLabel" class="modal-caption">
+            {{ modalLabel }}
+          </figcaption>
+        </figure>
         <button
           class="modal-close"
           @click.stop="modalSrc = null"
@@ -299,15 +330,47 @@ onMounted(() => {
   object-fit: cover;
   display: block;
 }
+.card-year {
+  display: block;
+  padding: 1.25rem 1.5rem 0.25rem;
+  font-family: 'Anton', 'Helvetica Neue', sans-serif;
+  font-size: 1.5rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--forest);
+  opacity: 0.55;
+  text-align: left;
+}
+.card-title {
+  display: block;
+  padding: 0 1.5rem;
+  font-family: 'Anton', 'Helvetica Neue', sans-serif;
+  font-size: 1.25rem;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--forest);
+  text-align: left;
+}
+.card-scope {
+  display: block;
+  padding: 0.4rem 1.5rem 0.5rem;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--forest);
+  opacity: 0.7;
+  text-align: left;
+}
 .card-label {
   display: block;
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1.5rem 1rem;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--forest);
-  text-align: center;
+  text-align: left;
 }
 
 /* ---------- scope (sage) ---------- */
@@ -464,11 +527,29 @@ onMounted(() => {
   justify-content: center;
   z-index: 10000;
 }
+.modal-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  max-width: 92vw;
+}
 .modal-img {
   max-width: 90vw;
-  max-height: 90vh;
+  max-height: 80vh;
   border-radius: 1rem;
   object-fit: contain;
+  display: block;
+}
+.modal-caption {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--cream);
+  opacity: 0.85;
 }
 .modal-close {
   position: absolute;

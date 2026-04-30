@@ -1,0 +1,33 @@
+id: regression_ghg_report_co2_subscript
+title: "CO₂ / CH₄ / N₂O / tCO₂e render with Unicode subscript-2"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+steps:
+  - login_as: Administrator
+  - navigate: /app/ghg-inventory-report
+  - wait_for_selector:
+      selector: "[data-original-title='Unit'] select"
+      timeout_ms: 15000
+  - capture: ghg-unit-options
+assertions:
+  # Audit #S9 (point 8): tCO2e / GgCO2e were rendered with ASCII "2" instead
+  # of Unicode subscript ₂. Fix uses { label: "tCO₂e", value: "tCO2e" } so
+  # the displayed label carries U+2082 while the backend value stays ASCII
+  # (Python switch keeps matching). Same fix on the data-table column
+  # headers in getColumns() — "CO₂", "CH₄", "N₂O", "tCO₂e".
+  - option_text_matches:
+      selector: "[data-original-title='Unit'] select option"
+      any_text_contains: "tCO₂e"
+  - option_text_matches:
+      selector: "[data-original-title='Unit'] select option"
+      any_text_contains: "GgCO₂e"
+  # Hardening: assert no visible label uses bare "tCO2e" (ASCII 2) — that
+  # would mean the subscript fix didn't apply. Allow it inside hidden inputs
+  # by scoping to .layout-main-section + the unit select options.
+  - text_not_matching:
+      selector: "[data-original-title='Unit'] select option"
+      pattern: "(tCO2e|GgCO2e|CO2(?!\\u2082))"
+  - no_console_error_matching: "TypeError|ReferenceError"
+tags: [regression, ghg-report, typography, day-1]
+sources:
+  - { audit: "#S9" }

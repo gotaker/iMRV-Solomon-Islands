@@ -1,5 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+// Document titles follow the editorial format `iMRV — <Page>`. The
+// beforeEach guard sets `document.title` from `meta.title`; keep this list
+// authoritative — copy here is what the browser tab will show.
 const routes = [
   {
     path: '',
@@ -18,7 +21,7 @@ const routes = [
     name: 'Home',
     component: () => import('@/pages/Home.vue'),
     meta: {
-      title: 'MRV Tool',
+      title: 'iMRV — Home',
     },
   },
   {
@@ -26,7 +29,7 @@ const routes = [
     name: 'WhataNew',
     component: () => import('@/pages/WhatsNew.vue'),
     meta: {
-      title: "What's new",
+      title: 'iMRV — Field Notes',
     },
   },
   {
@@ -34,7 +37,7 @@ const routes = [
     path: '/about',
     component: () => import('@/pages/About.vue'),
     meta: {
-      title: 'About MRV',
+      title: 'iMRV — About',
     },
   },
   {
@@ -42,7 +45,7 @@ const routes = [
     path: '/project',
     component: () => import('@/pages/Projects.vue'),
     meta: {
-      title: 'MRV Project',
+      title: 'iMRV — Programs',
     },
   },
   {
@@ -50,7 +53,7 @@ const routes = [
     path: '/climate-change-division',
     component: () => import('@/pages/ClimateChange.vue'),
     meta: {
-      title: 'Climate Change Division',
+      title: 'iMRV — Climate Change Division',
     },
   },
   {
@@ -58,7 +61,7 @@ const routes = [
     path: '/reports',
     component: () => import('@/pages/Reports.vue'),
     meta: {
-      title: 'MRV Report',
+      title: 'iMRV — National GHG Inventory',
     },
   },
   {
@@ -66,7 +69,7 @@ const routes = [
     path: '/support',
     component: () => import('@/pages/Support.vue'),
     meta: {
-      title: 'MRV Support',
+      title: 'iMRV — Support Centre',
     },
   },
   {
@@ -74,8 +77,38 @@ const routes = [
     path: '/knowledgeresource',
     component: () => import('@/pages/KnowledgeResource.vue'),
     meta: {
-      title: 'Knowledge Resource',
+      title: 'iMRV — Knowledge Resources',
     },
+  },
+  {
+    name: 'Privacy',
+    path: '/privacy',
+    component: () => import('@/pages/Privacy.vue'),
+    meta: { title: 'iMRV — Privacy' },
+  },
+  {
+    name: 'Accessibility',
+    path: '/accessibility',
+    component: () => import('@/pages/Accessibility.vue'),
+    meta: { title: 'iMRV — Accessibility' },
+  },
+  {
+    name: 'Source',
+    path: '/source',
+    component: () => import('@/pages/Source.vue'),
+    meta: { title: 'iMRV — Source' },
+  },
+  {
+    name: 'OpenData',
+    path: '/open-data',
+    component: () => import('@/pages/OpenData.vue'),
+    meta: { title: 'iMRV — Open Data API' },
+  },
+  {
+    name: 'Methodology',
+    path: '/methodology',
+    component: () => import('@/pages/Methodology.vue'),
+    meta: { title: 'iMRV — Methodology' },
   },
   // Catch-all: unknown SPA routes silently rendered nothing (white screen)
   // because <router-view> had no fallback. Redirect to home instead.
@@ -95,7 +128,7 @@ let router = createRouter({
 })
 
 router.beforeEach((to, from) => {
-  document.title = to.meta?.title ?? 'MRV Tool'
+  document.title = to.meta?.title ?? 'iMRV'
 })
 
 export default router

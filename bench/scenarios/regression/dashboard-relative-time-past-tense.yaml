@@ -1,0 +1,28 @@
+id: regression_dashboard_relative_time_past_tense
+title: "Recent Activity timestamps render in past tense (no 'in N hours')"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+steps:
+  - login_as: Administrator
+  - navigate: /app/main-dashboard
+  - wait_for_selector:
+      selector: ".ed-activity-when"
+      timeout_ms: 15000
+  - capture: dashboard-activity-when
+assertions:
+  # Audit #S8: past Activity Log entries rendered as "in 9 hours" (future
+  # tense) — moment(ts).fromNow() inverted the sign because it interpreted
+  # the server-local timestamp as the browser's local zone. Fix routes
+  # through frappe.datetime.comment_when which always reports past tense
+  # for past events. We assert NO ".ed-activity-when" cell text matches the
+  # "in N <unit>" future-tense pattern.
+  - selector:
+      selector: ".ed-activity-when"
+      count: { min: 1 }
+  - text_not_matching:
+      selector: ".ed-activity-when"
+      pattern: "^in \\d+\\s+(seconds?|minutes?|hours?|days?|months?|years?)( ago)?$"
+  - no_console_error_matching: "TypeError|ReferenceError"
+tags: [regression, dashboard, datetime, day-1]
+sources:
+  - { audit: "#S8" }

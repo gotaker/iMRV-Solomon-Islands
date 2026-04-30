@@ -1,0 +1,28 @@
+id: regression_ghg_report_future_years_excluded
+title: "Year filter excludes years with no data (≥2027)"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+steps:
+  - login_as: Administrator
+  - navigate: /app/ghg-inventory-report
+  - wait_for_selector:
+      selector: "select.input-with-feedback, [data-original-title='Year'] select"
+      timeout_ms: 15000
+  - capture: ghg-year-filter-options
+assertions:
+  # Audit #S9 (point 7): the Year dropdown was hard-coded 1990-2050. 2027-2050
+  # had no GHG Inventory data so picking those rendered blank charts. Fix
+  # replaces the hard-coded list with a get_years() backend call that returns
+  # only distinct years that exist in tabGHG Inventory Master Report ChildTable.
+  # We assert the dropdown contains no option for 2027 or later, AND it has
+  # at least one populated option (sanity-check that get_years() ran).
+  - selector:
+      selector: "[data-original-title='Year'] select option"
+      count: { min: 2 }
+  - option_text_not_matching:
+      selector: "[data-original-title='Year'] select option"
+      pattern: "^(202[7-9]|20[3-9][0-9]|205[0-9])$"
+  - no_console_error_matching: "TypeError|ReferenceError|HTTPError"
+tags: [regression, ghg-report, year-filter, day-1]
+sources:
+  - { audit: "#S9" }

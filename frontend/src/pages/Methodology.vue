@@ -1,0 +1,19 @@
+<script setup>
+import EditorialStub from '@/components/EditorialStub.vue'
+</script>
+
+<template>
+  <EditorialStub
+    eyebrow="(Index 00) Methodology"
+    title-a="Methodology."
+    lede="How each figure on the iMRV ledger is measured, reconciled, and verified — from a field site visit to a published number on the home page."
+    contact-subject="iMRV Methodology Inquiry"
+    :body-paragraphs="[
+      'iMRV inherits the Measurement, Reporting and Verification methodology described in the Solomon Islands Initial National Communication and updated in subsequent Biennial Update Reports. We follow the IPCC 2006 Guidelines for National Greenhouse Gas Inventories, with country-specific emission factors where they have been independently validated.',
+      'For adaptation and mitigation projects, the unit of record is the project itself: every figure on the project page is traceable back to the implementing agency documentation, with the verification stage visible in the My Approval workflow. Project costs are recorded in their original currency and rounded for display in USD using a same-day exchange rate snapshot held in the climate-finance child table.',
+      'Climate finance flows are tracked in three states — commitment (signed), disbursement (received), and absorption (spent). The home-page totals are commitments unless otherwise labelled. Source documents are attached to each finance record as PDF or scan, accessible through the Open Data API.',
+      'The GHG inventory rollups are recomputed on a fixed cadence: a partial update each quarter for activity-data sectors that change frequently (energy, waste), and a full national inventory recompute every two years aligned with the BUR cycle. Methodology notes for each inventory year are bundled into the corresponding Knowledge Resource entry.',
+      'Where we deviate from the IPCC default methodology, the deviation is footnoted on the source page and flagged in the Knowledge Resources library.',
+    ]"
+  />
+</template>

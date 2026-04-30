@@ -1,0 +1,50 @@
+id: regression_drawer_no_hidden_user_clones
+title: "Drawer renders exactly one user-info banner (no .fsm-user-info-clone-hidden)"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+
+# Audit 2026-04-29 (Agent C, Issue #S2): the side_menu1.html template embeds
+# a <li class="user-info"> inside every .treeview-menu, so an Administrator
+# session showed 7 hidden duplicate banners. Just hiding via display:none
+# leaves them in the accessibility tree (screen readers still enumerate
+# them). The fix removes the duplicate nodes outright in fsmDedupeUserInfo()
+# and keeps the single canonical instance at .fsm-user-footer.
+steps:
+  - login_as: Administrator
+  - navigate: /app/main-dashboard
+  - click: { selector: ".fsm-trigger" }
+  - wait_for_selector:
+      selector: "body.fsm-open .fsm-user-footer"
+      timeout_ms: 8000
+  # Force every accordion open — historically the deduper runs once on
+  # drawer attach; we want to be sure no accordion-expansion path re-spawns
+  # a clone.
+  - run_script: |
+      document.querySelectorAll('#fsm-drawer li.treeview.drop-down > a.link.menu').forEach(function(a){
+        if (!a.parentElement.classList.contains('fsm-expanded')) a.click();
+      });
+  - wait_ms: 600
+  - capture: drawer-fully-open
+
+assertions:
+  # Zero hidden clones — they should be removed from the DOM, not just
+  # display:none'd.
+  - selector:
+      selector: ".fsm-user-info-clone-hidden, #fsm-drawer .treeview-menu .user-info"
+      count: { equals: 0 }
+  # Exactly one canonical user banner in the footer.
+  - selector:
+      selector: "#fsm-drawer .fsm-user-footer"
+      count: { equals: 1 }
+  # The footer contains a non-empty user name (server-rendered escaped DOM).
+  - selector_text:
+      selector: "#fsm-drawer .fsm-user-footer .uname"
+      not_empty: true
+
+rubric:
+  visual_integrity: true
+  accessibility: true
+
+tags: [regression, drawer, accessibility, day-1]
+sources:
+  - audit: "qa-report-2026-04-29 issue #S2 (7 hidden duplicate user-info banners)"

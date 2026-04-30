@@ -21,14 +21,30 @@ class GHGInventoryGasWise {
 		this.datatable=null;
 		// this.add_card_button_to_toolbar();
 		this.set_default_secondary_action();
+		// Year + unit filters are added with placeholders, then `boot_filters`
+		// queries the backend for the years that actually have data, repopulates
+		// the year dropdown, auto-selects the most recent year, and renders.
+		// This replaces the old behaviour where 1990–2050 were hard-coded (so
+		// 2027–2050 always rendered as blank charts) and the page rendered two
+		// chart titles + Hide Chart buttons before a year was selected.
 		this.ghg_year_filter();
 		this.ghg_unit_filter();
-		// Render the chart container + data table on load. Without these the
-		// page sat blank below the filter row until the user changed a filter.
-		this.render_datatable();
-		this.make();
+		this.boot_filters();
+	}
 
-		// this.create_date_range_field();
+	boot_filters() {
+		frappe.call('mrvtools.ghg_inventory.page.ghg_inventory_report.ghg_inventory_report.get_years').then((r) => {
+			const years = (r && r.message) ? r.message : [];
+			const $select = $(this.inventory_year);
+			$select.empty();
+			$select.append(new Option(' ', ''));
+			years.forEach((y) => $select.append(new Option(String(y), String(y))));
+			if (years.length) {
+				const latest = String(years[0]);
+				this.inventory_year[0].value = latest;
+				$select.val(latest).trigger('change');
+			}
+		});
 	}
 	set_default_secondary_action() {
 		this.refresh_button && this.refresh_button.remove();
@@ -169,33 +185,46 @@ class GHGInventoryGasWise {
 	
 
 	get_chart_report() {
-		
 		frappe.call('mrvtools.ghg_inventory.page.ghg_inventory_report.ghg_inventory_report.get_chart',{
 			inventory_year:this.inventory_year[0].value,
 			inventory_unit:this.inventory_unit[0].value
 		})
 			.then((r) => {
-				$("#categories_chart1").html("Total National Emission of all Gases")
+				const unit_label = unitLabel(this.inventory_unit[0].value);
+				$("#categories_chart1").html("Total National Emission of all Gases (" + unit_label + ")");
 				let results = r.message || [];
+				if (!results || !results.data || !results.data.length) {
+					$(".totalghg_inventory_report-graph").html(
+						`<div class="ghg-empty-state">No data for the selected year.</div>`
+					);
+					return;
+				}
+				const values = (results.data[0] || []).map((v) => Number(v) || 0);
 				const custom_options = {
-					type: "bar",	
-					colors: ["#568f8b"],
-					height: 220,
+					type: "bar",
+					colors: ["#01472e"],
+					height: 260,
 					axisOptions: {
 						xIsSeries: 0,
-						isNavigable :1 ,
-						shortenYAxisNumbers: 0,
+						isNavigable: 1,
+						// shortenYAxisNumbers: 1 lets Frappe Charts render compact
+						// labels (e.g. "1M" / "1.2k") instead of the raw 7-digit
+						// integers that caused the "1,000,000" → ")00000" clip.
+						shortenYAxisNumbers: 1,
 						xAxisMode: "tick",
-						numberFormatter: frappe.utils.format_chart_axis_number,
+						numberFormatter: formatCompactNumber,
+					},
+					tooltipOptions: {
+						formatTooltipY: (v) => formatTooltipNumber(v) + " " + unit_label,
 					},
 					data: {
-						datasets: [{values: results.data[0]}],
+						datasets: [{ name: unit_label, values: values }],
 						labels: results.labels
 					}
 				};
 				frappe.utils.make_chart(".totalghg_inventory_report-graph", custom_options);
 			});
-			
+
 	}
 	get_chart_report2() {
 		frappe.call('mrvtools.ghg_inventory.page.ghg_inventory_report.ghg_inventory_report.get_pie_chart',{
@@ -203,28 +232,61 @@ class GHGInventoryGasWise {
 			inventory_unit:this.inventory_unit[0].value
 		})
 			.then((r) => {
-				$("#categories_chart2").html("Total National Emission of all Gases - Sector Wise")
+				const unit_label = unitLabel(this.inventory_unit[0].value);
+				$("#categories_chart2").html("Total National Emission of all Gases - Sector Wise (" + unit_label + ")");
 				let results = r.message || [];
+				if (!results || !results.data || !results.data.length) {
+					$(".totalghg_inventory_report-graph2").html(
+						`<div class="ghg-empty-state">No sector data for the selected year.</div>`
+					);
+					return;
+				}
+				// Backend returns rows as tuples like [(123,), (456,), ...].
+				// Frappe Charts wants a flat number array — without this flatten
+				// the pie rendered as a single solid blue circle (it summed
+				// arrays-as-objects to NaN and fell back to a single slice).
+				const values = (results.data || []).map((row) => {
+					const v = Array.isArray(row) ? row[0] : row;
+					return Number(v) || 0;
+				});
+				// Forest-and-Sage palette: 6 distinct shades from the editorial
+				// tokens (forest, moss, sage, olive, cream-deep, forest-dark).
+				// Do NOT introduce new hex codes — these mirror :root tokens.
+				const slice_colors = [
+					"#01472e", // --ed-forest
+					"#a3b18a", // --ed-moss
+					"#84b29e", // sage-mid
+					"#568f8b", // teal-forest accent
+					"#ccd5ae", // --ed-sage
+					"#022e1d"  // --ed-forest-dark
+				];
+				const total = values.reduce((s, n) => s + n, 0) || 1;
 				const custom_options = {
-					type: "pie",	
-					colors: ["#b9d5b2", "#84b29e", "#568f8b", "#326b77", "#1b485e", "#122740"],
-					height: 300,
+					type: "pie",
+					colors: slice_colors,
+					height: 320,
 					axisOptions: {
 						xIsSeries: 0,
-						isNavigable :1 ,
+						isNavigable: 1,
 						shortenYAxisNumbers: 1,
 						xAxisMode: "tick",
-						numberFormatter: frappe.utils.format_chart_axis_number,
+						numberFormatter: formatCompactNumber,
 						maxSlices: 6
 					},
+					tooltipOptions: {
+						formatTooltipY: (v) => {
+							const pct = ((Number(v) / total) * 100).toFixed(1);
+							return formatTooltipNumber(v) + " " + unit_label + " (" + pct + "%)";
+						},
+					},
 					data: {
-						datasets: [{values: results.data}],
-						labels: results.labels
+						labels: results.labels,
+						datasets: [{ name: "Sector", values: values }]
 					}
 				};
 				frappe.utils.make_chart(".totalghg_inventory_report-graph2", custom_options);
 			});
-			
+
 	}
 	render_datatable(){
 		frappe.call('mrvtools.ghg_inventory.page.ghg_inventory_report.ghg_inventory_report.execute',{
@@ -238,7 +300,8 @@ class GHGInventoryGasWise {
 				let data = r.message[1]
 				$('.headline:first').remove();
 				if(this.inventory_year[0].value){
-					this.$heading = $('<b class="report-heading" style="margin-left: 30px;">GHG Inventory Report - Gas wise</b>').insertBefore(this.$report);
+					const heading_unit = unitLabel(this.inventory_unit[0].value);
+				this.$heading = $(`<b class="report-heading" style="margin-left: 30px;">GHG Inventory Report - Gas wise (${heading_unit})</b>`).insertBefore(this.$report);
 				}
 				this.datatable = new DataTable(this.$report[0], {columns:columns,data:data,treeView:true,inlineFilters: true});
 				if(this.inventory_year[0].value ==''){
@@ -249,18 +312,19 @@ class GHGInventoryGasWise {
 	}
 
 	ghg_year_filter() {
-		this.inventory_year = this.page.add_select(
-			__("Year"),[" ","1990","1991","1992","1993","1994","1995","1996","1997","1998","1999","2000","2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024","2025","2026","2027","2028","2029","2030","2031","2032","2033","2034","2035","2036","2037","2038","2039","2040","2041","2042","2043","2044","2045","2046","2047","2048","2049","2050"]
-			
-		)
-		
+		// Year list is empty here — populated dynamically by boot_filters() so
+		// 2027–2050 (which have no GHG Inventory data in this site) don't
+		// appear as picker options.
+		this.inventory_year = this.page.add_select(__("Year"), [" "]);
+
 		this.inventory_year.on("change",(r) => {
 			$('[class="report-heading"]:first').remove()
+			$('[class="all_html"]:first').remove()
 			this.render_datatable()
 			this.make()
 			this.get_chart_report();
 			this.get_chart_report2();
-			this.$heading.empty();
+			if (this.$heading) this.$heading.empty();
 			if(this.inventory_year[0].value ==''){
 				$('.report-heading').attr('style',"display:none !important")
 				$('.all_html').attr('style',"display:none !important")
@@ -270,24 +334,74 @@ class GHGInventoryGasWise {
 				$('.all_html').attr('style',"display:block !important")
 			}
 		})
-		
+
 	}
 	ghg_unit_filter() {
+		// Display labels carry the Unicode subscript-2 (₂) so the chart axis
+		// title and unit picker read "tCO₂e" / "GgCO₂e" — the underlying
+		// values stay ASCII so the Python switch in get_chart / get_pie_chart
+		// (which compares against literal "tCO2e" / "GgCO2e") still matches.
 		this.inventory_unit = this.page.add_select(
-			__("Unit"),["tCO2e","GgCO2e"]
-			
+			__("Unit"),
+			[
+				{ label: "tCO₂e", value: "tCO2e" },
+				{ label: "GgCO₂e", value: "GgCO2e" }
+			]
 		)
 		this.inventory_unit.on("change",(r) => {
 			$('[class="report-heading"]:first').remove()
 			this.render_datatable()
 			this.get_chart_report();
 			this.get_chart_report2();
-			this.$heading.empty();
+			if (this.$heading) this.$heading.empty();
 		})
 	}
 
 
-	
 
 
+
+}
+
+// ---- helpers ---------------------------------------------------------------
+
+// Render the unit label with the Unicode subscript-2 (₂) for chart titles,
+// tooltips, and the data-table heading. Backend stays on ASCII keys.
+function unitLabel(raw) {
+	if (raw === "GgCO2e") return "GgCO₂e";
+	return "tCO₂e";
+}
+
+// Compact number formatter for Y-axis ticks. Uses Intl when available so a
+// 7-digit value like 1,234,567 renders as "1.2M" — fixes the clip where
+// raw "1,000,000" was getting cropped to ")00000" because the chart container
+// had no left padding for a multi-digit tick. Falls back to a manual switch
+// in case Intl.NumberFormat compact notation is unavailable.
+function formatCompactNumber(v) {
+	const n = Number(v);
+	if (!isFinite(n)) return String(v);
+	try {
+		return new Intl.NumberFormat('en-US', {
+			notation: 'compact',
+			maximumFractionDigits: 1
+		}).format(n);
+	} catch (e) {
+		const abs = Math.abs(n);
+		if (abs >= 1e9) return (n / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
+		if (abs >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+		if (abs >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'k';
+		return String(n);
+	}
+}
+
+// Tooltip wants the full thousands-separated value, not the compact one — so
+// users can see the exact number on hover even when the axis is compacted.
+function formatTooltipNumber(v) {
+	const n = Number(v);
+	if (!isFinite(n)) return String(v);
+	try {
+		return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(n);
+	} catch (e) {
+		return String(n);
+	}
 }

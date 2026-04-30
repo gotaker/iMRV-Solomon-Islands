@@ -1,0 +1,49 @@
+id: regression_login_bad_creds_shows_error
+title: "Bad credentials surface a visible inline error on /login"
+perspective: { role: guest, persona: standard, environment: any }
+preconditions: { sample_db: required, session: anonymous, cache: warm }
+
+# Audit 2026-04-29 (Agent C): submitting wrong credentials returned 401 from
+# /api/method/login but the UI showed nothing — silent failure. The user just
+# sees their click do nothing. The fix wires jQuery's ajaxError to render an
+# inline `.ed-login-error` paragraph below the password field; this scenario
+# guards against a regression where the silent-fail returns.
+steps:
+  - navigate: /login
+  - wait_for_selector:
+      selector: "#login_email"
+      timeout_ms: 10000
+  - fill: { selector: "#login_email", value: "nobody@example.invalid" }
+  - fill: { selector: "#login_password", value: "definitely-not-the-password" }
+  - click: { selector: ".btn-login" }
+  - wait_for_selector:
+      selector: "#login-error:not([hidden])"
+      timeout_ms: 8000
+  - capture: login-after-bad-creds
+
+assertions:
+  # Inline error visible (text non-empty + element not [hidden]).
+  - selector:
+      selector: "#login-error:not([hidden])"
+      count: { min: 1 }
+  - selector_text:
+      selector: "#login-error"
+      not_empty: true
+  # Inputs flagged invalid for the editorial red border.
+  - selector:
+      selector: "#login_email.is-invalid, #login_password.is-invalid"
+      count: { min: 2 }
+  # Sign-in panel still mounted (no accidental redirect on failure).
+  - selector:
+      selector: ".ed-login-card[data-mode=signin] .form-login"
+      count: { min: 1 }
+  # Page did NOT navigate away from /login.
+  - url_path_equals: "/login"
+
+rubric:
+  feedback_clarity: true
+  navigation_correctness: true
+
+tags: [regression, login, error-state, day-1]
+sources:
+  - audit: "qa-report-2026-04-29 issue #2 (silent 401 fail)"

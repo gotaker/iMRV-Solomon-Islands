@@ -148,39 +148,12 @@
           Get Help
         </h2>
 
-        <div class="cards-grid">
-          <router-link
-            to="/"
-            class="help-card"
-            data-reveal
-            data-reveal-delay="1"
-          >
-            <span class="card-title">Platform Guide</span>
-            <span class="card-desc"
-              >Step-by-step instructions for adding and updating records</span
-            >
-            <span class="card-arrow" aria-hidden="true">→</span>
-          </router-link>
-
-          <router-link
-            to="/"
-            class="help-card"
-            data-reveal
-            data-reveal-delay="2"
-          >
-            <span class="card-title">Data Formats</span>
-            <span class="card-desc"
-              >Accepted file types, field definitions, and validation
-              rules</span
-            >
-            <span class="card-arrow" aria-hidden="true">→</span>
-          </router-link>
-
+        <div class="cards-grid cards-grid--single">
           <router-link
             to="/climate-change-division"
             class="help-card"
             data-reveal
-            data-reveal-delay="3"
+            data-reveal-delay="1"
           >
             <span class="card-title">Contact Division</span>
             <span class="card-desc"
@@ -452,6 +425,10 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
+}
+.cards-grid--single {
+  grid-template-columns: minmax(0, 22rem);
+  justify-content: start;
 }
 
 .help-card {

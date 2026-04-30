@@ -1,0 +1,31 @@
+id: regression_ghg_report_y_axis_not_clipped
+title: "GHG Inventory Report Y-axis tick labels render without clipping"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+steps:
+  - login_as: Administrator
+  - navigate: /app/ghg-inventory-report
+  - wait_for_selector:
+      selector: ".totalghg_inventory_report-graph svg, .totalghg_inventory_report-graph .chart-container"
+      timeout_ms: 15000
+  - capture: ghg-bar-chart-rendered
+assertions:
+  # Audit #S9: 7-digit Y-axis labels like "1,000,000" rendered as ")00000"
+  # because the chart container had zero left padding. Fix sets a 24px
+  # left padding on .totalghg_inventory_report-graph + uses
+  # shortenYAxisNumbers:1 with Intl compact-notation formatter so a value
+  # like 1234567 renders as "1.2M".
+  - computed_style:
+      selector: ".totalghg_inventory_report-graph"
+      property: "padding-left"
+      min_px: 16
+  # Y-axis tick labels should never include a 7+ digit run — the compact
+  # formatter must have applied. Frappe Charts renders ticks as <text> in
+  # the SVG, so we read all text-content from the chart svg.
+  - text_not_matching:
+      selector: ".totalghg_inventory_report-graph svg text"
+      pattern: "[0-9]{7,}"
+  - no_console_error_matching: "TypeError|ReferenceError"
+tags: [regression, ghg-report, charts, day-1]
+sources:
+  - { audit: "#S9" }

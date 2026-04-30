@@ -39,7 +39,7 @@
                         {% if z.is_static_link==0%}
                         {%if z.sub_menu_type=="Page"%}
                         <li>
-                            <a id="/app/{{ z.route }}" onclick="go_to_page(this)">
+                            <a id="/app/{{ z.route }}" href="/app/{{ z.route }}" onclick="go_to_page(this)">
                                 {% if z.sub_menu_image_icon %}
                                     <img src="{{ z.sub_menu_image_icon }}" style="width: 30px;">
                                 {% else %}
@@ -54,7 +54,7 @@
                         {%if z.sub_menu_type=="DocType"%}
                         {%if z.is_single==0%}
                         <li> 
-                            <a id="/app/{{ z.route }}" onclick="go_to_page(this)">
+                            <a id="/app/{{ z.route }}" href="/app/{{ z.route }}" onclick="go_to_page(this)">
                                 {% if z.sub_menu_image_icon %}
                                 <img src="{{z.sub_menu_image_icon}}" alt="Mitigations" class="navbar-image" style="width: 30px;">
                                 {% else %}
@@ -66,7 +66,7 @@
                         </li>
                         {%else%}
                         <li>
-                            <a id="/app/{{ z.route }}" onclick="go_to_page(this)">
+                            <a id="/app/{{ z.route }}" href="/app/{{ z.route }}" onclick="go_to_page(this)">
                                 {% if z.sub_menu_image_icon %}
                                     <img src="{{ z.sub_menu_image_icon }}" style="width: 30px;">
                                 {% else %}
@@ -80,7 +80,7 @@
                         {% endif %}
                         {%if z.sub_menu_type=="Report"%}
                         <li>
-                            <a id="/app/{{ z.route }}" onclick="go_to_page(this)">
+                            <a id="/app/{{ z.route }}" href="/app/{{ z.route }}" onclick="go_to_page(this)">
                                 {% if z.sub_menu_image_icon %}
                                     <img src="{{ z.sub_menu_image_icon }}" style="width: 30px;">
                                 {% else %}
@@ -93,7 +93,7 @@
                         {% endif %}
                         {% else %}
                         <li>
-                            <a id="/app/{{ z.route }}" onclick="go_to_page(this)">
+                            <a id="/app/{{ z.route }}" href="/app/{{ z.route }}" onclick="go_to_page(this)">
                                 {% if z.sub_menu_image_icon %}
                                     <img src="{{ z.sub_menu_image_icon }}" style="width: 30px;">
                                 {% else %}
@@ -118,7 +118,7 @@
           {%if u.module_name=="Dashboard"%}
 
                 <li>
-                <a class="menu" onclick="gotodashboard()">
+                <a class="menu" href="/app/main-dashboard" title="{{ u.label }}" aria-label="{{ u.label }}" onclick="gotodashboard()">
                     <i class="fi fi-rr-home"></i>{% if center_menu==1 %}<br /> {% endif %}
                     <span style="font-size: 15px;">{{u.label}}</span>
                 </a>
@@ -130,7 +130,7 @@
             {%if u.menu_type=="DocType"%}
             {%if u.is_single_doc==0%}
             <li>
-                <a class="menu" id="/app/{{u.route}}" onclick="go_to_page(this)">                         
+                <a class="menu" id="/app/{{u.route}}" href="/app/{{u.route}}" onclick="go_to_page(this)">                         
                     {% if u.icon_image %}
                         <img src="{{ u.icon_image }}" alt="{{ u.label }}" class="navbar-image" style="width: 30px;">
                     {% else %}
@@ -142,7 +142,7 @@
            
             {%else%}
             <li>
-                <a class="menu" id="/app/{{u.route}}" onclick="go_to_page(this)">                         
+                <a class="menu" id="/app/{{u.route}}" href="/app/{{u.route}}" onclick="go_to_page(this)">                         
                     {% if u.icon_image %}
                         <img src="{{ u.icon_image }}" alt="{{ u.label }}" class="navbar-image" style="width: 30px;">
                     {% else %}
@@ -157,7 +157,7 @@
 
             {%if u.menu_type=="Report"%}
             <li>
-                <a class="menu" id="{{u.route}}" onclick="go_to_page(this)">                         
+                <a class="menu" id="{{u.route}}" href="/app/{{u.route}}" onclick="go_to_page(this)">                         
                     {% if u.icon_image %}
                         <img src="{{ u.icon_image }}" alt="{{ u.label }}" class="navbar-image" style="width: 30px;">
                     {% else %}
@@ -170,7 +170,7 @@
             {% endif %}
             {%if u.menu_type=="Page"%}
             <li>
-                <a class="menu" id="/app/{{u.route}}" onclick="go_to_page(this)">                         
+                <a class="menu" id="/app/{{u.route}}" href="/app/{{u.route}}" onclick="go_to_page(this)">                         
                     {% if u.icon_image %}
                         <img src="{{ u.icon_image }}" alt="{{ u.label }}" class="navbar-image" style="width: 30px;">
                     {% else %}

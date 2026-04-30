@@ -33,13 +33,19 @@
                     :href="item.document"
                     class="cus-text mobile-hidden"
                     target="blank"
-                    style="text-decoration: none; color: #022e1d; font-weight: 700"
+                    rel="noopener noreferrer"
+                    :aria-label="item.link_name || 'Knowledge resource'"
+                    style="
+                      text-decoration: none;
+                      color: #022e1d;
+                      font-weight: 700;
+                    "
                   >
                     <img
                       :src="item.image"
                       class="card-img-top"
                       style="cursor: pointer; border-radius: 6px"
-                      alt="..."
+                      :alt="item.link_name || 'Knowledge resource'"
                     />
                     <div v-if="item.link_name" class="overlay">
                       <h5
@@ -87,7 +93,13 @@
                     :href="item.document"
                     class="cus-text mobile-hidden"
                     target="blank"
-                    style="text-decoration: none; color: #022e1d; font-weight: 700"
+                    rel="noopener noreferrer"
+                    :aria-label="item.link_name || 'Knowledge resource'"
+                    style="
+                      text-decoration: none;
+                      color: #022e1d;
+                      font-weight: 700;
+                    "
                   >
                     <img
                       :src="item.image"
@@ -97,7 +109,7 @@
                         position: relative;
                         border-radius: 6px;
                       "
-                      alt="..."
+                      :alt="item.link_name || 'Knowledge resource'"
                     />
                     <div v-if="item.link_name" class="overlay">
                       <h5

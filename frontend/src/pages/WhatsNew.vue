@@ -104,7 +104,50 @@ import { useReveal } from '@/composables/useReveal'
 const data = ref({})
 const { observeAll } = useReveal()
 
-const newsItems = computed(() => data.value?.message?.add_new_content ?? [])
+// Sanity-check an image URL against the host the SPA itself was loaded from.
+// The audit caught a news card pulling its image from petapixel.com — we
+// either drop those URLs (returning null so the template falls back to the
+// no-image placeholder) or keep them only when they're same-origin or
+// served as a relative Frappe File path. Anything else is treated as
+// untrusted offsite content.
+const isSameOriginImage = (src) => {
+  if (!src || typeof src !== 'string') return false
+  // Relative paths (e.g. /files/foo.jpg) and Frappe upload URLs are safe.
+  if (src.startsWith('/') && !src.startsWith('//')) return true
+  try {
+    const u = new URL(src, window.location.origin)
+    return u.origin === window.location.origin
+  } catch {
+    return false
+  }
+}
+
+const safeImage = (src) => (isSameOriginImage(src) ? src : null)
+
+const rawNewsItems = computed(() => data.value?.message?.add_new_content ?? [])
+
+// Deduplicate by (title, date) so the source data being seeded with four
+// identical cards collapses to one. Sort newest-first by parsing `date`
+// (raw ISO string from Frappe) before formatting it for display.
+const newsItems = computed(() => {
+  const seen = new Set()
+  const out = []
+  for (const item of rawNewsItems.value) {
+    const key = `${item.title || ''}::${item.date || ''}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    out.push({
+      ...item,
+      add_image: safeImage(item.add_image),
+    })
+  }
+  out.sort((a, b) => {
+    const ta = a.date ? new Date(a.date).getTime() : 0
+    const tb = b.date ? new Date(b.date).getTime() : 0
+    return tb - ta
+  })
+  return out
+})
 
 const fetchData = async () => {
   try {
@@ -113,14 +156,17 @@ const fetchData = async () => {
     )
     if (response.status === 200) {
       data.value = response.data
-      let formatter = new Intl.DateTimeFormat('en-US', {
+      const formatter = new Intl.DateTimeFormat('en-US', {
         month: 'long',
         day: 'numeric',
         year: 'numeric',
       })
-      for (let i = 0; i < data.value.message.add_new_content.length; i++) {
-        let date = new Date(data.value.message.add_new_content[i].date)
-        data.value.message.add_new_content[i].creation = formatter.format(date)
+      const list = data.value?.message?.add_new_content
+      if (Array.isArray(list)) {
+        for (let i = 0; i < list.length; i++) {
+          const date = list[i].date ? new Date(list[i].date) : null
+          list[i].creation = date ? formatter.format(date) : ''
+        }
       }
       await nextTick()
       observeAll()

@@ -632,3 +632,39 @@ body.fsm-open {
 #fsm-drawer a:has(i.fa-download) {
     --fsm-icon: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/><polyline points='7 10 12 15 17 10'/><line x1='12' y1='15' x2='12' y2='3'/></svg>");
 }
+
+/* =====================================================================
+   Accordion chevron — distinguishes parent-with-submenu from direct-link.
+   Audit Issue #S7: top-level direct-link entries and accordion entries
+   are visually identical, so users don't know which expand. Add a
+   right-aligned chevron only to <a class="link menu"> (the parent toggle
+   for treeview.drop-down items); rotate when its <li> is .fsm-expanded.
+   Direct links use <a class="menu"> and don't get the chevron.
+   ===================================================================== */
+.main-sidebar li.treeview.drop-down > a.link.menu,
+#fsm-drawer li.treeview.drop-down > a.link.menu {
+    /* Make room for the chevron + push it to the trailing edge. */
+    justify-content: flex-start;
+    padding-right: 36px !important;
+    position: relative;
+}
+.main-sidebar li.treeview.drop-down > a.link.menu::after,
+#fsm-drawer li.treeview.drop-down > a.link.menu::after {
+    content: '';
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: translateY(-65%) rotate(-45deg);
+    transition: transform var(--ed-dur-fast) var(--ed-ease);
+    opacity: 0.55;
+    pointer-events: none;
+}
+.main-sidebar li.treeview.drop-down.fsm-expanded > a.link.menu::after,
+#fsm-drawer li.treeview.drop-down.fsm-expanded > a.link.menu::after {
+    transform: translateY(-30%) rotate(45deg);
+    opacity: 0.85;
+}

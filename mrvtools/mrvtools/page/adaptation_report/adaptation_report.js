@@ -16,9 +16,10 @@ class Adaptation {
 		this.page.sidebar.html(
 			`<ul class="standard-sidebar adaptation_report-sidebar overlay-sidebar"></ul>`
 		);
-		this.$sidebar_list = this.page.sidebar.find("ul");	
+		this.$sidebar_list = this.page.sidebar.find("ul");
 		this.datatable=null;
 		this.set_default_secondary_action();
+		add_report_description(this.page, "Resilience and adaptation progress against vulnerability indicators per project.");
 		this.adaptation_filter_fields()
 		this.render_datatable()
 		this.make();
@@ -300,4 +301,15 @@ class Adaptation {
 			
 	}
 
+}
+
+
+// ---- helpers ---------------------------------------------------------------
+
+function add_report_description(page, text) {
+	if (!page || !page.main || !text) return;
+	const $existing = $(page.main).find(".report-description");
+	if ($existing.length) return;
+	const html = `<div class="report-description" style="margin: 1rem 30px 0; font-family: var(--ed-font-body, 'Inter', system-ui, sans-serif); font-style: italic; font-size: 13px; color: var(--ed-forest-60, rgba(1, 71, 46, 0.6));">${$('<div>').text(text).html()}</div>`;
+	$(html).prependTo(page.main);
 }

@@ -152,8 +152,9 @@
 	display: grid;
 	grid-template-columns: 1fr auto;
 	grid-template-areas:
-		'eyebrow when'
-		'subject subject';
+		'eyebrow eyebrow'
+		'subject subject'
+		'user when';
 	gap: 0.25rem 1rem;
 	padding: 0.85rem 0;
 	border-top: 1px solid var(--ed-forest-08);
@@ -175,8 +176,20 @@
 	font-size: 14px;
 	color: var(--ed-forest);
 }
+.ed-dashboard .ed-activity-meta {
+	grid-area: user / user / when / when;
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 1rem;
+	font-size: 12px;
+	color: var(--ed-forest-60);
+}
+.ed-dashboard .ed-activity-user {
+	font-style: italic;
+	letter-spacing: 0.02em;
+}
 .ed-dashboard .ed-activity-when {
-	grid-area: when;
 	font-size: 12px;
 	color: var(--ed-forest-60);
 }

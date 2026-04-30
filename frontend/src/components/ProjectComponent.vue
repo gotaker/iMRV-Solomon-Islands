@@ -29,22 +29,33 @@
           style="list-style: none; display: flex"
         >
           <li v-if="item.project_image1" class="list_image">
-            <img :src="item.project_image1" class="pro_image" />
+            <img
+              :src="item.project_image1"
+              :alt="item.project_image1_title || 'Project'"
+              class="pro_image"
+            />
             <div class="overlay">
-              <h5>{{ item.project_image1_title }}</h5>
+              <h3>{{ item.project_image1_title }}</h3>
             </div>
           </li>
           <li v-if="item.project_image2" class="list_image">
-            <img :src="item.project_image2" class="pro_image" />
+            <img
+              :src="item.project_image2"
+              :alt="item.project_image2_title || 'Project'"
+              class="pro_image"
+            />
             <div class="overlay">
-              <h5></h5>
-              {{ item.project_image2_title }}
+              <h3>{{ item.project_image2_title }}</h3>
             </div>
           </li>
           <li v-if="item.project_image3" class="list_image">
-            <img :src="item.project_image3" class="pro_image" />
+            <img
+              :src="item.project_image3"
+              :alt="item.project_image3_title || 'Project'"
+              class="pro_image"
+            />
             <div class="overlay">
-              <h5>{{ item.project_image3_title }}</h5>
+              <h3>{{ item.project_image3_title }}</h3>
             </div>
           </li>
         </ul>
@@ -63,71 +74,21 @@
               id="pills-tab"
               role="tablist"
             >
-              <li class="nav-item active tab_child">
+              <li
+                v-for="tab in tabs"
+                :key="tab.id"
+                class="nav-item tab_child"
+                :class="{ active: activeTab === tab.id }"
+              >
                 <a
                   class="nav-link style-class"
-                  id="pills-home-tab"
-                  href="#p-view-2"
+                  :id="`pills-${tab.id}-tab`"
+                  :href="`#${tab.paneId}`"
                   role="tab"
-                  aria-selected="true"
-                  @click.prevent="onTabClick($event)"
-                  >Adaptation
+                  :aria-selected="activeTab === tab.id ? 'true' : 'false'"
+                  @click.prevent="setActiveTab(tab.id)"
+                  >{{ tab.label }}
                 </a>
-              </li>
-              <li class="nav-item tab_child">
-                <a
-                  class="nav-link style-class"
-                  id="pills-profile-tab"
-                  href="#p-view-5"
-                  role="tab"
-                  aria-selected="false"
-                  @click.prevent="onTabClick($event)"
-                  >Mitigation
-                </a>
-              </li>
-              <li class="nav-item tab_child">
-                <a
-                  class="nav-link style-class"
-                  id="pills-contact-tab"
-                  href="#p-view-6"
-                  role="tab"
-                  aria-selected="false"
-                  @click.prevent="onTabClick($event)"
-                  >Cross cutting</a
-                >
-              </li>
-              <li class="nav-item tab_child">
-                <a
-                  class="nav-link style-class"
-                  id="pills-contact-tab"
-                  href="#p-view-7"
-                  role="tab"
-                  aria-selected="false"
-                  @click.prevent="onTabClick($event)"
-                  >Enablers</a
-                >
-              </li>
-              <li class="nav-item tab_child">
-                <a
-                  class="nav-link style-class"
-                  id="pills-contact-tab"
-                  href="#p-view-8"
-                  role="tab"
-                  aria-selected="false"
-                  @click.prevent="onTabClick($event)"
-                  >Transparency</a
-                >
-              </li>
-              <li class="nav-item tab_child">
-                <a
-                  class="nav-link style-class"
-                  id="pills-contact-tab"
-                  href="#p-view-9"
-                  role="tab"
-                  aria-selected="false"
-                  @click.prevent="onTabClick($event)"
-                  >Support</a
-                >
               </li>
             </ul>
           </div>
@@ -147,7 +108,11 @@
                   :items="sortedData1"
                   class="datatable"
                 ></v-data-table>
-                <div class="tab-pane active" id="p-view-2">
+                <div
+                  class="tab-pane"
+                  :class="{ active: activeTab === 'adaptation' }"
+                  id="p-view-2"
+                >
                   <div class="tab-inner">
                     <div
                       class="table-responsive"
@@ -474,7 +439,7 @@
                               -
                             </td>
                             <td v-if="table_item.project_costusd">
-                              {{ table_item.project_costusd }}
+                              {{ formatUSD(table_item.project_costusd) }}
                             </td>
                             <td
                               v-else="table_item.project_costusd"
@@ -512,7 +477,11 @@
                     </div>
                   </div>
                 </div>
-                <div class="tab-pane" id="p-view-5">
+                <div
+                  class="tab-pane"
+                  :class="{ active: activeTab === 'mitigation' }"
+                  id="p-view-5"
+                >
                   <div class="tab-inner">
                     <div
                       class="table-responsive"
@@ -833,7 +802,7 @@
                               -
                             </td>
                             <td v-if="table_item.project_costusd">
-                              {{ table_item.project_costusd }}
+                              {{ formatUSD(table_item.project_costusd) }}
                             </td>
                             <td
                               v-else="table_item.project_costusd"
@@ -869,9 +838,16 @@
                         </tbody>
                       </table>
                     </div>
+                    <p v-if="!sortedData2.length" class="empty-pane">
+                      No mitigation projects yet.
+                    </p>
                   </div>
                 </div>
-                <div class="tab-pane" id="p-view-6">
+                <div
+                  class="tab-pane"
+                  :class="{ active: activeTab === 'cross-cutting' }"
+                  id="p-view-6"
+                >
                   <div class="tab-inner">
                     <div
                       class="table-responsive"
@@ -1192,7 +1168,7 @@
                               -
                             </td>
                             <td v-if="table_item.project_costusd">
-                              {{ table_item.project_costusd }}
+                              {{ formatUSD(table_item.project_costusd) }}
                             </td>
                             <td
                               v-else="table_item.project_costusd"
@@ -1228,9 +1204,16 @@
                         </tbody>
                       </table>
                     </div>
+                    <p v-if="!sortedData3.length" class="empty-pane">
+                      No cross-cutting projects yet.
+                    </p>
                   </div>
                 </div>
-                <div class="tab-pane" id="p-view-7">
+                <div
+                  class="tab-pane"
+                  :class="{ active: activeTab === 'enablers' }"
+                  id="p-view-7"
+                >
                   <div class="tab-inner">
                     <div
                       class="table-responsive"
@@ -1551,7 +1534,7 @@
                               -
                             </td>
                             <td v-if="table_item.project_costusd">
-                              {{ table_item.project_costusd }}
+                              {{ formatUSD(table_item.project_costusd) }}
                             </td>
                             <td
                               v-else="table_item.project_costusd"
@@ -1587,9 +1570,16 @@
                         </tbody>
                       </table>
                     </div>
+                    <p v-if="!sortedData4.length" class="empty-pane">
+                      No enabler projects yet.
+                    </p>
                   </div>
                 </div>
-                <div class="tab-pane" id="p-view-8">
+                <div
+                  class="tab-pane"
+                  :class="{ active: activeTab === 'transparency' }"
+                  id="p-view-8"
+                >
                   <div class="tab-inner">
                     <div
                       class="table-responsive"
@@ -1916,7 +1906,7 @@
                             </td>
 
                             <td v-if="trans_item.project_costusd">
-                              {{ trans_item.project_costusd }}
+                              {{ formatUSD(trans_item.project_costusd) }}
                             </td>
                             <td
                               v-else="table_item.project_costusd"
@@ -1955,9 +1945,16 @@
                         </tbody>
                       </table>
                     </div>
+                    <p v-if="!sortedData5.length" class="empty-pane">
+                      No transparency projects yet.
+                    </p>
                   </div>
                 </div>
-                <div class="tab-pane" id="p-view-9">
+                <div
+                  class="tab-pane"
+                  :class="{ active: activeTab === 'support' }"
+                  id="p-view-9"
+                >
                   <div class="tab-inner">
                     <div
                       class="table-responsive"
@@ -2284,7 +2281,7 @@
                             </td>
 
                             <td v-if="support_item.project_costusd">
-                              {{ support_item.project_costusd }}
+                              {{ formatUSD(support_item.project_costusd) }}
                             </td>
                             <td
                               v-else="table_item.project_costusd"
@@ -2323,6 +2320,9 @@
                         </tbody>
                       </table>
                     </div>
+                    <p v-if="!sortedData6.length" class="empty-pane">
+                      No support projects yet.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -2336,6 +2336,42 @@
 </template>
 
 <script>
+// Tab activation runs through a reactive `activeTab` ref keyed to a slug —
+// not Bootstrap's data-toggle="tab" + aria-controls contract, which silently
+// drifts when ids collide (the legacy markup had four duplicate
+// id="pills-contact-tab" entries). Per memory feedback_bootstrap_tab_override.md
+// the fix is a Vue @click handler maintaining the active state in JS, with
+// :class="{ active: ... }" bindings on both the <li> and the matching
+// .tab-pane so Bootstrap's display:none rule shows the right panel.
+const TABS = [
+  { id: 'adaptation', label: 'Adaptation', paneId: 'p-view-2' },
+  { id: 'mitigation', label: 'Mitigation', paneId: 'p-view-5' },
+  { id: 'cross-cutting', label: 'Cross cutting', paneId: 'p-view-6' },
+  { id: 'enablers', label: 'Enablers', paneId: 'p-view-7' },
+  { id: 'transparency', label: 'Transparency', paneId: 'p-view-8' },
+  { id: 'support', label: 'Support', paneId: 'p-view-9' },
+]
+
+// Map of incoming `?focus=` values (case-insensitive) onto tab ids. The home
+// page's program tiles link with `?focus=Adaptation|Mitigation|Cross-Cutting`,
+// so we accept both the slug form and the user-facing label spelling.
+const FOCUS_ALIASES = {
+  adaptation: 'adaptation',
+  mitigation: 'mitigation',
+  'cross-cutting': 'cross-cutting',
+  'cross cutting': 'cross-cutting',
+  crosscutting: 'cross-cutting',
+  enablers: 'enablers',
+  transparency: 'transparency',
+  support: 'support',
+}
+
+const usdFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 0,
+})
+
 export default {
   props: {
     data: {
@@ -2346,6 +2382,8 @@ export default {
 
   data() {
     return {
+      tabs: TABS,
+      activeTab: 'adaptation',
       sortedData: [],
       sortedData1: [],
       sortedData2: [],
@@ -2376,29 +2414,28 @@ export default {
         this.sortedData6 = pd.support_table || []
       },
     },
+    '$route.query.focus': {
+      immediate: true,
+      handler(val) {
+        if (!val) return
+        const key = String(val).toLowerCase()
+        const target = FOCUS_ALIASES[key]
+        if (target) this.activeTab = target
+      },
+    },
   },
   methods: {
-    onTabClick(e) {
-      const a = e.currentTarget
-      const href = a.getAttribute('href')
-      if (!href || !href.startsWith('#')) return
-      const paneId = href.slice(1)
-      const li = a.closest('.tab_child')
-      if (li && li.parentElement) {
-        li.parentElement
-          .querySelectorAll('.tab_child')
-          .forEach((s) => s.classList.remove('active'))
-        li.classList.add('active')
-      }
-      const content = document.querySelector('.tab-content')
-      if (content) {
-        content
-          .querySelectorAll('.tab-pane')
-          .forEach((p) => p.classList.remove('active'))
-        const target = content.querySelector('#' + paneId)
-        if (target) target.classList.add('active')
-      }
-      history.replaceState(null, '', href)
+    setActiveTab(id) {
+      this.activeTab = id
+    },
+    formatUSD(val) {
+      if (val === null || val === undefined || val === '') return '-'
+      const num =
+        typeof val === 'number'
+          ? val
+          : Number(String(val).replace(/[^0-9.-]/g, ''))
+      if (!Number.isFinite(num) || num === 0) return val
+      return usdFormatter.format(num)
     },
     sortList1(sortBy) {
       if (this.sortedbyASC1) {
@@ -3041,6 +3078,19 @@ export default {
 }
 .tab-menu ul {
   box-shadow: none !important;
+}
+
+/* Empty-state copy used when a tab category has no projects in the
+   feed yet. Keeps editorial typography (Inter body) and a subtle forest
+   tint, since the rest of this component hardcodes its own colors. */
+.empty-pane {
+  margin: 1.5rem 2rem;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #022e1d;
+  opacity: 0.65;
+  font-style: italic;
 }
 @media only screen and (max-width: 600px) {
   .list_image {

@@ -1,0 +1,43 @@
+id: regression_spa_news_no_offsite_images
+title: "Field Notes news feed only embeds same-origin images, no off-domain leaks"
+perspective: { role: guest, persona: standard, environment: any }
+preconditions: { sample_db: required, session: anonymous, cache: warm }
+
+# Audit issue #8 — /frontend/new rendered four identical news cards, one of
+# which embedded an image hosted at petapixel.com. Showing third-party
+# images on a government accountability portal is both a credibility
+# problem (we're vouching for content we don't control) and a privacy
+# concern (the third party gets a hit log of every visitor). Fix dedupes
+# by (title, date), drops offsite images via isSameOriginImage(), sorts
+# newest-first.
+steps:
+  - navigate: /frontend/new
+  - wait_for_selector:
+      selector: ".news-feed, .news-empty"
+      timeout_ms: 15000
+  - capture: news-feed
+
+assertions:
+  # No news image may resolve to an off-origin host.
+  # The selector targets <img> inside .news-feed — the no-image cards use
+  # .news-no-image div placeholders so they don't show up here.
+  - attribute_matches:
+      selector: ".news-feed img.news-img"
+      attribute: "src"
+      pattern: "^(/|https?://[^/]*demo\\.imrv\\.netzerolabs\\.io|https?://localhost)"
+      every: true
+  # Specific deny-list — these are the offsite domains we caught in the
+  # audit. The same-origin filter above is the real guard; this is a
+  # canary in case the regex permits something it shouldn't.
+  - attribute_matches:
+      selector: ".news-feed img.news-img"
+      attribute: "src"
+      pattern: "petapixel\\.com|unsplash\\.com|pexels\\.com|pinterest"
+      none: true
+  # Dedupe check: no two news titles in the feed should be byte-identical.
+  - no_duplicate_text_matching:
+      selector: ".news-feed .news-title"
+
+tags: [regression, content, news, security, spa]
+sources:
+  - audit_id: "8"

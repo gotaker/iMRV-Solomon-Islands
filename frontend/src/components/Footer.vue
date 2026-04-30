@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 // `data` accepted to keep parity with legacy `<Footer :data="..." />` callers.
 // `flush` lets legacy pages opt out of the editorial overlap (negative margin + radius).
@@ -14,15 +14,33 @@ const props = defineProps({
 const partnerLogos = computed(() => {
   const p = props.data?.parent_data
   if (!p) return []
-  return [1, 2, 3, 4, 5, 6]
-    .map((n) => p[`partner${n}`])
-    .filter(Boolean)
+  return [1, 2, 3, 4, 5, 6].map((n) => p[`partner${n}`]).filter(Boolean)
 })
+
+// Newsletter subscribe is a UI-only stub — no real backend yet. Validate the
+// email shape client-side so visitors aren't told "Subscribed →" when they
+// typed garbage. Keep the visible copy editorial (placeholder shifts to a
+// thank-you message on success, an inline error caption appears on failure).
+const subscribeStatus = ref('idle') // 'idle' | 'invalid' | 'thanks'
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const onSubscribe = (e) => {
   const input = e.target.querySelector('input')
-  input.value = ''
-  input.placeholder = 'Subscribed →'
+  const email = (input?.value || '').trim()
+  if (!EMAIL_RE.test(email)) {
+    subscribeStatus.value = 'invalid'
+    return
+  }
+  subscribeStatus.value = 'thanks'
+  if (input) {
+    input.value = ''
+    input.placeholder = 'Thanks — Subscribed.'
+  }
+}
+
+const onEmailInput = () => {
+  // Clear an error state once the visitor edits their input again.
+  if (subscribeStatus.value === 'invalid') subscribeStatus.value = 'idle'
 }
 </script>
 
@@ -32,14 +50,21 @@ const onSubscribe = (e) => {
       <div class="ed-news">
         <span class="ed-eyebrow">Field Dispatch</span>
         <h3>Slow news. From the islands.</h3>
-        <form class="ed-signup" @submit.prevent="onSubscribe">
+        <form
+          class="ed-signup"
+          :class="{ 'is-invalid': subscribeStatus === 'invalid' }"
+          @submit.prevent="onSubscribe"
+          novalidate
+        >
           <label class="ed-sr-only" for="ed-news-email">Email address</label>
           <input
             id="ed-news-email"
             type="email"
             aria-label="Email address"
+            :aria-invalid="subscribeStatus === 'invalid' ? 'true' : 'false'"
+            aria-describedby="ed-news-feedback"
             placeholder="Your email address"
-            required
+            @input="onEmailInput"
           />
           <button type="submit" aria-label="Subscribe">
             <svg
@@ -53,6 +78,19 @@ const onSubscribe = (e) => {
             </svg>
           </button>
         </form>
+        <p
+          id="ed-news-feedback"
+          class="ed-signup-feedback"
+          :data-status="subscribeStatus"
+          aria-live="polite"
+        >
+          <span v-if="subscribeStatus === 'invalid'">
+            Please enter a valid email address.
+          </span>
+          <span v-else-if="subscribeStatus === 'thanks'">
+            Thanks — you're on the list.
+          </span>
+        </p>
       </div>
 
       <div
@@ -76,28 +114,19 @@ const onSubscribe = (e) => {
             data.parent_data.email
           }}</a>
         </p>
-        <p
-          v-if="data?.parent_data?.contact_number1"
-          class="ed-contact-line"
-        >
+        <p v-if="data?.parent_data?.contact_number1" class="ed-contact-line">
           <span class="ed-contact-label">Tel</span>
           <a :href="`tel:${data.parent_data.contact_number1}`">{{
             data.parent_data.contact_number1
           }}</a>
         </p>
-        <p
-          v-if="data?.parent_data?.contact_number2"
-          class="ed-contact-line"
-        >
+        <p v-if="data?.parent_data?.contact_number2" class="ed-contact-line">
           <span class="ed-contact-label">Tel</span>
           <a :href="`tel:${data.parent_data.contact_number2}`">{{
             data.parent_data.contact_number2
           }}</a>
         </p>
-        <p
-          v-if="data?.parent_data?.contact_number3"
-          class="ed-contact-line"
-        >
+        <p v-if="data?.parent_data?.contact_number3" class="ed-contact-line">
           <span class="ed-contact-label">Tel</span>
           <a :href="`tel:${data.parent_data.contact_number3}`">{{
             data.parent_data.contact_number3
@@ -109,7 +138,6 @@ const onSubscribe = (e) => {
         <h4>Index</h4>
         <router-link to="/project">Programs</router-link>
         <router-link to="/reports">Inventory</router-link>
-        <router-link to="/reports">Finance Ledger</router-link>
         <router-link to="/new">Field Notes</router-link>
         <router-link to="/knowledgeresource">Issue Archive</router-link>
       </div>
@@ -121,8 +149,8 @@ const onSubscribe = (e) => {
         >
         <router-link to="/about">MECDM Honiara</router-link>
         <router-link to="/support">Press &amp; Inquiries</router-link>
-        <a href="mailto:admin@imrv.netzerolabs.io?subject=Open%20Data%20API%20Inquiry">Open Data API</a>
-        <a href="mailto:admin@imrv.netzerolabs.io?subject=Methodology%20Inquiry">Methodology</a>
+        <router-link to="/open-data">Open Data API</router-link>
+        <router-link to="/methodology">Methodology</router-link>
       </div>
     </div>
 
@@ -131,11 +159,7 @@ const onSubscribe = (e) => {
     <div v-if="partnerLogos.length" class="ed-partners">
       <span class="ed-eyebrow">In Partnership With</span>
       <div class="ed-partners-row">
-        <div
-          v-for="(src, i) in partnerLogos"
-          :key="i"
-          class="ed-partner"
-        >
+        <div v-for="(src, i) in partnerLogos" :key="i" class="ed-partner">
           <img :src="src" :alt="`Partner ${i + 1}`" loading="lazy" />
         </div>
       </div>
@@ -144,9 +168,9 @@ const onSubscribe = (e) => {
     <div class="ed-mark">
       <span>© 2026 Government of Solomon Islands · MECDM</span>
       <div class="ed-legal">
-        <a href="mailto:admin@imrv.netzerolabs.io?subject=Privacy%20Policy%20Inquiry">Privacy</a>
-        <a href="mailto:admin@imrv.netzerolabs.io?subject=Accessibility%20Inquiry">Accessibility</a>
-        <a href="mailto:admin@imrv.netzerolabs.io?subject=Source%20Code%20Inquiry">Source</a>
+        <router-link to="/privacy">Privacy</router-link>
+        <router-link to="/accessibility">Accessibility</router-link>
+        <router-link to="/source">Source</router-link>
       </div>
     </div>
   </footer>
@@ -318,6 +342,28 @@ const onSubscribe = (e) => {
 .ed-signup button svg {
   width: 20px;
   height: 20px;
+}
+.ed-signup.is-invalid input {
+  border-bottom-color: rgba(255, 230, 220, 0.85);
+}
+.ed-signup-feedback {
+  margin: 0.55rem 0 0;
+  min-height: 1.05rem;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #fefae0;
+  opacity: 0.75;
+  max-width: 540px;
+}
+.ed-signup-feedback[data-status='invalid'] {
+  color: #fefae0;
+  opacity: 1;
+}
+.ed-signup-feedback[data-status='thanks'] {
+  color: #c1cba4;
+  opacity: 1;
 }
 
 .ed-links {

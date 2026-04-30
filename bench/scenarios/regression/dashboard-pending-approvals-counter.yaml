@@ -1,0 +1,29 @@
+id: regression_dashboard_pending_approvals_counter
+title: "Pending Approvals tile counts My Approval rows where approver=me"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+steps:
+  - login_as: Administrator
+  - navigate: /app/main-dashboard
+  - wait_for_selector:
+      selector: ".ed-stat-tile[data-slot='approvals'] .ed-stat-number"
+      timeout_ms: 15000
+  - capture: dashboard-approvals-tile
+assertions:
+  # Audit #S8 (point 3): the counter filtered `My Approval` by `owner` —
+  # but `owner` is the row creator (the requester), not the approver. The
+  # admin sees 0 even when there are pending approvals where they're the
+  # approver. Fix changes the filter to `approver = session.user`. The
+  # counter should never render the loading ellipsis or "—" once the page
+  # has settled (only "—" is acceptable when the user genuinely has no
+  # `read` perm on My Approval, which is NOT the case for Administrator).
+  - selector:
+      selector: ".ed-stat-tile[data-slot='approvals'] .ed-stat-number"
+      count: { min: 1 }
+  - text_not_matching:
+      selector: ".ed-stat-tile[data-slot='approvals'] .ed-stat-number"
+      pattern: "^(\\u2026|…|—)$"
+  - no_console_error_matching: "TypeError|ReferenceError|PermissionError"
+tags: [regression, dashboard, approvals, day-1]
+sources:
+  - { audit: "#S8" }

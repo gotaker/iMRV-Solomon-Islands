@@ -1,0 +1,62 @@
+id: security_get_data_unauth_blocks_user_doctype
+title: "Guest GET /api/method/mrvtools.api.get_data?doctype=User must NOT return records"
+perspective: { role: guest, persona: standard, environment: any }
+preconditions: { sample_db: required, session: anonymous, cache: warm }
+
+# Black-box audit on 2026-04-29 found the legacy `get_data` endpoint was
+# `allow_guest=True` with `fields=["*"]` and no doctype allowlist. Querying
+# `?doctype=User` returned 83 records to unauthenticated callers — including
+# active `reset_password_key` tokens (one-shot account-takeover for 66 users)
+# and email/last_login metadata. Querying `?doctype=Email Account` exposed a
+# 19-character plaintext SMTP password. This scenario is the regression gate
+# for that class of leak: hit the endpoint as Guest, assert NO record-shaped
+# JSON makes it back AND no sensitive field name appears in the response body.
+#
+# Default A-tier discovery doesn't pick up bench/scenarios/security/ (only
+# journeys/ + regression/). Run explicitly:
+#   ./bench/bench.sh --target=local-docker --tier=a \
+#       --scenarios='scenarios/security/*.yaml'
+
+steps:
+  # Hit the API endpoint directly. Frappe returns its JSON body as the page
+  # response; on 403/401 it's a "Not permitted" / login redirect; on a leak
+  # (the bug) it's a JSON array of User rows that include `reset_password_key`.
+  - navigate: /api/method/mrvtools.api.get_data?doctype=User
+  - capture_text: get-data-user-as-guest
+  - capture: get-data-user-as-guest
+
+assertions:
+  # 1) Sensitive field NAMES must not appear in the response body. These match
+  #    BOTH the leaked-JSON case (legitimate field names from `tabUser`) AND
+  #    any case where Frappe renders a stack trace that names them. The
+  #    deny-list is the exact set the audit caught + the password-fieldtype
+  #    siblings.
+  - no_text_matching:
+      patterns:
+        - "reset_password_key"
+        - "reset_password_link_sent"
+        - "\"password\"\\s*:"
+        - "\"new_password\"\\s*:"
+        - "\"api_secret\"\\s*:"
+        - "\"api_key\"\\s*:"
+        - "smtp_password"
+
+  # 2) The locked-down endpoint should return 4xx, not a leaky 200. Detect via
+  #    captured text: a 403 page contains `PermissionError` or "Not permitted"
+  #    or a `_server_messages` JSON wrapper; a 200-leak contains `"data":` or
+  #    record-shaped JSON keys like "creation", "modified" alongside "name".
+  #    We can't directly check status here (no http step kind), but we CAN
+  #    assert that record-shaped User fields aren't all visible together.
+  - no_text_matching:
+      patterns:
+        # Co-occurrence of these three field names + JSON shape means a leaked
+        # record set. Each individually is too generic (could appear in a 403
+        # error trace), but the conjunction `email","last_login"` only ships
+        # in an actual `tabUser` row dump.
+        - "\"email\"\\s*:[^\\n]+\"last_login\""
+        - "\"last_login\"\\s*:[^\\n]+\"reset_password"
+
+tags: [security, day-1, allow_guest_audit, info-disclosure]
+sources:
+  - bug: "2026-04-29 black-box audit: get_data leaked 83 User rows incl. reset_password_key"
+  - file: "mrvtools/api.py:get_data"

@@ -528,8 +528,17 @@ function setBreadcrumbHome() {
     if (!$home.length) return;
     if ($home.attr("href") === "/app/main-dashboard" && $home.data("fsm-home-wired")) return;
     $home.attr("href", "/app/main-dashboard");
+    // The home icon in the breadcrumb is rendered as <a><svg .home-icon/></a>
+    // with no visible text. Without an accessible name screen readers announce
+    // it as "link" — the audit (Issue #S4) flagged this. Mirror the label on
+    // both `aria-label` (assistive tech) and `title` (mouse hover tooltip).
+    if (!$home.attr("aria-label")) $home.attr("aria-label", "Home");
+    if (!$home.attr("title")) $home.attr("title", "Home");
     $home.data("fsm-home-wired", true);
     $home.off("click.fsm").on("click.fsm", function (e) {
+        // Preserve modifier-click escape hatch — let the browser open in a new
+        // tab when the user explicitly asks for it.
+        if (e.button === 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
         e.preventDefault();
         gotodashboard();
     });
@@ -674,6 +683,16 @@ function fsmAttachDrawer() {
         var a = e.target.closest('a');
         if (!a) return;
 
+        // Modifier-click escape hatch: let the browser handle middle-click,
+        // ctrl/cmd-click (open in new tab), shift-click (new window),
+        // alt-click (download). Without this we strip status-bar preview,
+        // copy-link-address, and middle-click-to-new-tab — exactly what the
+        // sidebar audit (Issue #S1) flagged when 40 of 41 items had href=null
+        // and the click handler always preventDefaulted.
+        if (e.button === 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+            return;
+        }
+
         // side_menu1.html's parent <a class="link menu"> has no onclick, so we
         // delegate the accordion toggle here for ANY anchor that is a direct
         // child of <li class="treeview drop-down"> AND that li has a panel.
@@ -691,8 +710,39 @@ function fsmAttachDrawer() {
 
         var onclickAttr = a.getAttribute('onclick') || '';
         if (onclickAttr.indexOf('toggleSubMenu') !== -1) return;
-        // Treat any other anchor (go_to_page, gotodashboard, href) as nav.
+
+        // Honour real href for SPA navigation: leaf anchors now carry both an
+        // `id="/app/..." onclick="go_to_page(this)"` pair AND a real href= so
+        // hover preview, right-click copy, and modifier-clicks work natively.
+        // For a plain left-click, route through frappe.set_route to keep the
+        // SPA navigation feel (no full page reload).
+        var href = a.getAttribute('href') || '';
+        var hasGoToPage = onclickAttr.indexOf('go_to_page') !== -1;
+        var hasGotoDash = onclickAttr.indexOf('gotodashboard') !== -1;
+        if (href && href.charAt(0) !== '#' && (hasGoToPage || hasGotoDash || !onclickAttr)) {
+            e.preventDefault();
+            if (window.frappe && typeof window.frappe.set_route === 'function') {
+                // Strip leading /app or /desk so set_route receives the route only.
+                var route = href.replace(/^\/(app|desk)\/?/, '');
+                if (route) {
+                    window.frappe.set_route(route);
+                } else {
+                    window.location.href = href;
+                }
+            } else {
+                window.location.href = href;
+            }
+        }
+        // Treat any other anchor as nav — close the drawer once nav is en route.
         setTimeout(fsmCloseDrawer, 80);
+    });
+
+    // Middle-click (auxclick) — most browsers don't fire `click` for the middle
+    // button; let the browser open the href in a new tab natively. We just
+    // avoid swallowing the event.
+    fsmDrawerEl.addEventListener('auxclick', function(e) {
+        if (e.button !== 1) return;
+        // No-op: don't preventDefault, browser opens href in background tab.
     });
 
     fsmDrawerEl.addEventListener('keydown', fsmTrapFocus);
@@ -712,13 +762,25 @@ function fsmAttachDrawer() {
     document.body.classList.add('fsm-ready');
 }
 
-// Move the first .treeview-menu .user-info into a single drawer footer block,
-// hide the rest. side_menu1.html embeds .user-info inside every .treeview-menu
-// so without this it would render once per expanded parent.
+// Move the first .treeview-menu .user-info into a single drawer footer block
+// and REMOVE the rest. side_menu1.html embeds .user-info inside every
+// .treeview-menu so without this it would render 7+ duplicate banners.
+// Audit Issue #S2 flagged that just hiding via `display:none` still left the
+// nodes in the accessibility tree — remove them outright so screen readers
+// don't enumerate them.
 function fsmDedupeUserInfo() {
     if (!fsmDrawerEl) return;
     var infos = fsmDrawerEl.querySelectorAll('.treeview-menu .user-info');
     if (!infos.length) return;
+
+    // Skip work if we've already deduped (idempotent — guards against repeat
+    // calls when the drawer template is re-rendered).
+    if (fsmDrawerEl.querySelector('.fsm-user-footer')) {
+        infos.forEach(function(node) {
+            if (node.parentNode) node.parentNode.removeChild(node);
+        });
+        return;
+    }
 
     var footer = document.createElement('div');
     footer.className = 'fsm-user-footer';
@@ -730,8 +792,10 @@ function fsmDedupeUserInfo() {
     }
     fsmDrawerEl.appendChild(footer);
 
+    // Remove every embedded .user-info — the canonical instance now lives in
+    // the footer. Removal (vs class+display:none) keeps the a11y tree clean.
     infos.forEach(function(node) {
-        node.classList.add('fsm-user-info-clone-hidden');
+        if (node.parentNode) node.parentNode.removeChild(node);
     });
 }
 

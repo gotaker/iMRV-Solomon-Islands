@@ -17,6 +17,18 @@ class MrvFrontend(Document):
 
 @frappe.whitelist(allow_guest=True)
 def get_all():
+    # SECURITY: this endpoint is intentionally guest-readable — it serves the
+    # SPA home page payload at /frontend/home for unauthenticated visitors.
+    # Audited 2026-04-29: MrvFrontend is a Single doctype containing ONLY
+    # public-facing homepage content (carousel images, about-section copy,
+    # project/report image tiles, partner logos, public contact email +
+    # phone numbers, knowledge-resource child tables). It has no Password
+    # fields, no API keys, no PII, no internal config. The four child tables
+    # surfaced below (knowledge_resource_details, knowledge_resource_details2,
+    # climate_change_division_images, add_new_content) are likewise editorial
+    # content. If a future PR adds a sensitive field to MrvFrontend, switch
+    # this function to an explicit field allowlist instead of `as_dict()`.
+    #
     # TODO(editorial-wiring): expose editorial home content to the SPA Home page.
     # Add the following child tables to the MrvFrontend doctype (schema change
     # requires editor review — do NOT modify mrvfrontend.json from code):

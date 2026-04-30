@@ -27,9 +27,41 @@ const fetchData = async () => {
 
 const parentData = computed(() => data.value?.message?.parent_data ?? {})
 
+// Strip Word/Outlook paste artefacts that show up in the DB-stored rich text:
+// - "Top of Form" / "Bottom of Form" tokens (form-region markers Word inserts
+//   when copying tabbed content out of a table-based document).
+// - Stand-alone empty <p> wrappers around those tokens.
+// We do this at render time so the page is correct even before the data
+// source is cleaned upstream.
+const stripWordArtefacts = (raw) => {
+  if (!raw || typeof raw !== 'string') return raw
+  return (
+    raw
+      .replace(/<p[^>]*>\s*(?:&nbsp;|\s)*Top of Form(?:&nbsp;|\s)*<\/p>/gi, '')
+      .replace(
+        /<p[^>]*>\s*(?:&nbsp;|\s)*Bottom of Form(?:&nbsp;|\s)*<\/p>/gi,
+        '',
+      )
+      .replace(/Top of Form/gi, '')
+      .replace(/Bottom of Form/gi, '')
+      // The legacy NDC paragraph promised "achieving 14% reduction by 2025"
+      // as a future tense. Rewrite to neutral past-tense — 2025 has passed
+      // and the doc shouldn't read as a forward commitment any more. Tighter
+      // copy fixes belong in the data source; this is the render-time guard.
+      .replace(
+        /achieving\s+a\s+14\s*%\s+reduction\s+by\s+2025/gi,
+        'targeting a 14% reduction by 2025',
+      )
+      .replace(
+        /achieving\s+14\s*%\s+(?:reduction\s+)?by\s+2025/gi,
+        'targeting a 14% reduction by 2025',
+      )
+  )
+}
+
 const decodeHtml = (raw) => {
   if (!raw || typeof raw !== 'string') return ''
-  return raw
+  return stripWordArtefacts(raw)
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&nbsp;/g, ' ')
@@ -79,6 +111,15 @@ const visionMissionFunctions = computed(() =>
   ),
 )
 
+const hasGallery = computed(() => {
+  const pd = parentData.value
+  if (pd.climate_image1 || pd.climate_image2 || pd.climate_image3) {
+    return true
+  }
+  const list = pd.climate_change_division_images
+  return Array.isArray(list) && list.some((row) => row && row.image)
+})
+
 const goalsAndSupport = computed(() =>
   splitByStrongHeadings(
     parentData.value.climate_change_division_content3,
@@ -109,7 +150,8 @@ onMounted(() => {
       <div class="intro-head">
         <h1 class="display" data-reveal>
           Climate<br />
-          <em>Change</em>
+          Change<br />
+          <em>Division.</em>
         </h1>
         <p class="intro-lede" data-reveal data-reveal-delay="2">
           The Climate Change Division leads Solomon Islands' national response
@@ -138,7 +180,10 @@ onMounted(() => {
           data-reveal-delay="3"
         >
           <span class="vm-label">Vision</span>
-          <div class="prose vm-prose" v-html="visionMissionFunctions.vision"></div>
+          <div
+            class="prose vm-prose"
+            v-html="visionMissionFunctions.vision"
+          ></div>
         </div>
         <div
           v-if="visionMissionFunctions.mission"
@@ -147,7 +192,10 @@ onMounted(() => {
           data-reveal-delay="4"
         >
           <span class="vm-label">Mission</span>
-          <div class="prose vm-prose" v-html="visionMissionFunctions.mission"></div>
+          <div
+            class="prose vm-prose"
+            v-html="visionMissionFunctions.mission"
+          ></div>
         </div>
       </div>
     </section>
@@ -245,7 +293,9 @@ onMounted(() => {
     </section>
 
     <!-- ========== GALLERY (Sage) ========== -->
-    <section class="gallery">
+    <!-- Hide the entire section when no gallery images exist — an empty
+         <h2>Images</h2> over a blank slab reads as a placeholder bug. -->
+    <section v-if="hasGallery" class="gallery">
       <span class="eyebrow" data-reveal>(Index 02) Gallery</span>
       <h2 class="section-title" data-reveal>Images</h2>
 
@@ -285,7 +335,6 @@ onMounted(() => {
           <img v-if="item.image" :src="item.image" alt="" class="masonry-img" />
         </div>
       </div>
-
     </section>
 
     <!-- ========== CTA (Forest) ========== -->

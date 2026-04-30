@@ -1,0 +1,48 @@
+id: regression_spa_project_tabs_all_clickable
+title: "All six project tabs activate via Vue @click; pane swap is observable"
+perspective: { role: guest, persona: standard, environment: any }
+preconditions: { sample_db: required, session: anonymous, cache: warm }
+
+# Audit issue #5 — only "Adaptation" tab worked; Mitigation / Cross cutting /
+# Enablers / Transparency / Support were inert. Root cause: legacy markup
+# tried to use Bootstrap data-toggle="tab" but had four duplicate
+# id="pills-contact-tab" entries, breaking aria-controls drift. Fix moves
+# tab state into a Vue activeTab ref, with :class="{ active: ... }"
+# bindings on both <li> and .tab-pane. Per memory feedback_bootstrap_tab_override.md
+# this is the canonical pattern in this codebase.
+steps:
+  - navigate: /frontend/project
+  - wait_for_selector:
+      selector: ".tab_parent .tab_child"
+      timeout_ms: 15000
+  # Click each tab in turn. After each click, the matching .tab-pane should
+  # carry .active and the previously-active pane should not.
+  - click_each:
+      selectors:
+        - { click: "a[href='#p-view-2']", expect_active: "#p-view-2.tab-pane.active" }
+        - { click: "a[href='#p-view-5']", expect_active: "#p-view-5.tab-pane.active" }
+        - { click: "a[href='#p-view-6']", expect_active: "#p-view-6.tab-pane.active" }
+        - { click: "a[href='#p-view-7']", expect_active: "#p-view-7.tab-pane.active" }
+        - { click: "a[href='#p-view-8']", expect_active: "#p-view-8.tab-pane.active" }
+        - { click: "a[href='#p-view-9']", expect_active: "#p-view-9.tab-pane.active" }
+  - capture: project-tabs-after-clickthrough
+
+assertions:
+  # All six pane targets exist in the DOM (regression guard for the empty-state
+  # path — each tab MUST render its container even when its data array is
+  # empty, otherwise the click has nothing to activate).
+  - selector: { selector: "#p-view-2", count: { min: 1 } }
+  - selector: { selector: "#p-view-5", count: { min: 1 } }
+  - selector: { selector: "#p-view-6", count: { min: 1 } }
+  - selector: { selector: "#p-view-7", count: { min: 1 } }
+  - selector: { selector: "#p-view-8", count: { min: 1 } }
+  - selector: { selector: "#p-view-9", count: { min: 1 } }
+  # No duplicate tab-pill ids — the legacy markup had four duplicate
+  # id="pills-contact-tab" entries which broke aria-controls.
+  - no_duplicate_ids_matching: "^pills-.*-tab$"
+  - no_console_error_matching: "TypeError|ReferenceError|aria-controls|data-toggle"
+
+tags: [regression, tabs, vue, spa, projects]
+sources:
+  - audit_id: "5"
+  - memory: feedback_bootstrap_tab_override.md

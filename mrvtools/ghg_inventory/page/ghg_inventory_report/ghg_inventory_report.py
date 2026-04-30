@@ -15,35 +15,52 @@ def execute(inventory_year, inventory_unit, filters=None):
 
 
 def getColumns():
+	# Column headers carry the Unicode subscript-2 (₂) so the data table
+	# reads "CO₂", "CH₄", "N₂O", "tCO₂e" as published GHG convention.
+	# IDs stay ASCII so the SELECT aliases in getData() keep matching.
 	columns = [
 		{
 			"name": "Categories",
 			"id": "categories",
-			# "width":510
 		},
 		{
-			"name": "CO2",
+			"name": "CO₂",
 			"id": "CO2 Emission",
-			# "width":126
 		},
 		{
-			"name": "CH4",
+			"name": "CH₄",
 			"id": "CH4 Emission",
-			# "width":126
 		},
 		{
-			"name": "N2O",
+			"name": "N₂O",
 			"id": "N2O Emission",
-			# "width":126
 		},
 		{
-			"name": "tCO2e",
+			"name": "tCO₂e",
 			"id": "Total CO2 Emission",
-			# "width":126
 		}
-		
+
 	]
 	return columns
+
+
+@frappe.whitelist()
+def get_years():
+	"""Return the list of GHG Inventory parent years that actually have data,
+	newest first. Used by the Year filter on ghg-inventory-report so the
+	picker only offers years with rows — replaces the old hard-coded
+	1990–2050 list which left 2027–2050 as blank-chart options.
+	"""
+	rows = frappe.db.sql(
+		"""
+		SELECT DISTINCT parent
+		FROM `tabGHG Inventory Master Report ChildTable`
+		WHERE docstatus != 2 AND parent IS NOT NULL AND parent != ''
+		ORDER BY parent DESC
+		""",
+		as_dict=False,
+	)
+	return [r[0] for r in rows]
 
 def getData(inventory_year, inventory_unit):
 	conditions = ""
@@ -165,9 +182,13 @@ def get_pie_chart(inventory_year=None, inventory_unit=None):
 				return {"data":data,"labels":labels}
 		if inventory_unit == 'GgCO2e':
 			labels=  ['1. Energy', '2. Industrial processes and product use', '3. Agriculture', '4. LAND USE, LAND-USE CHANGE AND FORESTRY', '5. Waste', '6. Other']
+			# Return raw numeric values (not MariaDB FORMAT(...) strings — those
+			# embed thousands separators that JS Number() parses as NaN, which
+			# was a contributing factor to the pie rendering as one solid blue
+			# circle).
 			query = f"""
 					SELECT
-						format(total_co2_eq * 0.000000001,5) AS 'Total CO2 Emission'
+						total_co2_eq * 0.000000001 AS 'Total CO2 Emission'
 					FROM
 						`tabGHG Inventory Master Report ChildTable`
 					WHERE
@@ -178,7 +199,6 @@ def get_pie_chart(inventory_year=None, inventory_unit=None):
 						{conditions}
 					"""
 			data = frappe.db.sql(query)
-			frappe.log_error("Data == ",data)
 			return {"data":data,"labels":labels}
 
 

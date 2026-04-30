@@ -1,0 +1,74 @@
+id: regression_drawer_items_have_real_href
+title: "Every drawer link anchor carries a real href= (no nulls / no JS-only nav)"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+
+# Audit 2026-04-29 (Agent C, Issue #S1): 40 of 41 drawer items rendered as
+# <a id="/app/..." onclick="go_to_page(this)"> with NO href= attribute. That
+# breaks (a) status-bar URL preview, (b) middle-click-to-new-tab, (c)
+# right-click "Copy link address", and (d) screen-reader destination
+# announcement. The fix patches templates/side_menu1.html to also emit
+# `href="/app/..."` and the FSM JS click handler to honour modifier keys.
+#
+# This scenario is the structural counterpart to drawer_clickthrough_admin
+# (which walks every link and asserts the destination is healthy). Here we
+# only assert the *anchor structure* — every visible nav anchor must have a
+# non-empty href that points somewhere real.
+steps:
+  - login_as: Administrator
+  - navigate: /app/main-dashboard
+  - click: { selector: ".fsm-trigger" }
+  - wait_for_selector:
+      selector: "body.fsm-open #fsm-drawer a.menu, body.fsm-open #fsm-drawer a.link.menu"
+      timeout_ms: 8000
+  - capture: drawer-open-admin
+  # Expand every accordion parent so leaf anchors are present in the DOM.
+  - run_script: |
+      document.querySelectorAll('#fsm-drawer li.treeview.drop-down > a.link.menu').forEach(function(a){
+        if (!a.parentElement.classList.contains('fsm-expanded')) a.click();
+      });
+  - wait_ms: 600
+  - capture: drawer-all-expanded
+
+assertions:
+  # No nav anchor renders without href. .menu / .link.menu / submenu leaves
+  # all count.
+  - selector:
+      selector: '#fsm-drawer a.menu:not([href]), #fsm-drawer a.link.menu:not([href]), #fsm-drawer .treeview-menu li > a:not([href])'
+      count: { equals: 0 }
+  # No href is empty / "#" / "javascript:".
+  - attribute_not_matches:
+      selector: '#fsm-drawer a.menu, #fsm-drawer a.link.menu, #fsm-drawer .treeview-menu li > a'
+      attribute: href
+      forbidden_values: ["", "#", "javascript:void(0)", "javascript:;"]
+  # Every leaf has a real /app/ or /desk/ destination.
+  - attribute_matches:
+      selector: '#fsm-drawer .treeview-menu li > a'
+      attribute: href
+      pattern: "^/(app|desk)/"
+  # Modifier-click escape: cmd+click should NOT preventDefault.
+  # (Black-box check: dispatching a synthetic click with metaKey=true on a
+  # leaf anchor must leave defaultPrevented=false so the browser can open in
+  # a new tab.)
+  - run_script_returns_true: |
+      var a = document.querySelector('#fsm-drawer .treeview-menu li > a[href^="/app/"]');
+      if (!a) return false;
+      var ev = new MouseEvent('click', { bubbles: true, cancelable: true, metaKey: true });
+      a.dispatchEvent(ev);
+      return ev.defaultPrevented === false;
+  # Home-icon links must have an accessible name (audit Issue #S4).
+  - selector:
+      selector: '.navbar-breadcrumbs li:first-child a[aria-label], .navbar-breadcrumbs li:first-child a[title]'
+      count: { min: 1 }
+  - selector:
+      selector: '#fsm-drawer a[href="/app/main-dashboard"][aria-label]'
+      count: { min: 1 }
+
+rubric:
+  navigation_correctness: true
+  accessibility: true
+
+tags: [regression, drawer, sidebar, accessibility, day-1]
+sources:
+  - audit: "qa-report-2026-04-29 issues #S1 (40/41 href=null), #S4 (home a11y label)"
+  - memory: feedback_qa_clickthrough_required.md

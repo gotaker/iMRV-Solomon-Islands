@@ -1,0 +1,31 @@
+id: regression_dashboard_recent_activity_org_wide
+title: "Main Dashboard Recent Activity is org-wide (≥2 distinct users)"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+steps:
+  - login_as: Administrator
+  - navigate: /app/main-dashboard
+  - wait_for_selector:
+      selector: ".ed-activity-row"
+      timeout_ms: 15000
+  - capture: dashboard-activity-feed
+assertions:
+  # Audit #S8: the widget filtered Activity Log by `user = session.user`, so
+  # an admin only saw "Administrator logged in" 5×. Fix drops the user filter
+  # and renders WHO did what. We assert that within the rendered feed there
+  # are at least 2 distinct user values, which is the floor for the widget
+  # being "org-wide" rather than "single-user".
+  - selector:
+      selector: ".ed-activity-row"
+      count: { min: 1 }
+  - selector:
+      selector: ".ed-activity-user"
+      count: { min: 2 }
+  - distinct_text:
+      selector: ".ed-activity-user"
+      min_distinct: 2
+  - no_console_error_matching: "TypeError|ReferenceError|PermissionError"
+tags: [regression, dashboard, recent-activity, day-1]
+sources:
+  - { audit: "#S8" }
+  - { memory: reference_recent_activity_widget_filter.md }

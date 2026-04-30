@@ -1,0 +1,35 @@
+id: regression_spa_knowledge_no_ellipsis_alt
+title: "Knowledge Resources card images have descriptive alt, not '...'"
+perspective: { role: guest, persona: standard, environment: any }
+preconditions: { sample_db: required, session: anonymous, cache: warm }
+
+# Audit issue #15 — every <img> in the Knowledge Resources carousel had
+# alt="..." (the literal three-dot placeholder). For a government
+# accountability portal that is both an a11y bug and a content bug —
+# screen readers announce the file as "dot dot dot". Fix binds alt to
+# item.link_name with a "Knowledge resource" fallback and adds aria-label
+# on the wrapping <a>.
+steps:
+  - navigate: /frontend/knowledgeresource
+  - wait_for_selector:
+      selector: "#carouselExampleControls"
+      timeout_ms: 15000
+  - capture: knowledge-resource-cards
+
+assertions:
+  # No image inside the carousel may have alt='...' (the audit signature).
+  - attribute_matches:
+      selector: "#carouselExampleControls img"
+      attribute: "alt"
+      pattern: "^\\.\\.\\.$"
+      none: true
+  # Every carousel image must HAVE an alt attribute, even if the link_name
+  # was missing in the data (then it falls back to "Knowledge resource").
+  - attribute_present:
+      selector: "#carouselExampleControls img"
+      attribute: "alt"
+      every: true
+
+tags: [regression, accessibility, knowledge-resources, alt-text]
+sources:
+  - audit_id: "15"

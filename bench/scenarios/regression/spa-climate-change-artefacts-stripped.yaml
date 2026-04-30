@@ -1,0 +1,52 @@
+id: regression_spa_climate_change_artefacts_stripped
+title: "/climate-change-division has no Word paste artefacts and full H1"
+perspective: { role: guest, persona: standard, environment: any }
+preconditions: { sample_db: required, session: anonymous, cache: warm }
+
+# Audit issue #13:
+#   (a) Body text contained literal "Top of Form" / "Bottom of Form" tokens
+#       — these are Word/Outlook paste artefacts that should never reach
+#       the rendered page. The fix strips them at decodeHtml() time.
+#   (b) The page H1 read "Climate / Change" but should read
+#       "Climate / Change / Division" so the page title isn't ambiguous.
+#   (c) NDC copy referenced "achieving 14% reduction by 2025" in future
+#       tense — 2025 has passed; the render-time rewrite makes the verb
+#       neutral past-tense ("targeting...").
+#
+# Audit issue #19: empty GALLERY section with just an <h2>Images</h2> and
+# nothing under it. Hidden when the data has no gallery rows.
+steps:
+  - navigate: /frontend/climate-change-division
+  - wait_for_selector:
+      selector: ".editorial .narrative"
+      timeout_ms: 15000
+  - capture: climate-change-division-rendered
+
+assertions:
+  # The Word artefacts must be gone from rendered text.
+  - no_text_matching:
+      patterns:
+        - "Top of Form"
+        - "Bottom of Form"
+  # The H1 must include "Division" — not just "Climate Change".
+  - text_present:
+      selector: ".intro h1.display"
+      pattern: "DIVISION"
+  # Future-tense NDC copy must not survive into 2026+.
+  - no_text_matching:
+      patterns:
+        - "achieving a? ?14% reduction by 2025"
+        - "achieving 14% by 2025"
+  # The gallery section is hidden entirely when data has no images.
+  # When data DOES have gallery rows the H2 should appear; we can't assert
+  # both polarities without sample-data-side coupling, so we assert the
+  # weaker invariant: a Gallery h2 never appears with zero images under it.
+  - selector_pair_consistency:
+      header: ".gallery h2.section-title"
+      requires_any:
+        - ".gallery .photo-cell"
+        - ".gallery .masonry-cell"
+
+tags: [regression, climate-change-division, content, copy]
+sources:
+  - audit_id: "13, 19"

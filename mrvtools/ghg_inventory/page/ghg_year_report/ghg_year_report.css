@@ -109,6 +109,10 @@
 
 .totalghg_year_report-graph, .totalorder_analytics-graph, .avgorder_analytics-graph {
     margin-bottom: 15px;
+    /* Reserve left gutter so 7-digit Y-axis tick labels don't clip when
+       the chart container has no internal padding. Pairs with the
+       `shortenYAxisNumbers: 1` chart option in ghg_year_report.js. */
+    padding-left: 24px;
 }
 .ghg_year_report.page-main-content {
     padding: 15px;

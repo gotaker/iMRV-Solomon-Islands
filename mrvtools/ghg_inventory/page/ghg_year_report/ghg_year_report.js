@@ -103,16 +103,30 @@ class GHGInventory {
 				$("#categories_chart").html("No of emissions per gas (CO2, CH4, N2O)")
 				
 				let results = r.message || [];
+				// Forest-and-Sage palette for the three gas series — uses
+				// editorial tokens (--ed-forest, --ed-moss, --ed-sage) instead
+				// of the previous "pink", "blue", "green" placeholders.
+				const series_colors = ["#01472e", "#a3b18a", "#84b29e"];
 				const custom_options = {
-					type: "bar",	
-					colors: ["#48bb74"],
-					height: 220,
+					type: "bar",
+					colors: series_colors,
+					height: 260,
 					axisOptions: {
 						xIsSeries: 0,
-						isNavigable :1 ,
-						shortenYAxisNumbers: 0,
+						isNavigable: 1,
+						// shortenYAxisNumbers: 1 lets axis ticks render compactly
+						// (e.g. "1M") rather than clipping a 7-digit "1,000,000".
+						shortenYAxisNumbers: 1,
 						xAxisMode: "tick",
-						numberFormatter: frappe.utils.format_chart_axis_number,
+						numberFormatter: function (v) {
+							const n = Number(v);
+							if (!isFinite(n)) return String(v);
+							try {
+								return new Intl.NumberFormat('en-US', {
+									notation: 'compact', maximumFractionDigits: 1
+								}).format(n);
+							} catch (e) { return String(n); }
+						},
 					},
 					data: {
 						datasets: results.datasets,
@@ -120,18 +134,27 @@ class GHGInventory {
 					},
 					barOptions: {
 						"stacked": 1
-					},
-					colors:["pink","blue","green"]
+					}
 				};
 				frappe.utils.make_chart(".totalghg_year_report-graph", custom_options);
 			});
 			
 	}
 	ghg_from_year() {
+		// Empty year list — populated dynamically below via get_years() so
+		// 2027–2050 (no data) don't render as picker options.
 		this.from_year = this.page.add_select(
-			__("From Year"),[" ","1990","1991","1992","1993","1994","1995","1996","1997","1998","1999","2000","2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024","2025","2026","2027","2028","2029","2030","2031","2032","2033","2034","2035","2036","2037","2038","2039","2040","2041","2042","2043","2044","2045","2046","2047","2048","2049","2050"]
-			
-		)
+			__("From Year"), [" "]
+		);
+		// Reuse the ghg-inventory-report endpoint that returns distinct years
+		// with data, newest first.
+		frappe.call('mrvtools.ghg_inventory.page.ghg_inventory_report.ghg_inventory_report.get_years').then((r) => {
+			const years = (r && r.message) ? r.message : [];
+			const $select = $(this.from_year);
+			$select.empty();
+			$select.append(new Option(' ', ''));
+			years.forEach((y) => $select.append(new Option(String(y), String(y))));
+		});
 		this.from_year.on("change",(r) => {
 			// this.render_datatable()
 			// this.get_chart_report();
@@ -174,8 +197,14 @@ class GHGInventory {
 		})
 	}
 	ghg_unit_filter() {
+		// Display labels carry the Unicode subscript-2 (₂); values stay ASCII
+		// so the Python switch in get_chart still matches.
 		this.inventory_unit = this.page.add_select(
-			__("Unit"),["tCO2e","GgCO2e"]
+			__("Unit"),
+			[
+				{ label: "tCO₂e", value: "tCO2e" },
+				{ label: "GgCO₂e", value: "GgCO2e" }
+			]
 		)
 		this.inventory_unit.on("change",(r) => {
 			$('[class="all_html"]:first').remove()

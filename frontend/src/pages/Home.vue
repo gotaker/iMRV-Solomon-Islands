@@ -23,6 +23,7 @@ const fallbackPrograms = [
     metaBottom: 'SBD 12.4M',
     img: imgCoastal,
     alt: 'Coastal mangroves',
+    focus: 'Adaptation',
   },
   {
     num: '02',
@@ -31,6 +32,7 @@ const fallbackPrograms = [
     metaBottom: '−18.2 ktCO₂e',
     img: imgForest,
     alt: 'Forest canopy',
+    focus: 'Mitigation',
   },
   {
     num: '03',
@@ -39,6 +41,7 @@ const fallbackPrograms = [
     metaBottom: 'Q1 — 2026',
     img: imgReef,
     alt: 'Coral reef',
+    focus: 'Cross-Cutting',
   },
 ]
 
@@ -213,7 +216,13 @@ onUnmounted(() => {
           data-reveal
           :data-reveal-delay="i + 1"
         >
-          <a href="#" class="card-link">
+          <router-link
+            :to="{
+              path: '/project',
+              query: { focus: p.focus || 'Adaptation' },
+            }"
+            class="card-link"
+          >
             <div class="card-img">
               <span class="card-num">{{ p.num }}</span>
               <img :src="p.img" :alt="p.alt" loading="lazy" />
@@ -232,7 +241,7 @@ onUnmounted(() => {
                 <b>{{ p.metaBottom }}</b>
               </div>
             </div>
-          </a>
+          </router-link>
         </article>
       </div>
     </section>

@@ -77,9 +77,14 @@ function canRead(doctype) {
 }
 
 function loadStats($body) {
+	// `My Approval` rows ARE the pending-approval queue (rows are created on
+	// submission and deleted on approval — there is no `status` field). The
+	// counter for the current admin/approver is the count of rows where
+	// `approver = me`. Filtering by `owner` was wrong: `owner` is set to the
+	// submitter via insert_record, not the assignee.
 	const tiles = [
 		{ slot: 'projects', doctype: 'Project', filters: {} },
-		{ slot: 'approvals', doctype: 'My Approval', filters: { owner: frappe.session.user } },
+		{ slot: 'approvals', doctype: 'My Approval', filters: { approver: frappe.session.user } },
 		{ slot: 'reports', doctype: 'Adaptation Monitoring Information', filters: {} },
 	];
 
@@ -109,11 +114,19 @@ function loadActivity($body) {
 		$slot.html(emptyActivity());
 		return;
 	}
+	// Org-wide feed for the dashboard: drop the `user = session.user` filter
+	// so admins/approvers see WHO did what across the bench. Limit raised to
+	// 10 since we now show actor identity. See reference_recent_activity_widget_filter.md.
+	//
+	// Drop "Invalid login credentials" rows — those carry the attacker-SUPPLIED
+	// email as the `user` column, so without this filter a role with Activity
+	// Log read perm would see arbitrary attacker-controlled strings (and a free
+	// way to spam the feed). Discovered by 2026-04-29 stress test.
 	frappe.db
 		.get_list('Activity Log', {
-			filters: { user: frappe.session.user },
-			fields: ['subject', 'reference_doctype', 'reference_name', 'creation'],
-			limit: 5,
+			filters: { subject: ['not like', 'Invalid%'] },
+			fields: ['subject', 'user', 'reference_doctype', 'reference_name', 'creation'],
+			limit: 10,
 			order_by: 'creation desc',
 		})
 		.then((rows) => $slot.html(renderActivity(rows || [])))
@@ -128,11 +141,35 @@ function renderActivity(rows) {
 			<div class="ed-activity-row">
 				<div class="ed-activity-eyebrow">${escapeHTML(r.reference_doctype || 'Activity')}</div>
 				<div class="ed-activity-subject">${escapeHTML(stripHTML(r.subject || r.reference_name || ''))}</div>
-				<div class="ed-activity-when">${escapeHTML(moment(r.creation).fromNow())}</div>
+				<div class="ed-activity-meta">
+					<span class="ed-activity-user">${escapeHTML(r.user || 'system')}</span>
+					<span class="ed-activity-when">${escapeHTML(formatWhen(r.creation))}</span>
+				</div>
 			</div>
 		`
 		)
 		.join('');
+}
+
+// Past timestamps render as "9 hours ago" — never "in 9 hours". moment().fromNow()
+// reports future tense when the parsed timestamp is interpreted as future
+// (e.g. server-local string with no zone is read as browser-local UTC offset).
+// frappe.datetime.comment_when is the v16-correct helper: it parses the same
+// MariaDB-formatted timestamp the way Frappe's desk does and always reports
+// past tense for past events. Fall back to a clamped fromNow() if the helper
+// is missing on an older Frappe build.
+function formatWhen(ts) {
+	if (!ts) return '';
+	if (frappe && frappe.datetime && typeof frappe.datetime.comment_when === 'function') {
+		// comment_when returns HTML wrapped in <span>; strip tags to plain text.
+		return stripHTML(frappe.datetime.comment_when(ts));
+	}
+	const m = moment(ts);
+	const now = moment();
+	// If the parsed time is in the future (shouldn't happen for Activity Log
+	// rows), clamp to "just now" rather than rendering "in N hours".
+	if (m.isAfter(now)) return 'just now';
+	return m.fromNow();
 }
 
 function emptyActivity() {

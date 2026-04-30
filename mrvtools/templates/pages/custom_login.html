@@ -1,5 +1,7 @@
 {% extends "templates/baseweb.html" %}
 
+{% block title %}{{ _("iMRV — Sign In") }}{% endblock %}
+
 {# C1 audit (qa-report-2026-04-29.md): the QA tester reported that
    value="Administrator" / value="catch22" appear on these inputs.
    Verified false: `curl /login` shows zero value= attrs. The tester saw
@@ -40,6 +42,8 @@
 		</div>
 	</div>
 
+	<p class="ed-login-error" id="login-error" role="alert" aria-live="polite" hidden></p>
+
 	<p class="forgot-password-message">
 		<a href="#forgot">{{ _("Forgot Password?") }}</a>
 	</p>
@@ -73,7 +77,7 @@
 		color: #01472e;
 	}
 
-	.navbar, .page-header, .web-footer, #wrap-footer { display: none !important; }
+	.navbar, .page-header, .web-footer, #wrap-footer, .page-breadcrumbs { display: none !important; }
 	.page-content, main.container { width: 100%; max-width: 100%; padding: 0; margin: 0 !important; }
 	.page-content-wrapper { background: transparent !important; height: auto !important; }
 	#wrap { background: transparent !important; }
@@ -443,8 +447,35 @@
 		color: rgba(1, 71, 46, 0.35);
 	}
 
-	.for-forgot, .for-signup, .for-email-login { display: none; }
-	.for-forgot.show, .for-signup.show, .for-email-login.show { display: block; }
+	/* Exclusive panel toggle. Frappe's bundled login.js relies on jQuery
+	   .show()/.hide() class swaps that set inline display. To make sure
+	   we always render exactly one of {sign-in, forgot} regardless of what
+	   login.js does, scope visibility to data-mode on the card. */
+	.ed-login-card .form-login,
+	.ed-login-card .form-forgot { display: none; }
+	.ed-login-card[data-mode="signin"] .form-login { display: block; }
+	.ed-login-card[data-mode="forgot"] .form-forgot { display: block; }
+	/* Hide the "Don't have an account? Request access" text in forgot mode
+	   so only the forgot panel is visible in that state. */
+	.ed-login-card[data-mode="forgot"] .ed-login-card-foot { display: none; }
+
+	/* Inline auth error — rendered below the password field on bad creds. */
+	.ed-login-card .ed-login-error {
+		margin: 0.25rem 0 0.5rem;
+		padding: 10px 14px;
+		border: 1px solid rgba(176, 39, 47, 0.3);
+		background: rgba(176, 39, 47, 0.08);
+		color: #b0272f;
+		border-radius: 10px;
+		font-size: 12px;
+		font-weight: 600;
+		letter-spacing: 0.02em;
+	}
+	.ed-login-card .ed-login-error[hidden] { display: none; }
+	.ed-login-card .form-control.is-invalid {
+		border-color: rgba(176, 39, 47, 0.6) !important;
+		box-shadow: 0 0 0 3px rgba(176, 39, 47, 0.1) !important;
+	}
 
 	.ed-login-card .form-forgot .page-card-head h4 {
 		font-family: 'Anton', sans-serif;
@@ -515,7 +546,6 @@
 		</p>
 
 		<div class="ed-login-meta">
-			<img src="/assets/mrvtools/Flag_of_the_Solomon_Islands.png" alt="Flag of the Solomon Islands">
 			<div class="ed-login-meta-text">
 				<small>Government of</small>
 				<span>Solomon Islands</span>
@@ -524,7 +554,7 @@
 	</section>
 
 	<section class="ed-login-form-pane">
-		<div class="ed-login-card login-content page-card">
+		<div class="ed-login-card login-content page-card" data-mode="signin">
 			<div class="page-card-head">
 				<img src="/assets/mrvtools/Flag_of_the_Solomon_Islands.png" alt="Solomon Islands">
 				<h4>Sign In</h4>
@@ -565,7 +595,7 @@
 				{%- endif -%}
 			</form>
 
-			<form class="form-signin form-forgot hide" role="form">
+			<form class="form-signin form-forgot" role="form">
 				<div class="page-card-head">
 					<h4>{{ _('Forgot Password') }}</h4>
 				</div>
@@ -593,13 +623,12 @@
 			</form>
 
 			{%- if not disable_signup and not disable_user_pass_login -%}
-			<div class="text-center sign-up-message">
+			<div class="text-center sign-up-message ed-login-card-foot">
 				{{ _("Don't have an account?") }}
 				<a href="#signup">{{ _("Request access") }}</a>
 			</div>
 			{%- endif -%}
 
-			<p class="ed-login-version">Version 1.0</p>
 		</div>
 	</section>
 </div>
@@ -608,6 +637,179 @@
 {% block script %}
 <script>{% include "templates/includes/login/login.js" %}
 $('.web-footer').remove();
+
+// =====================================================================
+// iMRV editorial login extensions (Agent C, audit fixes 2-7)
+// ---------------------------------------------------------------------
+// 1. Force exclusive panel rendering driven by `data-mode` on the card
+//    (audit #3 — both forms rendered simultaneously). Frappe's bundled
+//    login.js relies on jQuery .show()/.hide() class flips that fight
+//    our CSS; we drive everything off `data-mode` instead.
+// 2. Render an inline error below the password field on auth failure
+//    (audit #2 — silent 401). Hook into jQuery's global ajaxError event
+//    filtered to /api/method/login.
+// 3. Fix the "Back to Sign In" link target (audit #4 — observed pointing
+//    at /user-registration). Hash-only navigation, no full reload.
+// =====================================================================
+(function () {
+	var $card = $('.ed-login-card');
+	if (!$card.length) return;
+
+	function setMode(mode) {
+		if (mode !== 'signin' && mode !== 'forgot') mode = 'signin';
+		$card.attr('data-mode', mode);
+		// Clear any stale inline error when switching modes.
+		$('#login-error').attr('hidden', true).text('');
+		$('#login_email, #login_password').removeClass('is-invalid');
+	}
+
+	function modeFromHash() {
+		var h = (window.location.hash || '').toLowerCase();
+		if (h === '#forgot') return 'forgot';
+		return 'signin';
+	}
+
+	// Initial paint + react to hash changes.
+	setMode(modeFromHash());
+	$(window).on('hashchange', function () { setMode(modeFromHash()); });
+
+	// Click delegation: any anchor with href starting with #forgot or #login
+	// flips the panel without reloading. Stops Frappe's bundled login.js from
+	// taking either form path on top of ours. stopImmediatePropagation prevents
+	// Frappe's same-element .show()/.hide() handler from running and inline-styling
+	// the inactive panel back to display:block, which would beat our CSS rule.
+	$card.on('click', 'a[href^="#"]', function (e) {
+		var href = ($(this).attr('href') || '').toLowerCase();
+		if (href === '#forgot') {
+			e.preventDefault();
+			e.stopImmediatePropagation();
+			window.location.hash = '#forgot';
+			setMode('forgot');
+		} else if (href === '#login' || href === '#signin') {
+			e.preventDefault();
+			e.stopImmediatePropagation();
+			// Strip the hash entirely so refreshing lands on signin.
+			if (history && history.replaceState) {
+				history.replaceState(null, '', window.location.pathname + window.location.search);
+			} else {
+				window.location.hash = '';
+			}
+			setMode('signin');
+		}
+	});
+
+	// Render the inline error message + invalid-input state.
+	function showLoginError(msg) {
+		if (!msg) msg = "{{ _('Email or password is incorrect.') }}";
+		// Frappe's login.js may open a msgprint dialog; suppress.
+		$('.modal:visible').modal('hide');
+		$('#login-error').text(msg).removeAttr('hidden');
+		$('#login_email, #login_password').addClass('is-invalid');
+	}
+
+	function extractFrappeMessage(body, fallback) {
+		try {
+			var msg = (body && (body.message || body._server_messages)) || '';
+			if (msg && typeof msg === 'string' && msg.charAt(0) === '[') {
+				try {
+					var first = JSON.parse(JSON.parse(msg)[0] || '{}');
+					msg = first.message || msg;
+				} catch (_) { /* keep raw */ }
+			}
+			return msg || fallback || '';
+		} catch (_) { return fallback || ''; }
+	}
+
+	// =================================================================
+	// Inline error on /api/method/login auth failure — three-way capture.
+	//
+	// Frappe v15 issues login via jQuery $.ajax (ajaxError fires).
+	// Frappe v16 issues login via native fetch() (ajaxError silent).
+	// Some environments still use XMLHttpRequest. Cover all three so the
+	// error message renders no matter which transport Frappe's bundled
+	// login.js uses on this site/version.
+	// =================================================================
+
+	// (a) jQuery global ajaxError — backward-compat for $.ajax callsites.
+	$(document).on('ajaxError', function (_evt, jqXHR, settings) {
+		var url = (settings && settings.url) || '';
+		if (url.indexOf('/api/method/login') === -1) return;
+		if (jqXHR.status < 400) return;
+		var body = jqXHR.responseJSON || (function () {
+			try { return jqXHR.responseText ? JSON.parse(jqXHR.responseText) : {}; }
+			catch (_) { return {}; }
+		})();
+		showLoginError(extractFrappeMessage(body, ''));
+	});
+
+	// (b) window.fetch wrapper — Frappe v16 path. We wrap once, filter to
+	//     the login endpoint, and only act on failure responses. Other fetch
+	//     traffic passes through untouched.
+	if (typeof window.fetch === 'function' && !window.__imrvLoginFetchWrapped) {
+		var origFetch = window.fetch.bind(window);
+		window.fetch = function (input, init) {
+			var url = '';
+			try {
+				url = typeof input === 'string' ? input : (input && input.url) || '';
+			} catch (_) { /* ignore */ }
+			var isLogin = url && url.indexOf('/api/method/login') !== -1;
+			var p = origFetch(input, init);
+			if (!isLogin) return p;
+			return p.then(function (resp) {
+				if (resp && resp.ok === false && resp.status >= 400) {
+					// Clone before reading so the original consumer still sees the body.
+					var clone = (typeof resp.clone === 'function') ? resp.clone() : null;
+					if (clone) {
+						clone.json().then(function (body) {
+							showLoginError(extractFrappeMessage(body, ''));
+						}).catch(function () { showLoginError(''); });
+					} else {
+						showLoginError('');
+					}
+				}
+				return resp;
+			}).catch(function (err) {
+				// Network failure (server unreachable, CORS) — show a generic msg.
+				showLoginError("{{ _('Could not reach the server. Please try again.') }}");
+				throw err;
+			});
+		};
+		window.__imrvLoginFetchWrapped = true;
+	}
+
+	// (c) XMLHttpRequest wrapper — defensive third path, in case any code
+	//     bypasses both jQuery and fetch (rare but historically present
+	//     in Frappe code).
+	if (typeof window.XMLHttpRequest === 'function' && !window.__imrvLoginXhrWrapped) {
+		var XHR = window.XMLHttpRequest;
+		var origOpen = XHR.prototype.open;
+		var origSend = XHR.prototype.send;
+		XHR.prototype.open = function (method, url) {
+			this.__imrvUrl = url || '';
+			return origOpen.apply(this, arguments);
+		};
+		XHR.prototype.send = function () {
+			var self = this;
+			if ((self.__imrvUrl || '').indexOf('/api/method/login') !== -1) {
+				self.addEventListener('loadend', function () {
+					if (self.status >= 400) {
+						var body = {};
+						try { body = JSON.parse(self.responseText || '{}'); } catch (_) {}
+						showLoginError(extractFrappeMessage(body, ''));
+					}
+				});
+			}
+			return origSend.apply(self, arguments);
+		};
+		window.__imrvLoginXhrWrapped = true;
+	}
+
+	// Clear error state as the user retries.
+	$('#login_email, #login_password').on('input', function () {
+		$('#login-error').attr('hidden', true).text('');
+		$(this).removeClass('is-invalid');
+	});
+})();
 </script>
 {% endblock %}
 

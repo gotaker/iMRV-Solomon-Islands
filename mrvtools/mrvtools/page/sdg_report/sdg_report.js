@@ -21,6 +21,7 @@ class SDG {
 		this.datatable=null;
 		// this.add_card_button_to_toolbar();
 		this.set_default_secondary_action();
+		add_report_description(this.page, "Project alignment to UN Sustainable Development Goals, by goal and target.");
 		this.sdg_filter_fields()
 		this.render_datatable()
 		this.make()
@@ -262,4 +263,15 @@ class SDG {
 	}
 
 
+}
+
+
+// ---- helpers ---------------------------------------------------------------
+
+function add_report_description(page, text) {
+	if (!page || !page.main || !text) return;
+	const $existing = $(page.main).find(".report-description");
+	if ($existing.length) return;
+	const html = `<div class="report-description" style="margin: 1rem 30px 0; font-family: var(--ed-font-body, 'Inter', system-ui, sans-serif); font-style: italic; font-size: 13px; color: var(--ed-forest-60, rgba(1, 71, 46, 0.6));">${$('<div>').text(text).html()}</div>`;
+	$(html).prependTo(page.main);
 }

@@ -1,0 +1,38 @@
+id: regression_spa_home_program_tiles_not_deadlinks
+title: "Home page program tiles link to filtered project views, not href='#'"
+perspective: { role: guest, persona: standard, environment: any }
+preconditions: { sample_db: required, session: anonymous, cache: warm }
+
+# Audit issue #6 — the three programs cards on /frontend/home (Coastal /
+# Forest / Reef) had href="#" so they were dead links. Fix routes them to
+# /frontend/project?focus=Adaptation|Mitigation|Cross-Cutting and the
+# Projects.vue tab handler reads the ?focus= query param to pre-select
+# the matching tab.
+steps:
+  - navigate: /frontend/home
+  - wait_for_selector:
+      selector: ".programs .card .card-link"
+      timeout_ms: 15000
+  - capture: home-program-tiles
+
+assertions:
+  # Three program cards rendered.
+  - selector: { selector: ".programs .card .card-link", count: { equals: 3 } }
+  # Every program tile href must point at /frontend/project (router-link
+  # rewrites the to:{path,query} into the resolved href). None may be "#",
+  # which was the audit signature.
+  - attribute_matches:
+      selector: ".programs .card .card-link"
+      attribute: "href"
+      pattern: "/frontend/project\\?focus="
+      every: true
+  - attribute_matches:
+      selector: ".programs .card .card-link"
+      attribute: "href"
+      pattern: "^#$"
+      none: true
+  - no_console_error_matching: "TypeError|ReferenceError"
+
+tags: [regression, home, links, spa, navigation]
+sources:
+  - audit_id: "6"

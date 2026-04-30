@@ -1,0 +1,72 @@
+id: regression_login_form_toggle_exclusive
+title: "/login renders exactly one panel at a time (sign-in XOR forgot-password)"
+perspective: { role: guest, persona: standard, environment: any }
+preconditions: { sample_db: required, session: anonymous, cache: warm }
+
+# Audit 2026-04-29 (Agent C): the bundled Frappe login.js uses jQuery
+# .show()/.hide() class swaps that didn't fire on this page, so both
+# .form-login AND .form-forgot were visible at once. The fix drives
+# visibility off `data-mode` on the card. Also covers issue #4 — "Back to
+# Sign In" was observed pointing at /user-registration; the fix routes
+# every #login / #forgot anchor through the data-mode toggle.
+steps:
+  # 1. Default state should be sign-in.
+  - navigate: /login
+  - wait_for_selector:
+      selector: ".ed-login-card[data-mode=signin]"
+      timeout_ms: 10000
+  - capture: login-default-signin
+
+  # 2. Click "Forgot Password?" → should swap to forgot mode.
+  - click: { selector: 'a[href="#forgot"]' }
+  - wait_for_selector:
+      selector: ".ed-login-card[data-mode=forgot]"
+      timeout_ms: 5000
+  - capture: login-forgot-mode
+
+  # 3. Click "Back to Sign In" inside forgot panel → should return to signin.
+  - click: { selector: '.form-forgot a[href="#login"]' }
+  - wait_for_selector:
+      selector: ".ed-login-card[data-mode=signin]"
+      timeout_ms: 5000
+  - capture: login-signin-restored
+
+assertions:
+  # Forgot panel: form-forgot must be visible, form-login hidden.
+  - computed_style:
+      when: "step 2 settled"
+      selector: ".form-forgot"
+      property: display
+      not_equal: "none"
+  - computed_style:
+      when: "step 2 settled"
+      selector: ".form-login"
+      property: display
+      equal: "none"
+  # Signin panel restored: form-login visible, form-forgot hidden.
+  - computed_style:
+      when: "step 3 settled"
+      selector: ".form-login"
+      property: display
+      not_equal: "none"
+  - computed_style:
+      when: "step 3 settled"
+      selector: ".form-forgot"
+      property: display
+      equal: "none"
+  # The "Back to Sign In" anchor must NOT navigate away to /user-registration.
+  - url_path_equals: "/login"
+  # Source-level guard: only one flag image in the rendered DOM.
+  - selector:
+      selector: 'img[src*="Flag_of_the_Solomon_Islands"]'
+      count: { max: 1 }
+  # No "Version 1.0" footer leaking app version to public visitors.
+  - text_not_present: "Version 1.0"
+
+rubric:
+  navigation_correctness: true
+  feedback_clarity: true
+
+tags: [regression, login, panel-toggle, day-1]
+sources:
+  - audit: "qa-report-2026-04-29 issues #3 (dual form render), #4 (Back-to-Sign-In wrong target), #5 (dup flag), #6 (Version 1.0)"
