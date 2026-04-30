@@ -890,12 +890,23 @@ function fsmAttachDrawer() {
         var onclickAttr = a.getAttribute('onclick') || '';
         if (onclickAttr.indexOf('toggleSubMenu') !== -1) return;
 
+        var href = a.getAttribute('href') || '';
+
+        // Don't intercept non-desk routes — `frappe.set_route('/frontend/home')`
+        // silently re-prefixes with `/desk/` and lands users at /desk/frontend/home
+        // (broken). Public SPA, file downloads, API endpoints, and absolute URLs
+        // must navigate natively. Close the drawer asynchronously so it doesn't
+        // block the navigation.
+        if (href && /^(https?:|mailto:|tel:|\/(frontend|files|api|method|website|private)\/)/.test(href)) {
+            setTimeout(fsmCloseDrawer, 80);
+            return;
+        }
+
         // Honour real href for SPA navigation: leaf anchors now carry both an
         // `id="/app/..." onclick="go_to_page(this)"` pair AND a real href= so
         // hover preview, right-click copy, and modifier-clicks work natively.
         // For a plain left-click, route through frappe.set_route to keep the
         // SPA navigation feel (no full page reload).
-        var href = a.getAttribute('href') || '';
         var hasGoToPage = onclickAttr.indexOf('go_to_page') !== -1;
         var hasGotoDash = onclickAttr.indexOf('gotodashboard') !== -1;
         if (href && href.charAt(0) !== '#' && (hasGoToPage || hasGotoDash || !onclickAttr)) {

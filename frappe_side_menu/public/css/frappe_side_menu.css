@@ -587,23 +587,24 @@ body.fsm-open {
    ===================================================================== */
 
 /* Drawer header band. The drawer's first <li> is .app-logo with the SI
-   flag. Two floating controls sit on top of this LI: the .fsm-trigger
-   burger (top-left, fixed in viewport, ~56px tall) and the .fsm-close
-   button (top-right of drawer, ~44px). Use padding to keep the flag and
-   the cream surface clear of both:
-     padding-top:    80px   - clears the 56px burger circle + 20px gap
-     padding-right:  4.5rem - keeps the cream from passing under the close
-                              button (which is ~40px + 16px right offset)
-     padding-bottom: 20px   - breathing room before the first menu item
-     padding-left:   1.5rem - flush-left flag, editorial-aligned
+   flag. The cream band sits BELOW the .fsm-close button (which occupies
+   y=8..40) and to the right of the .fsm-trigger burger which only
+   overlaps the band by ~12px vertically. Use SYMMETRIC vertical padding
+   so the cream rectangle reads as a balanced strip with the flag
+   vertically centred — flex layout keeps the flag in the middle of the
+   band regardless of band height. Right padding keeps the cream from
+   passing under the close button; left padding is editorial flush-left.
    Also kill the legacy grey box-shadow set inline by AdminLTE markup. */
 .main-sidebar li.app-logo,
 #fsm-drawer li.app-logo {
-    padding: 80px 4.5rem 20px 1.5rem !important;
+    padding: 24px 4.5rem 24px 1.5rem !important;
     background: var(--ed-cream) !important;
     text-align: left !important;
     box-shadow: none !important;
     border-bottom: 1px solid var(--ed-forest-08) !important;
+    display: flex !important;
+    align-items: center !important;
+    min-height: 0 !important;
 }
 .main-sidebar li.app-logo > a.logo,
 #fsm-drawer li.app-logo > a.logo {
