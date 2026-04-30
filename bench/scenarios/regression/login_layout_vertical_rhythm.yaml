@@ -1,0 +1,50 @@
+id: regression_login_layout_vertical_rhythm
+title: "Login card has minimum vertical rhythm between flag, heading, and tagline"
+perspective: { role: guest, persona: standard, environment: any }
+preconditions: { sample_db: required, session: anonymous, cache: warm }
+
+# UX audit 2026-04-30 finding F7: login card felt visually crowded —
+# flag, "SIGN IN" heading, and "iMRV TOOL · AUTHORISED ACCESS" tagline sat
+# too close together. Editorial composition needs breathing room. Fix
+# bumped the page-card-head padding/margin from 1.75rem to 2rem, and the
+# image bottom margin from 1rem to 1.5rem, and the heading bottom margin
+# from 0.25rem to 0.5rem.
+#
+# This scenario asserts a minimum vertical gap between the three elements
+# so the rhythm doesn't quietly tighten again in a future "let's compact
+# the login card" PR.
+
+steps:
+  - logout
+  - navigate: /login
+  - wait_for_selector:
+      selector: ".ed-login-card .page-card-head img"
+      timeout_ms: 10000
+  - capture: login-card-rendered
+
+assertions:
+  # Geometric assertion: gap between flag-image bottom and heading top
+  # must be ≥ 16px (1rem). Catches "compact the login" regressions.
+  - run_assertion:
+      script: |
+        const card = document.querySelector('.ed-login-card .page-card-head');
+        const img = card?.querySelector('img');
+        const heading = card?.querySelector('h4');
+        const tagline = document.querySelector('.ed-login-card-sub') || card?.nextElementSibling;
+        if (!img || !heading) return { ok: false, missing: 'image_or_heading' };
+        const imgBottom = img.getBoundingClientRect().bottom;
+        const headTop = heading.getBoundingClientRect().top;
+        const gap_img_head = headTop - imgBottom;
+        const headBottom = heading.getBoundingClientRect().bottom;
+        const taglineTop = tagline ? tagline.getBoundingClientRect().top : null;
+        const gap_head_tagline = taglineTop ? (taglineTop - headBottom) : null;
+        return {
+          ok: gap_img_head >= 16 && (gap_head_tagline === null || gap_head_tagline >= 4),
+          gap_img_head: Math.round(gap_img_head),
+          gap_head_tagline: gap_head_tagline === null ? null : Math.round(gap_head_tagline),
+        };
+      expect: { ok: true }
+
+tags: [regression, login, layout, day-1]
+sources:
+  - audit: docs/audits/2026-04-30-ux-audit-live-demo-CONSOLIDATED.md#f7

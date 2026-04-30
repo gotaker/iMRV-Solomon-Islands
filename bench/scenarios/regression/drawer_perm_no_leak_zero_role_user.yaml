@@ -1,0 +1,54 @@
+id: regression_drawer_perm_no_leak_zero_role_user
+title: "Zero-role user does NOT see USERS / restricted parents in drawer"
+perspective: { role: zero_role_test, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:zero_role_test, cache: warm }
+
+# UX audit 2026-04-30 finding R1 (Critical): a user with zero explicitly-
+# assigned roles still saw the USERS submenu (parent + Approved Users leaf)
+# in the drawer; clicking the leaf returned HTTP 403. Root cause: the
+# Approved User doctype shipped with role="All" in its DocPerm — Frappe's
+# built-in "All" grant returns true for `frappe.has_permission(d, "read")`
+# regardless of the user's actual roles, so the api.get_menulist()'s perm
+# filter was a no-op for that doctype. Fixed by scoping perms to
+# System Manager + MRV Admin in approved_user.json + migration patch
+# fix_approved_user_role_all_leak.
+#
+# This scenario is broader than drawer_perm_filter_user_section.yaml (which
+# only tests the "Approved User" role). It uses a fixture user with zero
+# assigned roles — the strictest-possible case — and asserts the drawer
+# shows ONLY the always-public subset.
+
+steps:
+  - ensure_user:
+      email: zero_role_test@bench.local
+      first_name: ZeroRoleBench
+      enabled: 1
+      roles: []                # NO roles assigned
+  - login_as: zero_role_test@bench.local
+  - navigate: /desk/main-dashboard
+  - wait_for_selector:
+      selector: ".fsm-trigger"
+      timeout_ms: 15000
+  - click: ".fsm-trigger"
+  - wait_for_selector:
+      selector: "body.fsm-open #fsm-drawer .sidebar-menu li"
+      timeout_ms: 8000
+  - capture: drawer-zero-role
+
+assertions:
+  # USERS parent must NOT render for a zero-role user.
+  - selector:
+      selector: "#fsm-drawer .sidebar-menu > li:has(a span:text-is('USERS'))"
+      count: { equals: 0 }
+  # No leaf anchor pointing at user-management doctypes either (paranoia).
+  - selector:
+      selector: "#fsm-drawer a[href='/app/approved-user'], #fsm-drawer a[href='/app/user-registration']"
+      count: { equals: 0 }
+  # No PermissionError must surface in the console — would mean a leaked
+  # link is being clicked or perms are still being evaluated wrong.
+  - no_console_error_matching: "PermissionError"
+
+tags: [regression, drawer, perm-filter, day-1]
+sources:
+  - audit: docs/audits/2026-04-30-ux-audit-live-demo-CONSOLIDATED.md#r1
+  - memory: reference_drawer_perm_filter.md

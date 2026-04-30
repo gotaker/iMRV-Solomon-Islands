@@ -1,0 +1,67 @@
+id: regression_user_role_persists_on_insert
+title: "frappe.client.insert User with N roles persists N rows in tabHas Role"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+
+# UX audit 2026-04-30 finding R6: API call
+#   POST /api/method/frappe.client.insert
+#   { doctype: "User", roles: [{role: "Observer GHG Inventory Report"}, ...] }
+# returned 200 OK but the new user's tabHas Role was empty afterwards.
+# The roles silently dropped — likely a User.before_save validator that
+# filters out non-`desk_access` roles without surfacing an error.
+#
+# This breaks any automation / fixture / test-harness flow that relies on
+# the insert API as the source of role truth. Cover it with a deterministic
+# scenario that creates a User with 2 roles via insert + reads back the row
+# count; if N_inserted != N_read_back, fail.
+
+steps:
+  - login_as: Administrator
+  - run_script: |
+      const csrf = document.cookie.match(/csrf_token=([^;]+)/)?.[1] || frappe.csrf_token;
+      const email = 'roleassign_bench_' + Date.now() + '@bench.local';
+      const insertRes = await fetch('/api/method/frappe.client.insert', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {'Content-Type':'application/x-www-form-urlencoded', 'X-Frappe-CSRF-Token': csrf},
+        body: 'doc=' + encodeURIComponent(JSON.stringify({
+          doctype: 'User',
+          email,
+          first_name: 'RoleAssignBench',
+          enabled: 1,
+          send_welcome_email: 0,
+          new_password: 'BenchPwd2026!',
+          roles: [
+            { role: 'Approver Mitigation Report' },
+            { role: 'Observer GHG Inventory Report' },
+          ],
+        })),
+      });
+      const insertOk = insertRes.ok;
+      // Read back via Frappe REST
+      const getRes = await fetch('/api/method/frappe.client.get?doctype=User&name=' + encodeURIComponent(email), { credentials: 'include' });
+      const got = (await getRes.json()).message || {};
+      const persistedRoles = (got.roles || []).map(r => r.role).filter(Boolean);
+      // Cleanup: disable the test user
+      await fetch('/api/method/frappe.client.set_value', {
+        method: 'POST', credentials: 'include',
+        headers: {'Content-Type':'application/x-www-form-urlencoded', 'X-Frappe-CSRF-Token': csrf},
+        body: `doctype=User&name=${encodeURIComponent(email)}&fieldname=enabled&value=0`,
+      });
+      return { insertOk, sentCount: 2, persistedRoles, persistedCount: persistedRoles.length };
+  - capture: role-insert-roundtrip
+
+assertions:
+  - script_result_matches:
+      key: insertOk
+      equals: true
+  # All roles sent must persist. If Frappe filters silently, persistedCount
+  # will be < sentCount and this fails.
+  - script_result_matches:
+      key: persistedCount
+      equals: 2
+  - no_console_error_matching: "ValidationError|LinkValidationError"
+
+tags: [regression, api, user-management, day-1]
+sources:
+  - audit: docs/audits/2026-04-30-ux-audit-live-demo-CONSOLIDATED.md#r6

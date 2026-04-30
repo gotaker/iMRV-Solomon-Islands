@@ -1,0 +1,55 @@
+id: regression_desk_page_h1_no_dashboard_leak
+title: "Tracking Report pages must not show 'Good evening, …' as their h1"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+
+# UX audit 2026-04-30 finding R7: SPA navigation between desk pages leaves
+# the Main Dashboard's <h1>"Good evening, Administrator"</h1> in the DOM.
+# Probe across 6 Tracking Reports returned dashboard greeting as the h1
+# every time. Two-fold issue:
+#   1. Heading-hierarchy bug: the report pages have no <h1> of their own
+#      — the only h1 in the document is from the previous page's residual
+#      DOM. Accessibility regression.
+#   2. DOM-leak signal: list-row count rose 20 → 284 across 33 SPA route
+#      changes in the audit. Suggests page lifecycle teardown is missing.
+#
+# This scenario nails part 1 by asserting that on every Tracking Report,
+# the document's first <h1> matches the page's own title (NOT the
+# dashboard greeting). Part 2 (DOM leak) needs deeper instrumentation.
+
+matrix:
+  - report_path: /desk/mitigation-report
+    expected_h1_pattern: "(?i)mitigation"
+  - report_path: /desk/adaptation-report
+    expected_h1_pattern: "(?i)adaptation"
+  - report_path: /desk/finance-report
+    expected_h1_pattern: "(?i)finance"
+  - report_path: /desk/sdg-report
+    expected_h1_pattern: "(?i)sdg"
+  - report_path: /desk/mrv-report
+    expected_h1_pattern: "(?i)mrv"
+  - report_path: /desk/ghg-inventory-report
+    expected_h1_pattern: "(?i)ghg|inventory"
+
+steps:
+  - login_as: Administrator
+  - navigate: "{{ report_path }}"
+  - wait_for_selector:
+      selector: "h1, .page-title .title-text, .page-head"
+      timeout_ms: 15000
+  - wait_ms: 1500
+  - capture: report-h1-state
+
+assertions:
+  # h1 (or page-title) must NOT contain the dashboard greeting.
+  - text_not_matching:
+      selector: "h1, .page-title .title-text"
+      pattern: "Good evening|Good morning|Good afternoon"
+  # h1 SHOULD match the report's expected name.
+  - text_matches:
+      selector: "h1, .page-title .title-text"
+      pattern: "{{ expected_h1_pattern }}"
+
+tags: [regression, accessibility, dom-lifecycle, day-1]
+sources:
+  - audit: docs/audits/2026-04-30-ux-audit-live-demo-CONSOLIDATED.md#r7

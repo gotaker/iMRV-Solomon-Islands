@@ -1,0 +1,62 @@
+id: regression_tracking_reports_chart_health
+title: "All Tracking Reports — chart tooltips, axis labels, titles render correctly"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+
+# UX audit 2026-04-30 findings R2 + R3:
+# R2: chart tooltips on every Tracking Report rendered literal "undefined"
+#     in <span class="tooltip-content">. Fixed by adding tooltipOptions
+#     .formatTooltipY to the 6 reports (mitigation, adaptation, finance,
+#     ndc, sdg, mrv).
+# R3: bar chart on /desk/mitigation-report had title "No of Projects based
+#     on Categories" but Y-axis went 0 → 400,000+ (emission values). Y-axis
+#     labels were also clipped on the left edge. Fixed: title renamed to
+#     "GHG Emission Reduction Summary..." + shortenYAxisNumbers: 0 → 1.
+#
+# Architect-tightened from the original audit proposal: regex uses word
+# boundary \bundefined\b and excludes input placeholder + aria-* attrs.
+
+# Each surface gets its own iteration. We keep them in one file because the
+# assertions are identical and the only thing that changes is the URL.
+matrix:
+  - report_path: /desk/mitigation-report
+  - report_path: /desk/adaptation-report
+  - report_path: /desk/finance-report
+  - report_path: /desk/ndc-report
+  - report_path: /desk/sdg-report
+  - report_path: /desk/mrv-report
+
+steps:
+  - login_as: Administrator
+  - navigate: "{{ report_path }}"
+  - wait_for_selector:
+      selector: ".chart-container svg, .frappe-chart svg, [class*='-graph'] svg"
+      timeout_ms: 20000
+  - wait_ms: 2000             # let chart render its tooltips/labels
+  # Hover every visible bar to force tooltip render — no-op if no bars.
+  - run_script: |
+      document.querySelectorAll('.chart-container .bar, .frappe-chart .bar').forEach(function(b){
+        b.dispatchEvent(new MouseEvent('mouseover', {bubbles:true}));
+      });
+  - wait_ms: 500
+  - capture: report-chart-rendered
+
+assertions:
+  # R2: no chart tooltip content shows literal "undefined". Word-boundary
+  # match per architect to avoid false-positives on legitimate substrings.
+  - text_not_matching:
+      selector: ".tooltip-content, .frappe-chart .graph-svg-tip, .chart-container .chart-tooltip"
+      pattern: "\\bundefined\\b"
+  # R3: Y-axis tick labels must NOT contain a 6+ digit run — the compact
+  # formatter (shortenYAxisNumbers:1) must have applied.
+  - text_not_matching:
+      selector: ".chart-container svg .y.axis text, .frappe-chart svg text"
+      pattern: "[0-9]{6,}"
+  # No console error during the tooltip hover — a broken formatter throws
+  # TypeError, which is the failure mode we want to catch.
+  - no_console_error_matching: "TypeError|ReferenceError"
+
+tags: [regression, charts, tracking-reports, day-1]
+sources:
+  - audit: docs/audits/2026-04-30-ux-audit-live-demo-CONSOLIDATED.md#r2
+  - audit: docs/audits/2026-04-30-ux-audit-live-demo-CONSOLIDATED.md#r3

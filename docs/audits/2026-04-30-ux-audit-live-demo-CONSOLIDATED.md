@@ -185,8 +185,12 @@ Same as before.
 ## Permanence checklist
 
 - [x] Test users created on live demo (3 succeeded, 1 failed on missing role) — **all 3 disabled (not deleted) at audit end**, audit trail preserved.
-- [ ] Architect-reviewed audit landed at `/docs/audits/2026-04-30-ux-audit-live-demo-CONSOLIDATED.md` (this file).
-- [ ] R1 drawer-leak ticketed.
+- [x] Architect-reviewed audit landed at `/docs/audits/2026-04-30-ux-audit-live-demo-CONSOLIDATED.md` (this file).
+- [x] R1 drawer-leak fixed in code + DB (commit 8da8a49) + bench scenario `drawer_perm_no_leak_zero_role_user.yaml`.
+- [x] R2/R3 chart fixes shipped + bench scenarios `tracking_reports_chart_health.yaml`, `pie_chart_data_labels_emitted.yaml`.
+- [x] F5a / F7 / F8 / D1 / D2 fixes shipped + bench scenarios.
+- [x] R4 / R5 / R6 / R7 / F1 / F6 / F9 covered as bench scenarios (will fail until corresponding code fix lands).
+- [x] Existing `intersection_observer_threshold.yaml` tightened to `opacity < 0.99` per architect review.
 - [ ] F1 deploy verification before any composable change.
 
 ## Carry-overs to next audit

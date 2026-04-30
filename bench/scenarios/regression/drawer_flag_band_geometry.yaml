@@ -1,0 +1,54 @@
+id: regression_drawer_flag_band_geometry
+title: "Drawer flag band — vertical symmetry + flag link routes to public SPA"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+
+# UX audit 2026-04-30 findings D1 + D2 (both fixed in commit 07a5025):
+# D1: cream `.app-logo` band was 137px tall with the flag pinned to the
+#     bottom-left — 80px empty cream above the flag, 21px below; visually
+#     lopsided. Fix: padding `80px 4.5rem 20px 1.5rem` → `24px 4.5rem 24px
+#     1.5rem` + flexbox align-items:center.
+# D2: clicking the SI flag in the drawer landed at /desk/frontend/home
+#     (broken — Frappe set_route prefixed /desk/) instead of /frontend/home
+#     (the public SPA). Fix: drawer click delegate now skips frappe.set_route
+#     for href starting with /(frontend|files|api|method|website|private)/.
+
+steps:
+  - login_as: Administrator
+  - navigate: /desk/main-dashboard
+  - wait_for_selector:
+      selector: ".fsm-trigger"
+      timeout_ms: 15000
+  - click: ".fsm-trigger"
+  - wait_for_selector:
+      selector: "body.fsm-open #fsm-drawer li.app-logo a.logo img"
+      timeout_ms: 8000
+  - capture: flag-band-rendered
+
+assertions:
+  # D1: vertical symmetry. The gap above the flag and below the flag
+  # within the cream band must be approximately equal (within 8px).
+  - run_assertion:
+      script: |
+        const li = document.querySelector('#fsm-drawer li.app-logo');
+        const img = li?.querySelector('a.logo img');
+        if (!li || !img) return { ok: false, missing: 'li_or_img' };
+        const liR = li.getBoundingClientRect();
+        const imR = img.getBoundingClientRect();
+        const top_gap = imR.top - liR.top;
+        const bottom_gap = liR.bottom - imR.bottom;
+        const symmetric = Math.abs(top_gap - bottom_gap) <= 8;
+        // Also: band height shouldn't balloon back to >120px.
+        const compact = liR.height <= 120;
+        return { ok: symmetric && compact, top_gap: Math.round(top_gap), bottom_gap: Math.round(bottom_gap), band_height: Math.round(liR.height) };
+      expect: { ok: true }
+  # D2: flag <a href> must point at the public SPA, not the desk.
+  - attribute_matches:
+      selector: "#fsm-drawer li.app-logo a.logo"
+      attribute: "href"
+      pattern: "^/frontend/(home|$)"
+
+tags: [regression, drawer, flag-band, day-1]
+sources:
+  - audit: docs/audits/2026-04-30-ux-audit-live-demo-CONSOLIDATED.md#d1
+  - audit: docs/audits/2026-04-30-ux-audit-live-demo-CONSOLIDATED.md#d2

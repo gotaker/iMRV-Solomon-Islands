@@ -1,0 +1,37 @@
+id: regression_list_view_button_label_singular
+title: "List-view 'Add' / 'New' button uses singular doctype label"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+
+# UX audit 2026-04-30 finding F6 (low): "+ ADD MITIGATIONS" reads
+# grammatically odd — Frappe button uses doctype name (plural in this
+# case "Mitigations"). Architect note: a forced "must be singular" rule
+# is FLAKY because some doctypes are legitimately plural ("Settings",
+# "Permissions"). So this scenario uses an explicit allowlist of
+# doctypes that we KNOW should be singular for the button label.
+
+steps:
+  - login_as: Administrator
+
+  # Mitigations doctype — should read "Add Mitigation" not "Add Mitigations"
+  - navigate: /desk/mitigations
+  - wait_for_selector:
+      selector: ".page-actions .primary-action, button.primary-action, .standard-actions .btn-primary"
+      timeout_ms: 15000
+  - capture: mitigations-list
+
+assertions:
+  # The primary-action button text must match the singular form.
+  - text_matches:
+      selector: ".page-actions .primary-action, button.primary-action, .standard-actions .btn-primary"
+      pattern: "(?i)^\\+?\\s*(add|new)\\s+mitigation\\s*$"
+
+# Future expansion (commented — uncomment as more doctypes are normalised):
+#   - navigate: /desk/adaptation
+#   - text_matches:
+#       selector: ".page-actions .primary-action"
+#       pattern: "(?i)^\\+?\\s*(add|new)\\s+adaptation\\s*$"
+
+tags: [regression, copy, list-view, day-1]
+sources:
+  - audit: docs/audits/2026-04-30-ux-audit-live-demo-CONSOLIDATED.md#f6

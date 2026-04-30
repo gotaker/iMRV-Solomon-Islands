@@ -1,0 +1,66 @@
+id: regression_drawer_flyout_no_fa_icon
+title: "Drawer flyout leaf items render Lucide-style icons (no Font-Awesome leak)"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+
+# UX audit 2026-04-30 finding F5a: 27 `<i class="fa fa-bar-chart navbar-icon">`
+# instances rendered inside drawer flyout leaf items. The drawer rail uses
+# Lucide-style mask SVGs (consistent stroke weight, single visual family);
+# the flyouts fell through to FA glyphs. Visible inconsistency across every
+# parent-with-submenu interaction.
+#
+# Fix lands a CSS rule that hides the FA <i> and renders a Lucide bar-chart
+# mask SVG via ::before for any flyout leaf containing one. This scenario
+# asserts that no FA glyph is VISIBLE inside an open flyout (display:none
+# is OK because the swap is pure-CSS).
+
+steps:
+  - login_as: Administrator
+  - navigate: /desk/main-dashboard
+  - wait_for_selector:
+      selector: ".fsm-trigger"
+      timeout_ms: 15000
+  - click: ".fsm-trigger"
+  - wait_for_selector:
+      selector: "body.fsm-open #fsm-drawer"
+      timeout_ms: 8000
+  # Click each parent with a submenu so all flyouts spawn.
+  - run_script: |
+      const parents = ['MITIGATION', 'ADAPTATION', 'SDG ASSESSMENTS', 'CLIMATE FINANCE', 'REPORTS', 'MASTER DATABASE'];
+      for (const label of parents) {
+        const span = Array.from(document.querySelectorAll('#fsm-drawer a span')).find(s => s.textContent.trim() === label);
+        if (!span) continue;
+        const a = span.closest('li.treeview.drop-down')?.querySelector('a.link.menu, a.menu');
+        if (a) a.click();
+        await new Promise(r => setTimeout(r, 300));
+      }
+  - capture: drawer-flyouts-spawned
+
+assertions:
+  # No <i class="fa fa-..."> inside an .fsm-flyout-anchored should be VISIBLE.
+  # The CSS hides them via display:none — that satisfies the design system.
+  - run_assertion:
+      script: |
+        const visible = Array.from(document.querySelectorAll('.fsm-flyout-anchored i[class*="fa-"]'))
+          .filter(el => {
+            const r = el.getBoundingClientRect();
+            return r.width > 0 && r.height > 0;
+          });
+        return { visible_fa_count: visible.length, ok: visible.length === 0 };
+      expect: { ok: true }
+  # Lucide replacement must be present: each leaf <a> with FA icon should
+  # produce a ::before pseudo-element with mask-image (we can't query
+  # pseudo-elements directly, but we can assert the parent <a> has a
+  # ::before by checking computed styles on a sample anchor).
+  - run_assertion:
+      script: |
+        const anchors = Array.from(document.querySelectorAll('.fsm-flyout-anchored a:has(i.fa-bar-chart)'));
+        if (anchors.length === 0) return { skipped: true, ok: true };
+        const sample = anchors[0];
+        const beforeContent = window.getComputedStyle(sample, '::before').content;
+        return { has_before: beforeContent !== 'none' && beforeContent !== '', ok: beforeContent !== 'none' && beforeContent !== '' };
+      expect: { ok: true }
+
+tags: [regression, design-system, drawer, day-1]
+sources:
+  - audit: docs/audits/2026-04-30-ux-audit-live-demo-CONSOLIDATED.md#f5a

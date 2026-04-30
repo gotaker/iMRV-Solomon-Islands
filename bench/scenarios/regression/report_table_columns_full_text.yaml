@@ -1,0 +1,51 @@
+id: regression_report_table_columns_full_text
+title: "Tracking Report data tables expose full column-header text on hover/scroll"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+
+# UX audit 2026-04-30 finding R5: Frappe DataTable on Tracking Reports
+# renders 20 columns, several mid-word truncated to "Acti...", "Program...",
+# "Lifeti...", "Locati...". Users can't tell the column meaning from the
+# header alone.
+#
+# Architect note: the truncation itself is a layout consequence (20 cols
+# in 1470px viewport) — fix is to make the FULL text reachable, either via
+# title attribute, horizontal scroll, or wrap. We assert the easier of:
+# every truncated header (showing an ellipsis or scroll-overflow) has the
+# full text in a `title` attribute.
+
+matrix:
+  - report_path: /desk/mitigation-report
+  - report_path: /desk/adaptation-report
+  - report_path: /desk/finance-report
+  - report_path: /desk/sdg-report
+  - report_path: /desk/mrv-report
+
+steps:
+  - login_as: Administrator
+  - navigate: "{{ report_path }}"
+  - wait_for_selector:
+      selector: ".dt-scrollable .dt-row, table.frappe-data-table tbody tr"
+      timeout_ms: 20000
+  - capture: report-table-rendered
+
+assertions:
+  # Every column-header cell that visibly truncates (scrollWidth > clientWidth)
+  # MUST carry a `title` attribute (or `aria-label`) with the full text so
+  # hover-reveals work + screen readers announce correctly.
+  - run_assertion:
+      script: |
+        const headers = document.querySelectorAll('.dt-scrollable .dt-cell--header, [role="columnheader"]');
+        const failures = Array.from(headers).filter(h => {
+          const truncated = h.scrollWidth > h.clientWidth + 1;
+          if (!truncated) return false;
+          const fullText = h.getAttribute('title') || h.getAttribute('aria-label');
+          return !fullText || fullText.trim().length === 0;
+        }).map(h => h.textContent.trim());
+        return { failures, ok: failures.length === 0 };
+      expect: { ok: true }
+  - no_console_error_matching: "TypeError"
+
+tags: [regression, tables, tracking-reports, day-1]
+sources:
+  - audit: docs/audits/2026-04-30-ux-audit-live-demo-CONSOLIDATED.md#r5

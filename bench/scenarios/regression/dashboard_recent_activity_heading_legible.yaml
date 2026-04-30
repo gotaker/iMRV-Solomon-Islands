@@ -1,0 +1,38 @@
+id: regression_dashboard_recent_activity_heading_legible
+title: "Dashboard 'Recent Activity' heading meets minimum readable size"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+
+# UX audit 2026-04-30 finding F8: Recent Activity heading was Inter, 11px,
+# 0.3em letter-spacing — at the edge of readability for an editorial
+# small-caps style. Fix bumps to 12px / 0.24em.
+#
+# Bench assertion: enforce minimum font-size and maximum letter-spacing
+# on the heading so a future "tighten the dashboard" PR can't quietly
+# regress it past the readability threshold.
+
+steps:
+  - login_as: Administrator
+  - navigate: /desk/main-dashboard
+  - wait_for_selector:
+      selector: ".ed-dashboard .ed-activity-title"
+      timeout_ms: 15000
+  - capture: dashboard-recent-activity-heading
+
+assertions:
+  - computed_style:
+      selector: ".ed-dashboard .ed-activity-title"
+      property: "font-size"
+      min_px: 12
+  - computed_style:
+      selector: ".ed-dashboard .ed-activity-title"
+      property: "letter-spacing"
+      max_px: 4               # 0.24em at 12px = 2.88px; cap at 4px (~0.33em)
+  - computed_style:
+      selector: ".ed-dashboard .ed-activity-title"
+      property: "font-family"
+      contains: "Inter"
+
+tags: [regression, dashboard, typography, day-1]
+sources:
+  - audit: docs/audits/2026-04-30-ux-audit-live-demo-CONSOLIDATED.md#f8

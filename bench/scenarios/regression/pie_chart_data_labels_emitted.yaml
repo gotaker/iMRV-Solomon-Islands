@@ -1,0 +1,47 @@
+id: regression_pie_chart_data_labels_emitted
+title: "Pie/donut charts always emit data labels (no degenerate solid disk)"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+
+# UX audit 2026-04-30 finding R4: pie chart "GHG emissions reductions
+# actual sector wise" rendered as a single solid pink/forest disk because
+# 100% of emissions in the sample data fell into one sector ("Energy").
+# No labels, no breakdown — visually indistinguishable from "no data" or
+# "broken chart".
+#
+# Architect's tightening: original proposal gated on segments ≥95% which
+# is FLAKY because real data legitimately has dominant segments. Better
+# assertion: the chart must always emit at least one <text> data label
+# regardless of segment ratios. If it does, the chart can communicate
+# what it shows even when one slice dominates. If it doesn't, the chart
+# fails the user.
+
+steps:
+  - login_as: Administrator
+  - navigate: /desk/ghg-inventory-report
+  - wait_for_selector:
+      selector: ".chart-container svg, .frappe-chart.pie svg, .pie-chart svg"
+      timeout_ms: 20000
+  - wait_ms: 2500             # pie chart legend + labels paint after data
+  - capture: pie-chart-rendered
+
+assertions:
+  # Each pie/donut chart renders at least one <text> element (label/legend)
+  # — independent of segment distribution. Frappe Charts pies emit labels
+  # in the legend area as <text> nodes; if all labels are missing, the
+  # chart is unreadable.
+  - selector:
+      selector: ".chart-container svg text, .frappe-chart svg text"
+      count: { min: 1 }
+  # Alternative legibility path: a sibling element in the chart-container
+  # carries the legend (legend list with sector names + values). At least
+  # one MUST be present — covers chart implementations that render labels
+  # outside the SVG.
+  - selector:
+      selector: ".chart-container .chart-legend li, .frappe-chart .chart-legend li, .chart-container [class*='legend']"
+      count: { min: 1 }
+  - no_console_error_matching: "TypeError"
+
+tags: [regression, charts, ghg-report, day-1]
+sources:
+  - audit: docs/audits/2026-04-30-ux-audit-live-demo-CONSOLIDATED.md#r4

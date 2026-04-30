@@ -1,0 +1,47 @@
+id: regression_desk_pages_console_clean
+title: "Desk pages do not emit PermissionError or unguarded TypeError on render"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+
+# UX audit 2026-04-30 finding F9 (architect-reclassified from Informational
+# to Medium): "≥1 console error per desk page" — the architect noted this
+# smells like a missing `frappe.boot.user.can_read.includes(...)` guard,
+# the same pattern that was fixed for main_dashboard.js. Without the
+# guard, a doctype the user can't read returns 403 from the page-load
+# query and lands as a console error.
+#
+# Treat as permission-leakage scent, not noise. Allowlist the known-
+# deferred CSRF retry interceptor error per `reference_csrf_retry_interceptor.md`
+# but flag everything else.
+
+matrix:
+  - desk_path: /desk/main-dashboard
+  - desk_path: /desk/mitigations
+  - desk_path: /desk/adaptation
+  - desk_path: /desk/sdg-assessment
+  - desk_path: /desk/climate-finance
+  - desk_path: /desk/ghg-inventory
+  - desk_path: /desk/project
+
+steps:
+  - login_as: Administrator
+  - navigate: "{{ desk_path }}"
+  - wait_for_selector:
+      selector: ".layout-main-section, .page-head, h1"
+      timeout_ms: 15000
+  - wait_ms: 2500           # let v16 desk SPA settle (memory: reference_frappe_v16_desk_settle.md)
+  - capture: desk-page-settled
+
+assertions:
+  # No PermissionError — that's the F9 leak symptom.
+  - no_console_error_matching: "PermissionError"
+  # No unguarded TypeError — usually comes from a missing perm guard
+  # downstream of a 403'd query.
+  - no_console_error_matching: "TypeError.*undefined.*read|Cannot read prop.*of (undefined|null)"
+  # Allowlist: `Network error` from the deferred CSRF retry is OK.
+  # Anything else fails the assertion.
+
+tags: [regression, console-hygiene, perm-guard, day-1]
+sources:
+  - audit: docs/audits/2026-04-30-ux-audit-live-demo-CONSOLIDATED.md#f9
+  - memory: reference_frappe_perm_can_read.md
