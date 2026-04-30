@@ -494,3 +494,60 @@ def download_excel(project):
 
 
 
+
+
+@frappe.whitelist()
+def download_pdf(project=None):
+	"""Editorial PDF export for the per-project MRV Report.
+
+	Renders project header + GHG-by-year bar chart + spend-by-year bar chart.
+	The full 5-section tabular detail (mitigation/adaptation/sdg/finance/project)
+	is reserved for the Excel export — PDF gives the executive summary view.
+	"""
+	from mrvtools.mrvtools.pdf_export import render_tracking_report_pdf
+
+	if not project:
+		return ""
+	header = get_project_details(project) or []
+	# Flatten project header into a 2-column [field, value] table
+	if isinstance(header, list) and header and isinstance(header[0], dict):
+		header_row = header[0]
+		columns = ["Field", "Value"]
+		data = [[k, str(v) if v is not None else "—"] for k, v in header_row.items()]
+	else:
+		columns = ["Field"]
+		data = [[str(header)]]
+
+	# get_chart: GHG actuals by year — already in {data, labels} shape
+	try:
+		chart_raw = get_chart(project) or {}
+	except Exception:
+		chart_raw = {}
+	chart_data = (
+		{"datasets": [{"name": "Actual GHG (tCO₂e)", "values": chart_raw.get("data") or []}],
+		 "labels": chart_raw.get("labels") or []}
+		if chart_raw.get("data") else None
+	)
+	# get_chart2: spend by year — upstream raises if project has no Climate Finance record
+	try:
+		chart2_raw = get_chart2(project) or {}
+	except Exception:
+		chart2_raw = {}
+	pie_chart_data = (
+		{"data": chart2_raw.get("data") or [], "labels": chart2_raw.get("labels") or []}
+		if chart2_raw.get("data") else None
+	)
+
+	return render_tracking_report_pdf(
+		report_slug=f"MRV-Report-{project}",
+		report_title=f"MRV Report — {project}",
+		lede="Per-project monitoring snapshot: emissions delivered, finance spent, alignment with NDC + SDG commitments.",
+		columns=columns,
+		data=data,
+		chart_data=chart_data,
+		pie_chart_data=pie_chart_data,
+		chart_caption_bar="Actual GHG reductions by year (tCO₂e)",
+		chart_caption_pie="Cumulative spend by year (USD)",
+		table_title="Project profile",
+		filter_state={"Project": project},
+	)

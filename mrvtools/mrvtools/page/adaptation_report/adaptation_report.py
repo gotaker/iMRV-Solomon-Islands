@@ -167,3 +167,39 @@ def download_excel(columns,data):
 	nowTime = nowTime.replace(":","")
 	export_data.to_excel(f"{site_name}/public/files/Adaptation-Report-{nowTime}.xlsx",index=False)
 	return f"../files/Adaptation-Report-{nowTime}.xlsx"
+
+@frappe.whitelist()
+def download_pdf(year=None, impact_area=None, key_sector=None, key_sub_sector=None):
+	"""Editorial PDF export for the Adaptation Tracking Report."""
+	from mrvtools.mrvtools.pdf_export import render_tracking_report_pdf
+
+	columns = get_columns()
+	data = get_datas(year, key_sector, key_sub_sector, impact_area)
+
+	# data1: {data:[counts], categories:[names]} → bar shape expected by SVG renderer
+	d1 = get_total_adaptation_report_data1(year, impact_area, key_sector, key_sub_sector) or {}
+	chart_data = (
+		{"datasets": [{"name": "Projects", "values": d1.get("data") or []}],
+		 "labels": d1.get("categories") or []}
+		if d1.get("data") else None
+	)
+	# data2: dict {sector: count} → pie shape
+	d2 = get_total_adaptation_report_data2(year, impact_area, key_sector, key_sub_sector) or {}
+	pie_chart_data = ({"data": list(d2.values()), "labels": list(d2.keys())} if d2 else None)
+
+	return render_tracking_report_pdf(
+		report_slug="Adaptation-Report",
+		report_title="Adaptation Tracking Report",
+		lede="Resilience-building project portfolio with sectoral breakdown and impact area filters.",
+		columns=columns,
+		data=data,
+		chart_data=chart_data,
+		pie_chart_data=pie_chart_data,
+		chart_caption_bar="Projects by impact category",
+		chart_caption_pie="Projects by sector",
+		table_title="Adaptation projects",
+		filter_state={
+			"Year": year, "Impact Area": impact_area,
+			"Key Sector": key_sector, "Key Sub-Sector": key_sub_sector,
+		},
+	)

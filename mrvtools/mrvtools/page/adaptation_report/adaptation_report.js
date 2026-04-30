@@ -133,7 +133,7 @@ class Adaptation {
 			this.make()
 			this.render_datatable()
 		});
-		this.download_button = this.page.set_secondary_action('Download', () => {
+		this.download_button = this.page.set_secondary_action('Download Excel', () => {
 
 			frappe.call('mrvtools.mrvtools.page.adaptation_report.adaptation_report.execute',{
 				year:this.year_select[0].value,
@@ -150,6 +150,14 @@ class Adaptation {
 					})
 				})
 		})
+		this.page.add_inner_button('Download PDF', () => {
+			frappe.call('mrvtools.mrvtools.page.adaptation_report.adaptation_report.download_pdf', {
+				year: this.year_select[0].value,
+				key_sector: this.key_sector,
+				key_sub_sector: this.key_sub_sector,
+				impact_area: this.impact_area[0].value,
+			}).then((i) => { if (i.message) window.open(i.message); });
+		});
 	}
 	// hide_btn() {
 	// 	const toggleButtons = (hideBtn, showBtn, targetClass) => {

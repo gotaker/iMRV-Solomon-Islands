@@ -1,0 +1,46 @@
+id: regression_tracking_reports_pdf_safe_against_xss
+title: "PDF export does not reflect XSS / script payloads as executable HTML"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+
+# Adversarial test from 2026-04-30: an XSS payload (`<script>alert(1)</script>`)
+# in a filter value. The Jinja template that renders the PDF must autoescape
+# user-controlled strings (filter chips, lede, project labels). If the literal
+# `<script>` tag survives into the PDF body, that's a confirmed reflected-XSS
+# escape from chip → PDF.
+#
+# Note: payload may cause an upstream SQL ProgrammingError because of the
+# pre-existing f-string-injection bug in the report's getData() — that's
+# tracked separately. This scenario only asserts that *if* the PDF is
+# produced, it does not contain the literal `<script>` substring.
+
+steps:
+  - login_as: Administrator
+  - run_script: |
+      const params = new URLSearchParams({ year: "2024", impact_area: "<script>alert(1)</script>" });
+      const r = await fetch('/api/method/mrvtools.mrvtools.page.adaptation_report.adaptation_report.download_pdf?' + params,
+                            { credentials: 'include' });
+      let url = null, body = "", produced = false;
+      if (r.ok) {
+        const j = await r.json();
+        url = j.message;
+        if (url) {
+          produced = true;
+          const f = await fetch(url, { credentials: 'include' });
+          body = await f.text();
+        }
+      }
+      return {
+        produced,
+        contains_literal_script: body.indexOf('<script>') !== -1,
+        contains_literal_alert: body.indexOf('alert(1)') !== -1,
+      };
+  - capture: pdf-xss-probe
+
+assertions:
+  # Filter payload must NEVER reach the PDF as a live <script> tag.
+  - script_result_matches: { key: contains_literal_script, equals: false }
+
+tags: [regression, pdf-export, security, day-1]
+sources:
+  - audit: docs/audits/2026-04-30-ux-audit-live-demo-CONSOLIDATED.md

@@ -311,3 +311,41 @@ def download_excel(columns,data):
 	nowTime = nowTime.replace(":","")
 	export_data.to_excel(f"{site_name}/public/files/Mitigation-Report-{nowTime}.xlsx")
 	return f"../files/Mitigation-Report-{nowTime}.xlsx"
+
+
+@frappe.whitelist()
+def download_pdf(monitoring_year=None, key_sector=None, key_sub_sector=None,
+				 location=None, ndc=None, market_mechanism=None):
+	"""Editorial PDF export — single-call server-side generation.
+
+	Charts are re-rendered server-side as inline SVG (deterministic, no axis-clip
+	risk, no "undefined" tooltips). Filter state is included in the cover page.
+	"""
+	from mrvtools.mrvtools.pdf_export import render_tracking_report_pdf
+
+	columns = getColumns()
+	data_pkg = getData(monitoring_year, key_sector, key_sub_sector, location, ndc, market_mechanism)
+	data = data_pkg[0] if isinstance(data_pkg, list) and len(data_pkg) >= 1 else []
+	chart_data = data_pkg[1] if isinstance(data_pkg, list) and len(data_pkg) >= 2 else None
+	pie_chart_data = get_pie_chart(monitoring_year, key_sector, key_sub_sector, location, ndc, market_mechanism)
+
+	return render_tracking_report_pdf(
+		report_slug="Mitigation-Report",
+		report_title="Mitigation Tracking Report",
+		lede="Quarterly emission-reduction progress per mitigation project, by sector and sub-sector.",
+		columns=columns,
+		data=data,
+		chart_data=chart_data,
+		pie_chart_data=pie_chart_data,
+		chart_caption_bar="Expected vs actual GHG reductions (tCO₂e)",
+		chart_caption_pie="Actual GHG reductions by sector",
+		table_title="Mitigation projects",
+		filter_state={
+			"Monitoring Year": monitoring_year,
+			"Key Sector": key_sector,
+			"Key Sub-Sector": key_sub_sector,
+			"Location": location,
+			"NDC": ndc,
+			"Market Mechanism": market_mechanism,
+		},
+	)

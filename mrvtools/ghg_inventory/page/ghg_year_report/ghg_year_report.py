@@ -230,3 +230,35 @@ def download_excel(columns,data):
 	nowTime = nowTime.replace(":","")
 	export_data.to_excel(f"{site_name}/public/files/GHGInventory-Year-Wise-Report-{nowTime}.xlsx")
 	return f"../files/GHGInventory-Year-Wise-Report-{nowTime}.xlsx"
+
+@frappe.whitelist()
+def download_pdf(inventory_unit=None, to_year=None, from_year=None):
+	"""Editorial PDF export for the GHG Inventory (Year-Wise) Report."""
+	from mrvtools.mrvtools.pdf_export import render_tracking_report_pdf
+
+	columns_pkg = execute(inventory_unit, to_year, from_year)
+	raw_cols = columns_pkg[0] if columns_pkg else []
+	columns = [c.get("name") if isinstance(c, dict) else str(c) for c in raw_cols]
+	raw_data = columns_pkg[1] if len(columns_pkg) > 1 else []
+	data = []
+	for row in raw_data:
+		if isinstance(row, dict):
+			data.append([row.get(c) for c in columns])
+		elif isinstance(row, (list, tuple)):
+			data.append(list(row))
+
+	# get_chart returns {labels:[years], datasets:[CO2, CH4, N2O]} — already correct shape
+	chart_data = get_chart(inventory_unit, from_year, to_year)
+
+	return render_tracking_report_pdf(
+		report_slug="GHG-Inventory-Year-Wise-Report",
+		report_title="GHG Inventory Report — Year Wise",
+		lede=f"Annual emissions by category and gas — {from_year}–{to_year}, {inventory_unit or 'tCO₂e'}.",
+		columns=columns,
+		data=data,
+		chart_data=chart_data,
+		pie_chart_data=None,
+		chart_caption_bar=f"Annual emissions by gas ({inventory_unit or 'tCO₂e'})",
+		table_title="Emission detail",
+		filter_state={"Unit": inventory_unit, "From Year": from_year, "To Year": to_year},
+	)

@@ -43,7 +43,7 @@ class MRVReport {
 			this.make()
 			this.render_datatable();
 		});
-		this.download_button = this.page.set_secondary_action('Download', () => {
+		this.download_button = this.page.set_secondary_action('Download Excel', () => {
 
 			frappe.call('mrvtools.mrvtools.page.mrv_report.mrv_report.download_excel',{
 				project:this.project
@@ -51,7 +51,15 @@ class MRVReport {
 				window.open(i.message)
 			})
 		})
-		
+		this.page.add_inner_button('Download PDF', () => {
+			if (!this.project) {
+				frappe.msgprint(__('Select a project first.'));
+				return;
+			}
+			frappe.call('mrvtools.mrvtools.page.mrv_report.mrv_report.download_pdf', {
+				project: this.project,
+			}).then((i) => { if (i.message) window.open(i.message); });
+		});
 
 	}
 	// hide_btn() {

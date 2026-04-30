@@ -225,3 +225,73 @@ def download_excel(columns,data):
 	nowTime = nowTime.replace(":","")
 	export_data.to_excel(f"{site_name}/public/files/GHGInventory-Gas-Wise-Report-{nowTime}.xlsx")
 	return f"../files/GHGInventory-Gas-Wise-Report-{nowTime}.xlsx"
+
+@frappe.whitelist()
+def download_pdf(inventory_year=None, inventory_unit=None):
+	"""Editorial PDF export for the GHG Inventory (Gas-Wise) Report."""
+	from mrvtools.mrvtools.pdf_export import render_tracking_report_pdf
+
+	# Validate inventory_unit — anything else makes execute() return None
+	# (TypeError downstream). Caught in adversarial probes 2026-04-30.
+	if inventory_unit not in (None, "", "tCO2e", "GgCO2e"):
+		inventory_unit = "tCO2e"
+
+	try:
+		columns_pkg = execute(inventory_year, inventory_unit) or [[], []]
+	except Exception:
+		columns_pkg = [[], []]
+	raw_cols = columns_pkg[0] if columns_pkg else []
+	columns = [c.get("name") if isinstance(c, dict) else str(c) for c in raw_cols]
+	raw_data = columns_pkg[1] if len(columns_pkg) > 1 and columns_pkg[1] else []
+
+	# Each row is a dict with the columns as keys (incl. the 'indent' field for tree rendering).
+	# Convert to a plain list-of-lists matching `columns`. Skip 'indent' which is presentation-only.
+	data = []
+	for row in raw_data:
+		if isinstance(row, dict):
+			data.append([row.get(c) for c in columns])
+		elif isinstance(row, (list, tuple)):
+			data.append(list(row))
+
+	chart_raw = get_chart(inventory_year, inventory_unit) or {}
+	# get_chart returns {data:[(co2,ch4,n2o)], labels:["CO2","CH4","N2O"]}
+	# For a bar chart we need {datasets:[{name, values}], labels}.
+	bar_values = []
+	if chart_raw.get("data"):
+		first = chart_raw["data"][0] if chart_raw["data"] else None
+		if isinstance(first, (list, tuple)):
+			bar_values = list(first)
+		elif first is not None:
+			bar_values = [first]
+	chart_data = (
+		{"datasets": [{"name": "Emissions", "values": bar_values}],
+		 "labels": chart_raw.get("labels") or []}
+		if bar_values else None
+	)
+
+	pie_raw = get_pie_chart(inventory_year, inventory_unit) or {}
+	# Pie data is {data:[(sector_total,)...], labels:[6 sector names]} — unwrap tuples
+	pie_data = []
+	for v in pie_raw.get("data") or []:
+		if isinstance(v, (list, tuple)):
+			pie_data.append(v[0] if v else 0)
+		else:
+			pie_data.append(v)
+	pie_chart_data = (
+		{"data": pie_data, "labels": pie_raw.get("labels") or []}
+		if any(pie_data) else None
+	)
+
+	return render_tracking_report_pdf(
+		report_slug="GHG-Inventory-Gas-Wise-Report",
+		report_title="GHG Inventory Report",
+		lede=f"National greenhouse-gas inventory by category and gas — {inventory_year or 'all years'}, {inventory_unit or 'tCO₂e'}.",
+		columns=columns,
+		data=data,
+		chart_data=chart_data,
+		pie_chart_data=pie_chart_data,
+		chart_caption_bar=f"Total emission by gas ({inventory_unit or 'tCO₂e'})",
+		chart_caption_pie="Total emission by sector",
+		table_title="Emission breakdown",
+		filter_state={"Inventory Year": inventory_year, "Unit": inventory_unit},
+	)

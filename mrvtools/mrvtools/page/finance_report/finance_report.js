@@ -38,7 +38,7 @@ class Finance {
 			this.make()
 			this.render_datatable()
 		});
-		this.download_button = this.page.set_secondary_action('Download', () => {
+		this.download_button = this.page.set_secondary_action('Download Excel', () => {
 
 			frappe.call('mrvtools.mrvtools.page.finance_report.finance_report.execute',{
 				year:this.monitoring_year[0].value,
@@ -51,11 +51,19 @@ class Finance {
 						columns:r.message[0],
 						data:r.message[1]
 					}).then((i) =>{
-						
+
 						window.open(i.message)
 					})
 				})
 		})
+		this.page.add_inner_button('Download PDF', () => {
+			frappe.call('mrvtools.mrvtools.page.finance_report.finance_report.download_pdf', {
+				year: this.monitoring_year[0].value,
+				objective: this.objective[0].value,
+				key_sector: this.key_sector,
+				key_sub_sector: this.key_sub_sector,
+			}).then((i) => { if (i.message) window.open(i.message); });
+		});
 	}
 	hide_btn() {
 		const toggleButtons = (hideBtn, showBtn, targetClass) => {

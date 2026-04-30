@@ -41,7 +41,7 @@ class GHGInventory {
 			this.make()
 			this.render_datatable()
 		});
-		this.download_button = this.page.set_secondary_action('Download', () => {
+		this.download_button = this.page.set_secondary_action('Download Excel', () => {
 
 			frappe.call('mrvtools.ghg_inventory.page.ghg_year_report.ghg_year_report.execute',{
 				from_year:this.from_year[0].value,
@@ -57,6 +57,13 @@ class GHGInventory {
 					})
 				})
 		})
+		this.page.add_inner_button('Download PDF', () => {
+			frappe.call('mrvtools.ghg_inventory.page.ghg_year_report.ghg_year_report.download_pdf', {
+				from_year: this.from_year[0].value,
+				to_year: this.to_year[0].value,
+				inventory_unit: this.inventory_unit[0].value,
+			}).then((i) => { if (i.message) window.open(i.message); });
+		});
 	}
 	
 

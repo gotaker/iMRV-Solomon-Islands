@@ -1,0 +1,74 @@
+id: regression_tracking_reports_pdf_export
+title: "All 8 Tracking Reports — PDF download produces a valid editorial PDF"
+perspective: { role: Administrator, persona: standard, environment: any }
+preconditions: { sample_db: required, session: logged_in_as:Administrator, cache: warm }
+
+# Feature: PDF export shipped 2026-05-01 (commit pending). Each report's
+# "Download PDF" button (added next to the existing Excel "Download")
+# fires `download_pdf(filter_args)` — a single server-side call that
+# renders the report data + charts as inline SVG into a Jinja template,
+# pipes through wkhtmltopdf, and returns a /files/<slug>-<ts>.pdf URL.
+#
+# This scenario walks every report, triggers the PDF download, verifies:
+#   - HTTP 200 from the API method
+#   - URL returned starts with /files/ and ends in .pdf
+#   - File size > 10 KB (anything smaller is a chart-only or empty-shell)
+#   - File starts with the literal "%PDF-1.4" magic header
+#
+# Stable assertions per architect's audit-review heuristic: file presence
+# + magic header is deterministic regardless of row count or filter state.
+
+matrix:
+  - report_method: mrvtools.mrvtools.page.mitigation_report.mitigation_report.download_pdf
+    filters: {}
+    expected_slug: Mitigation-Report
+  - report_method: mrvtools.mrvtools.page.adaptation_report.adaptation_report.download_pdf
+    filters: { year: "2024" }
+    expected_slug: Adaptation-Report
+  - report_method: mrvtools.mrvtools.page.finance_report.finance_report.download_pdf
+    filters: { year: "2024" }
+    expected_slug: Finance-Report
+  - report_method: mrvtools.mrvtools.page.ndc_report.ndc_report.download_pdf
+    filters: { year: "2024" }
+    expected_slug: NDC-Report
+  - report_method: mrvtools.mrvtools.page.sdg_report.sdg_report.download_pdf
+    filters: { year: "2024" }
+    expected_slug: SDG-Report
+  - report_method: mrvtools.ghg_inventory.page.ghg_inventory_report.ghg_inventory_report.download_pdf
+    filters: { inventory_year: "2023", inventory_unit: "tCO2e" }
+    expected_slug: GHG-Inventory-Gas-Wise-Report
+  - report_method: mrvtools.ghg_inventory.page.ghg_year_report.ghg_year_report.download_pdf
+    filters: { inventory_unit: "tCO2e", from_year: "2018", to_year: "2025" }
+    expected_slug: GHG-Inventory-Year-Wise-Report
+
+steps:
+  - login_as: Administrator
+  - run_script: |
+      const args = new URLSearchParams({{ filters | tojson | safe }}).toString();
+      const r = await fetch('/api/method/{{ report_method }}?' + args, { credentials: 'include' });
+      const j = await r.json();
+      const url = j.message;
+      const head = await fetch(url, { credentials: 'include' });
+      const buf = new Uint8Array(await head.arrayBuffer());
+      const magic = String.fromCharCode(...buf.slice(0, 8));
+      return {
+        status: r.status,
+        url: url,
+        size: buf.length,
+        magic: magic,
+        slug_match: url && url.includes('{{ expected_slug }}'),
+      };
+  - capture: pdf-export-result
+
+assertions:
+  - script_result_matches: { key: status,      equals: 200 }
+  - script_result_matches: { key: slug_match,  equals: true }
+  - script_result_matches: { key: magic,       startsWith: "%PDF-1." }
+  - run_assertion:
+      script: |
+        return { ok: window.__lastResult.size > 10000, size: window.__lastResult.size };
+      expect: { ok: true }
+
+tags: [regression, pdf-export, tracking-reports, day-1]
+sources:
+  - feature: docs/audits/2026-04-30-ux-audit-live-demo-CONSOLIDATED.md

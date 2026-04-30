@@ -322,3 +322,29 @@ def download_excel(columns,data):
 	nowTime = nowTime.replace(":","")
 	export_data.to_excel(f"{site_name}/public/files/Finance-Report-{nowTime}.xlsx",index=False)
 	return f"../files/Finance-Report-{nowTime}.xlsx"
+
+@frappe.whitelist()
+def download_pdf(year=None, objective=None, key_sector=None, key_sub_sector=None):
+	"""Editorial PDF export for the Finance Tracking Report."""
+	from mrvtools.mrvtools.pdf_export import render_tracking_report_pdf
+
+	columns_data = execute(year, objective, key_sector, key_sub_sector)
+	columns = columns_data[0] if columns_data else []
+	data = columns_data[1] if len(columns_data) > 1 else []
+	chart_data = get_chart(year, objective, key_sector, key_sub_sector)
+	pie_chart_data = get_pie_chart(year, objective, key_sector, key_sub_sector)
+
+	return render_tracking_report_pdf(
+		report_slug="Finance-Report",
+		report_title="Climate Finance Tracking Report",
+		lede="Expected vs actual climate-finance disbursement, by sector and sub-sector.",
+		columns=columns,
+		data=data,
+		chart_data=chart_data,
+		pie_chart_data=pie_chart_data,
+		chart_caption_bar="Expected vs actual budget (USD)",
+		chart_caption_pie="Total spend by sector",
+		table_title="Climate-finance projects",
+		filter_state={"Year": year, "Objective": objective,
+					  "Key Sector": key_sector, "Key Sub-Sector": key_sub_sector},
+	)

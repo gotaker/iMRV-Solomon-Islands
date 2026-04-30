@@ -44,7 +44,8 @@ class Mitigation {
 			this.make()
 		});
 
-		this.download_button = this.page.set_secondary_action('Download', () => {
+		// Excel is the primary download button (legacy parity).
+		this.download_button = this.page.set_secondary_action('Download Excel', () => {
 
 			frappe.call('mrvtools.mrvtools.page.mitigation_report.mitigation_report.execute',{
 				monitoring_year:this.monitoring_year[0].value,
@@ -63,6 +64,21 @@ class Mitigation {
 					})
 				})
 		})
+
+		// PDF: editorial print-ready snapshot. Single server-side call —
+		// columns, rows, charts, pie all derived from the filter args.
+		this.page.add_inner_button('Download PDF', () => {
+			frappe.call('mrvtools.mrvtools.page.mitigation_report.mitigation_report.download_pdf', {
+				monitoring_year: this.monitoring_year[0].value,
+				key_sector: this.key_sector,
+				key_sub_sector: this.key_sub_sector,
+				location: this.location[0].value,
+				ndc: this.ndc[0].value,
+				market_mechanism: this.market_mechanism[0].value,
+			}).then((i) => {
+				if (i.message) window.open(i.message);
+			});
+		});
 	}
 	mitigation_filter_fields() {
 		this.monitoring_year = this.page.add_select(

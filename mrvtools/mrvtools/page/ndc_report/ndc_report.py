@@ -224,3 +224,29 @@ def download_excel(columns,data):
 	return f"../files/NDC-Report-{nowTime}.xlsx"
 
 
+
+
+@frappe.whitelist()
+def download_pdf(year=None):
+	"""Editorial PDF export for the NDC Tracking Report."""
+	from mrvtools.mrvtools.pdf_export import render_tracking_report_pdf
+
+	columns_data = execute(year)
+	columns = columns_data[0] if columns_data else []
+	data = columns_data[1] if len(columns_data) > 1 else []
+	chart_data = get_chart(year)
+	pie_chart_data = get_pie_chart(year)
+
+	return render_tracking_report_pdf(
+		report_slug="NDC-Report",
+		report_title="NDC Tracking Report",
+		lede="Nationally Determined Contributions: emission-reduction progress against pledges.",
+		columns=columns,
+		data=data,
+		chart_data=chart_data,
+		pie_chart_data=pie_chart_data,
+		chart_caption_bar="Expected vs actual GHG (tCO₂e)",
+		chart_caption_pie="Reductions by sector",
+		table_title="NDC-tracked projects",
+		filter_state={"Monitoring Year": year},
+	)

@@ -209,3 +209,43 @@ def download_excel(columns,data):
 	nowTime = nowTime.replace(":","")
 	export_data.to_excel(f"{site_name}/public/files/SDG-Report-{nowTime}.xlsx")
 	return f"../files/SDG-Report-{nowTime}.xlsx"
+
+@frappe.whitelist()
+def download_pdf(year=None, impact_area=None, key_sector=None, key_sub_sector=None):
+	"""Editorial PDF export for the SDG Tracking Report."""
+	from mrvtools.mrvtools.pdf_export import render_tracking_report_pdf
+	import re
+
+	columns_pkg = execute(year, impact_area, key_sector, key_sub_sector)
+	# SDG columns are dicts {id, name, width}, not flat strings — flatten for PDF
+	raw_cols = columns_pkg[0] if columns_pkg else []
+	columns = [c.get("name") if isinstance(c, dict) else str(c) for c in raw_cols]
+	data = columns_pkg[1] if len(columns_pkg) > 1 else []
+
+	# Strip inline <img> sentinels from the impact_summaries column for print
+	def _strip_img(v):
+		if isinstance(v, str) and "<img" in v:
+			return re.sub(r"<[^>]+>", "", v).strip() or "—"
+		return v
+	data = [[_strip_img(c) for c in row] if isinstance(row, (list, tuple)) else row for row in data]
+
+	d1 = get_total_sdg_report_data(year, impact_area, key_sector, key_sub_sector) or {}
+	chart_data = (
+		{"datasets": [{"name": "Projects", "values": d1.get("data") or []}],
+		 "labels": d1.get("categories") or []}
+		if d1.get("data") else None
+	)
+
+	return render_tracking_report_pdf(
+		report_slug="SDG-Report",
+		report_title="SDG Tracking Report",
+		lede="Sustainable Development Goal alignment: project contribution by goal and sector.",
+		columns=columns,
+		data=data,
+		chart_data=chart_data,
+		pie_chart_data=None,
+		chart_caption_bar="Projects by SDG goal",
+		table_title="SDG-aligned projects",
+		filter_state={"Year": year, "Impact Area": impact_area,
+					  "Key Sector": key_sector, "Key Sub-Sector": key_sub_sector},
+	)
