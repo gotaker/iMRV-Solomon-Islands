@@ -239,7 +239,9 @@ body.fsm-open .fsm-backdrop {
     max-width: 320px;
     z-index: 1040 !important;
     transform: translateX(-100%);
-    transition: transform var(--ed-dur-mid) var(--ed-ease);
+    transition: transform var(--ed-dur-mid) var(--ed-ease),
+                width var(--ed-dur-mid) var(--ed-ease),
+                max-width var(--ed-dur-mid) var(--ed-ease);
     background: var(--ed-frost-bg) !important;
     -webkit-backdrop-filter: blur(20px) saturate(140%);
     backdrop-filter: blur(20px) saturate(140%);
@@ -254,9 +256,10 @@ body.fsm-ready .main-sidebar {
 body.fsm-open .main-sidebar {
     transform: translateX(0);
 }
-
 /* Reset legacy fixed-rail geometry so .sidebar-menu becomes a normal
-   vertical list inside the drawer. */
+   vertical list inside the drawer. Drawer stays 320px wide regardless
+   of submenu state — the contextual flyout pops out as a small popover
+   anchored to the clicked row (see .fsm-flyout-anchored below). */
 .main-sidebar .sidebar-menu {
     position: static !important;
     left: auto !important;
@@ -319,68 +322,192 @@ body.fsm-open .main-sidebar {
     border-left-color: var(--ed-moss);
 }
 
-/* Kill the legacy hover reveal — drawer now uses click accordion */
-li.treeview.drop-down:hover .treeview-menu {
+/* =====================================================================
+   Contextual flyout submenu — anchored to the clicked row.
+   The drawer stays 320px wide. When a parent (e.g. MITIGATION) is
+   clicked, JS re-parents the .side-menu / .submenu element to <body>
+   and adds `.fsm-flyout-anchored`, then positions it via inline
+   `top` / `left` to sit just outside the drawer's right edge at the
+   same vertical level as the clicked row. Auto-height (only as tall as
+   its items), capped at 70vh with internal scroll. Re-parenting is
+   required because the drawer has overflow:hidden and a transform
+   containing block — anything inside it gets clipped past 320px.
+   ===================================================================== */
+
+/* Inner list inside the popover — natural flow, no clipping */
+.fsm-flyout-anchored ul.treeview-menu,
+.fsm-flyout-anchored.submenu {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    list-style: none;
+}
+.fsm-flyout-anchored ul.treeview-menu > li > a,
+.fsm-flyout-anchored.submenu > li > a {
+    padding: 10px 16px !important;
+    font-size: 13px;
+    color: var(--ed-forest);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+.fsm-flyout-anchored ul.treeview-menu > li:hover > a,
+.fsm-flyout-anchored.submenu > li:hover > a {
+    background: rgba(163, 177, 138, 0.25);
+    color: var(--ed-forest);
+}
+.fsm-flyout-anchored ul.treeview-menu > li > a:focus-visible,
+.fsm-flyout-anchored.submenu > li > a:focus-visible {
+    outline: 2px solid var(--ed-forest);
+    outline-offset: -2px;
+    background: rgba(163, 177, 138, 0.35);
+}
+.fsm-flyout-anchored ul.treeview-menu .treeview-head {
+    padding: 10px 16px 6px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ed-forest-60);
+    border-bottom: 1px solid var(--ed-forest-08);
+}
+
+/* The popover surface itself — fixed-position chip anchored to the row.
+   Inline `top` and `left` set by JS; everything else here. */
+.fsm-flyout-anchored {
+    position: fixed !important;
+    z-index: 1042 !important;
+    width: 280px !important;
+    height: auto !important;
+    max-height: 70vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none;
+    background: var(--ed-frost-bg) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    backdrop-filter: blur(20px) saturate(140%);
+    box-shadow: 0 12px 40px -8px rgba(1, 71, 46, 0.4),
+                0 0 0 1px var(--ed-forest-08);
+    border-radius: 10px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(-8px);
+    transition: opacity 220ms var(--ed-ease),
+                transform 220ms var(--ed-ease),
+                visibility 0s linear 220ms;
+}
+body.fsm-flyout-active .fsm-flyout-anchored {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(0);
+    transition: opacity 220ms var(--ed-ease),
+                transform 220ms var(--ed-ease),
+                visibility 0s linear 0s;
+}
+
+/* Closed-state default for .side-menu / .submenu while still inside
+   their parent <li> — invisible so they don't render at the bottom of
+   the drawer before the click handler re-parents them. */
+.main-sidebar .side-menu:not(.fsm-flyout-anchored),
+.main-sidebar .submenu:not(.fsm-flyout-anchored) {
     display: none !important;
 }
 
-/* Inline-accordion for .treeview-menu (side_menu1.html).
-   Uses .main-sidebar .sidebar-menu .treeview-menu specificity (3 classes)
-   to outweigh the legacy `display: none` rule above. */
-.main-sidebar .sidebar-menu .treeview-menu,
-.main-sidebar .treeview-menu {
-    display: block !important;
-    position: static !important;
-    left: auto !important;
-    top: auto !important;
-    width: 100% !important;
-    height: auto !important;
-    max-height: 0;
-    overflow: hidden;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: var(--ed-olive) !important;
-    border-right: none !important;
-    border-bottom: 1px solid var(--ed-forest-08);
-    box-shadow: none !important;
-    transition: max-height var(--ed-dur-mid) var(--ed-ease);
-}
-.main-sidebar li.treeview.drop-down.fsm-expanded > .side-menu > .treeview-menu,
-.main-sidebar li.treeview.drop-down.fsm-expanded > .treeview-menu {
-    /* JS sets exact scrollHeight in pixels; cap is fallback only */
-    max-height: 4000px;
-}
-.main-sidebar .treeview-menu > li > a {
-    padding: 10px 16px 10px 44px !important;
-    font-size: 13px;
-}
-.main-sidebar .treeview-menu .treeview-head {
-    padding: 8px 16px;
+/* Mobile (<480px): drawer is full-width; popover renders centered
+   beneath the trigger row instead of pinned to the right edge. */
+@media (max-width: 480px) {
+    .fsm-flyout-anchored {
+        width: calc(100vw - 32px) !important;
+        max-width: 320px !important;
+    }
 }
 
-/* Inline-accordion for .submenu (drill_down_menu.html, drill_down_tab.html) */
-.main-sidebar .submenu {
-    max-height: 0;
-    overflow: hidden;
-    margin: 0 !important;
-    padding-left: 0 !important;
-    background: var(--ed-olive);
-    transition: max-height var(--ed-dur-mid) var(--ed-ease);
+/* Flyout header — back arrow + parent label. Injected by JS so we don't
+   have to edit each template's Jinja. Sticky so it stays put when the
+   submenu list is long. */
+.fsm-side-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--ed-cream);
+    border-bottom: 1px solid var(--ed-forest-08);
 }
-.main-sidebar li.treeview.drop-down.fsm-expanded > .submenu {
-    max-height: 4000px;
+.fsm-side-back {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 auto;
+    border: none;
+    border-radius: var(--ed-radius-pill);
+    background: transparent;
+    color: var(--ed-forest);
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--ed-dur-fast) var(--ed-ease);
 }
+.fsm-side-back:hover {
+    background: var(--ed-forest-08);
+}
+.fsm-side-back:focus-visible {
+    outline: 2px solid var(--ed-moss);
+    outline-offset: 2px;
+}
+.fsm-side-title {
+    font-family: var(--ed-font-body);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    color: var(--ed-forest-dark);
+}
+
+/* Drill-down (.submenu) item styling — kept consistent with .treeview-menu */
 .main-sidebar .submenu li {
-    padding-left: 44px !important;
+    padding: 0 !important;
     list-style: none;
+    background: transparent;
 }
 .main-sidebar .submenu li:hover {
-    background: var(--ed-forest-08);
-    padding-left: 48px !important;
+    background: rgba(163, 177, 138, 0.25);
 }
 .main-sidebar .submenu li a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
     color: var(--ed-forest);
     text-decoration: none;
+    font-size: 13px;
+}
+
+/* Mobile: flyout overlays the drawer (drill-down behaviour) since both
+   panels can't fit side-by-side. */
+@media (max-width: 480px) {
+    .main-sidebar .sidebar-menu .side-menu,
+    .main-sidebar .sidebar-menu .submenu {
+        left: 0;
+        width: 100vw;
+        max-width: 100vw;
+        z-index: 1041;
+    }
 }
 
 /* Hide per-submenu user-info; JS moves a single instance to the footer */
@@ -663,8 +790,10 @@ body.fsm-open {
     opacity: 0.55;
     pointer-events: none;
 }
+/* Expanded state: chevron stays pointing right (the popover pops to the
+   right of this row), just brighten it to indicate active. */
 .main-sidebar li.treeview.drop-down.fsm-expanded > a.link.menu::after,
 #fsm-drawer li.treeview.drop-down.fsm-expanded > a.link.menu::after {
-    transform: translateY(-30%) rotate(45deg);
-    opacity: 0.85;
+    opacity: 1;
+    color: var(--ed-forest-dark);
 }

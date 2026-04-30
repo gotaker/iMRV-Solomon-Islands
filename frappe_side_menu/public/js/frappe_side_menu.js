@@ -441,44 +441,223 @@ $('[class="search"]').css("display", "none");
 $('[id="recordListContainer"]').css("display", "none");
 
 
-// Unified accordion: toggles `.fsm-expanded` on the parent <li class="treeview drop-down">.
-// Handles both .treeview-menu (side_menu1.html) and .submenu (drill_down variants).
-// Single-open: collapsing siblings before expanding the clicked one.
+// Contextual flyout: clicking a parent re-parents its <.side-menu>/<.submenu>
+// to <body> and pins it next to the clicked row via getBoundingClientRect.
+// Single-open across all parents. The original parent <li> is remembered on
+// the panel so collapse can restore the DOM.
+var fsmActiveFlyout = null;
+
+function fsmFindFlyout(parentLi) {
+    // Once tagged, the panel keeps its data-fsm-owner attribute regardless of
+    // whether it currently has the .fsm-flyout-anchored class (class is added
+    // when shown, removed when hidden; attribute persists across the cycle).
+    // The panel may live either inside parentLi (collapsed) or under <body>
+    // mid-animation, so search globally.
+    if (parentLi.dataset.fsmFlyoutId) {
+        return document.querySelector('[data-fsm-owner="' + parentLi.dataset.fsmFlyoutId + '"]');
+    }
+    return parentLi.querySelector(':scope > .side-menu, :scope > .submenu');
+}
+
+function fsmPositionFlyout(panel, parentLi) {
+    var liRect = parentLi.getBoundingClientRect();
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+    var gap = 8;
+
+    // Default: just outside drawer's right edge, top aligned with the row.
+    var left = liRect.right + gap;
+    var top = liRect.top;
+
+    // Mobile (<480px): center under the row.
+    if (vw < 480) {
+        left = Math.max(16, (vw - 280) / 2);
+        top = liRect.bottom + 4;
+    } else {
+        // If popover would extend past viewport bottom, shift up so it fits.
+        var maxH = Math.min(vh * 0.7, vh - 16);
+        var panelH = Math.min(panel.scrollHeight || 200, maxH);
+        if (top + panelH > vh - 8) {
+            top = Math.max(8, vh - panelH - 8);
+        }
+        // If popover would extend past viewport right, fall back below the row.
+        if (left + 280 > vw - 8) {
+            left = Math.max(8, vw - 280 - 8);
+        }
+    }
+
+    panel.style.top = top + 'px';
+    panel.style.left = left + 'px';
+}
+
+function fsmShowFlyout(parentLi) {
+    var panel = fsmFindFlyout(parentLi);
+    if (!panel) return;
+
+    if (!parentLi.dataset.fsmFlyoutId) {
+        var id = 'fsm-flyout-' + Math.random().toString(36).slice(2, 9);
+        parentLi.dataset.fsmFlyoutId = id;
+        panel.dataset.fsmOwner = id;
+    }
+
+    if (panel.parentElement !== document.body) {
+        document.body.appendChild(panel);
+    }
+    panel.classList.add('fsm-flyout-anchored');
+
+    // Pre-position once so panel.scrollHeight reflects real layout.
+    fsmPositionFlyout(panel, parentLi);
+
+    // If the popover would extend past viewport bottom even after our
+    // anti-overflow shift-up, scroll the drawer so the parent row sits
+    // high enough that the popover can anchor at the row's y. Without
+    // this, REPORTS / MASTER DATABASE on short viewports look detached
+    // (popover floats up next to MITIGATION's row instead of its own).
+    var liTop = parentLi.getBoundingClientRect().top;
+    var panelH = panel.scrollHeight || 200;
+    var vh = window.innerHeight;
+    var margin = 16;
+    if (liTop + panelH > vh - margin) {
+        var desiredTop = Math.max(margin, vh - panelH - margin);
+        var delta = liTop - desiredTop;
+        var scroller = parentLi.closest('.main-sidebar');
+        if (scroller) {
+            scroller.scrollTop += delta;
+            // Re-measure and reposition after scroll.
+            fsmPositionFlyout(panel, parentLi);
+        }
+    }
+    fsmActiveFlyout = { panel: panel, parentLi: parentLi };
+
+    // Focus the first leaf link so keyboard users land in the popover.
+    var firstLink = panel.querySelector('a[href]');
+    if (firstLink) {
+        try { firstLink.focus({ preventScroll: true }); } catch (e) {}
+    }
+
+    // Reposition on viewport / drawer-scroll changes while open.
+    window.addEventListener('resize', fsmRepositionFlyout);
+    window.addEventListener('scroll', fsmRepositionFlyout, true);
+}
+
+// Keyboard nav inside the active popover:
+//   ↓ / ↑   move focus to next / prev item
+//   Home / End jump to first / last
+//   ←       close popover, return focus to parent toggle
+//   Esc     close popover only (NOT the whole drawer); fall through to
+//           the global Esc handler if no popover is active.
+function fsmHandlePopoverKeydown(e) {
+    if (!fsmActiveFlyout) return;
+    var panel = fsmActiveFlyout.panel;
+    var items = Array.prototype.slice.call(
+        panel.querySelectorAll('a[href], a[onclick]')
+    );
+    if (!items.length) return;
+    var idx = items.indexOf(document.activeElement);
+
+    // Only handle the popover-relevant keys; let everything else through.
+    var key = e.key;
+    if (key !== 'ArrowDown' && key !== 'ArrowUp' && key !== 'Home' &&
+        key !== 'End' && key !== 'ArrowLeft' && key !== 'Escape') return;
+
+    // Block ALL the popover keys from reaching Frappe's desk handlers,
+    // which intercept ArrowDown/ArrowUp for list navigation and would
+    // override our focus shifts. stopImmediatePropagation prevents both
+    // sibling listeners on document and downstream propagation.
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    e.stopPropagation();
+
+    if (key === 'ArrowDown') {
+        items[(idx + 1) % items.length].focus();
+    } else if (key === 'ArrowUp') {
+        items[(idx - 1 + items.length) % items.length].focus();
+    } else if (key === 'Home') {
+        items[0].focus();
+    } else if (key === 'End') {
+        items[items.length - 1].focus();
+    } else if (key === 'ArrowLeft' || key === 'Escape') {
+        var parentLi = fsmActiveFlyout.parentLi;
+        var toggleA = parentLi.querySelector(':scope > a.link.menu, :scope > a.menu');
+        parentLi.classList.remove('fsm-expanded');
+        if (toggleA) toggleA.setAttribute('aria-expanded', 'false');
+        fsmHideFlyout(parentLi);
+        document.body.classList.remove('fsm-flyout-active');
+        if (toggleA) toggleA.focus();
+    }
+}
+
+function fsmHideFlyout(parentLi) {
+    var panel = parentLi.dataset.fsmFlyoutId
+        ? document.querySelector('.fsm-flyout-anchored[data-fsm-owner="' + parentLi.dataset.fsmFlyoutId + '"]')
+        : null;
+    if (!panel) return;
+    panel.classList.remove('fsm-flyout-anchored');
+    panel.style.top = '';
+    panel.style.left = '';
+    // Move panel back into the original <li> so subsequent renders / template
+    // re-runs find it where the Jinja put it. Idempotent if already there.
+    if (panel.parentElement !== parentLi) {
+        parentLi.appendChild(panel);
+    }
+    if (fsmActiveFlyout && fsmActiveFlyout.parentLi === parentLi) {
+        fsmActiveFlyout = null;
+        window.removeEventListener('resize', fsmRepositionFlyout);
+        window.removeEventListener('scroll', fsmRepositionFlyout, true);
+    }
+}
+
+function fsmRepositionFlyout() {
+    if (fsmActiveFlyout) {
+        fsmPositionFlyout(fsmActiveFlyout.panel, fsmActiveFlyout.parentLi);
+    }
+}
+
 function toggleSubMenu(element) {
-    const parentLi = element.closest('li.treeview.drop-down');
+    var parentLi = element.closest('li.treeview.drop-down');
     if (!parentLi) return;
+    var isOpen = parentLi.classList.contains('fsm-expanded');
 
-    const childPanel = parentLi.querySelector(':scope > .submenu, :scope > .side-menu > .treeview-menu, :scope > .treeview-menu');
-    if (!childPanel) return;
-
-    const isOpen = parentLi.classList.contains('fsm-expanded');
-
-    // Collapse all siblings first
     document.querySelectorAll('li.treeview.drop-down.fsm-expanded').forEach(function(li) {
         if (li === parentLi) return;
         li.classList.remove('fsm-expanded');
-        const sibPanel = li.querySelector(':scope > .submenu, :scope > .side-menu > .treeview-menu, :scope > .treeview-menu');
-        if (sibPanel) sibPanel.style.maxHeight = '0px';
-        const sibIcon = li.querySelector('i.fa-angle-down');
-        if (sibIcon) sibIcon.classList.replace('fa-angle-down', 'fa-angle-right');
-        const sibToggle = li.querySelector(':scope > a[role="button"]');
+        var sibToggle = li.querySelector(':scope > a[role="button"]');
         if (sibToggle) sibToggle.setAttribute('aria-expanded', 'false');
+        fsmHideFlyout(li);
     });
 
-    if (isOpen) {
-        parentLi.classList.remove('fsm-expanded');
-        childPanel.style.maxHeight = '0px';
-        const icon = parentLi.querySelector('i.fa-angle-down');
-        if (icon) icon.classList.replace('fa-angle-down', 'fa-angle-right');
-    } else {
-        parentLi.classList.add('fsm-expanded');
-        childPanel.style.maxHeight = childPanel.scrollHeight + 'px';
-        const icon = parentLi.querySelector('i.fa-angle-right');
-        if (icon) icon.classList.replace('fa-angle-right', 'fa-angle-down');
-    }
+    parentLi.classList.toggle('fsm-expanded', !isOpen);
     if (element.getAttribute('role') === 'button') {
         element.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
     }
+    document.body.classList.toggle('fsm-flyout-active', !isOpen);
+
+    if (isOpen) {
+        fsmHideFlyout(parentLi);
+    } else {
+        fsmShowFlyout(parentLi);
+    }
+}
+
+function fsmCollapseExpanded() {
+    if (!fsmDrawerEl) return;
+    fsmDrawerEl.querySelectorAll('li.treeview.drop-down.fsm-expanded').forEach(function(li) {
+        li.classList.remove('fsm-expanded');
+        var toggleA = li.querySelector(':scope > a[role="button"]');
+        if (toggleA) toggleA.setAttribute('aria-expanded', 'false');
+        fsmHideFlyout(li);
+    });
+    // Also handle any orphan flyouts that may have lost their <li> reference.
+    document.querySelectorAll('.fsm-flyout-anchored').forEach(function(panel) {
+        var ownerId = panel.dataset.fsmOwner;
+        var owner = ownerId ? document.querySelector('[data-fsm-flyout-id="' + ownerId + '"]') : null;
+        panel.classList.remove('fsm-flyout-anchored');
+        panel.style.top = '';
+        panel.style.left = '';
+        if (owner && panel.parentElement !== owner) owner.appendChild(panel);
+    });
+    fsmActiveFlyout = null;
+    document.body.classList.remove('fsm-flyout-active');
 }
 
 const sidebarMenu = document.getElementById('sideMenu');
@@ -759,6 +938,45 @@ function fsmAttachDrawer() {
         toggleSubMenu(target);
     });
 
+    // Popover keyboard nav (arrow keys, Home/End, ←/Esc to close popover).
+    // Capture phase so we run BEFORE the global Esc→fsmCloseDrawer handler
+    // (which is bound to document in fsmInjectTrigger). Without capture,
+    // pressing Esc inside a popover would close the whole drawer.
+    document.addEventListener('keydown', fsmHandlePopoverKeydown, true);
+
+    // Body-level delegate for the contextual flyout (which lives on <body>,
+    // not inside fsmDrawerEl). Mirrors the drawer delegate above:
+    // SPA-route on plain click, let modifier clicks pass through, close
+    // drawer after navigation.
+    document.body.addEventListener('click', function(e) {
+        var panel = e.target.closest('.fsm-flyout-anchored');
+        if (!panel) {
+            // Click outside an open flyout → close it.
+            if (fsmActiveFlyout && !e.target.closest('.fsm-trigger') &&
+                !e.target.closest('li.treeview.drop-down.fsm-expanded')) {
+                fsmCollapseExpanded();
+            }
+            return;
+        }
+        var a = e.target.closest('a');
+        if (!a) return;
+        if (e.button === 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        var onclickAttr = a.getAttribute('onclick') || '';
+        var href = a.getAttribute('href') || '';
+        var hasGoToPage = onclickAttr.indexOf('go_to_page') !== -1;
+        if (href && href.charAt(0) !== '#' && (hasGoToPage || !onclickAttr)) {
+            e.preventDefault();
+            if (window.frappe && typeof window.frappe.set_route === 'function') {
+                var route = href.replace(/^\/(app|desk)\/?/, '');
+                if (route) window.frappe.set_route(route);
+                else window.location.href = href;
+            } else {
+                window.location.href = href;
+            }
+        }
+        setTimeout(fsmCloseDrawer, 80);
+    });
+
     document.body.classList.add('fsm-ready');
 }
 
@@ -820,6 +1038,7 @@ function fsmOpenDrawer() {
 
 function fsmCloseDrawer(opts) {
     if (!fsmDrawerEl) return;
+    fsmCollapseExpanded();
     document.body.classList.remove('fsm-open');
     if (fsmTriggerEl) {
         fsmTriggerEl.setAttribute('aria-expanded', 'false');

@@ -30,11 +30,17 @@ http {
         listen ${PORT} default_server;
         server_name _;
 
-        # Static bench-built assets (JS/CSS bundles, Frappe desk assets)
+        # Static bench-built assets (JS/CSS bundles, Frappe desk assets).
+        # Cache-Control: no-cache forces revalidation on every request, but
+        # nginx returns 304 (~50 ms) when ETag matches — so cost is bounded
+        # to round-trip while guaranteeing every deploy / docker cp is
+        # immediately visible without a hard-reload. The previous `expires
+        # 1h` made hot-patched edits invisible to users for up to an hour.
         location /assets/ {
             alias /home/frappe/frappe-bench/sites/assets/;
             try_files $uri =404;
-            expires 1h;
+            add_header Cache-Control "no-cache, must-revalidate" always;
+            etag on;
         }
 
         # Public site files (seed images + user uploads with is_private=0).
