@@ -152,7 +152,7 @@ class NdcReport {
 			.then((r) => {
 				if (this.monitoring_year[0].value != ''){
 
-					$("#categories_chart").html("No of Projects based on Categories")
+					$("#categories_chart").html("GHG Emission Reduction Summary (Expected vs. Actual, tCO₂e)")
 				}
 				else{
 					
@@ -167,10 +167,11 @@ class NdcReport {
 					axisOptions: {
 						xIsSeries: 0,
 						isNavigable :1 ,
-						shortenYAxisNumbers: 0,
+						shortenYAxisNumbers: 1,
 						xAxisMode: "tick",
 						numberFormatter: frappe.utils.format_chart_axis_number,
 					},
+					tooltipOptions: { formatTooltipY: (v) => (v == null ? "—" : Number(v).toLocaleString()) },
 					data: {
 						datasets: results.datasets,
 						labels: results.labels
@@ -202,6 +203,7 @@ class NdcReport {
 						numberFormatter: frappe.utils.format_chart_axis_number,
 						maxSlices: 6
 					},
+					tooltipOptions: { formatTooltipY: (v) => (v == null ? "—" : Number(v).toLocaleString()) },
 					data: {
 						datasets: [{values: results.data}],
 						labels: results.labels

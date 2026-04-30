@@ -276,8 +276,8 @@ class Mitigation {
 			market_mechanism:this.market_mechanism[0].value
 		})
 			.then((r) => {
-				$("#categories_chart").html("No of Projects based on Categories")
-				
+				$("#categories_chart").html("GHG Emission Reduction Summary (Expected vs. Actual, tCO₂e)")
+
 				let results = r.message[1] || [];
 				const custom_options = {
 					type: "bar",
@@ -286,15 +286,18 @@ class Mitigation {
 					axisOptions: {
 						xIsSeries: 0,
 						isNavigable :1 ,
-						shortenYAxisNumbers: 0,
+						shortenYAxisNumbers: 1,   // R3: render 100K instead of 100000 to avoid left-edge clip
 						xAxisMode: "tick",
 						numberFormatter: frappe.utils.format_chart_axis_number,
+					},
+					tooltipOptions: {                // R2: prevent literal "undefined" in chart tooltips
+						formatTooltipY: (v) => (v == null ? "—" : Number(v).toLocaleString()),
 					},
 					data: {
 						datasets: results.datasets,
 						labels: results.labels
 					},
-					
+
 				};
 				frappe.utils.make_chart(".totalmitigation_report-graph", custom_options);
 			});

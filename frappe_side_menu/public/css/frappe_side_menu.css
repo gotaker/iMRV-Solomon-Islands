@@ -371,6 +371,28 @@ body.fsm-open .main-sidebar {
     outline-offset: -2px;
     background: rgba(163, 177, 138, 0.35);
 }
+
+/* Replace the legacy Font-Awesome glyphs (`<i class="fa fa-bar-chart">`)
+   shipped inside flyout leaf items with a Lucide-style outline icon
+   — same family as the rail above. Hide the original FA glyph and
+   render a mask-image SVG before each anchor that contains one. */
+.fsm-flyout-anchored ul.treeview-menu > li > a > i.fa,
+.fsm-flyout-anchored.submenu > li > a > i.fa {
+    display: none !important;
+}
+.fsm-flyout-anchored ul.treeview-menu > li > a:has(> i.fa-bar-chart)::before,
+.fsm-flyout-anchored ul.treeview-menu > li > a:has(> i.fa-line-chart)::before,
+.fsm-flyout-anchored.submenu > li > a:has(> i.fa-bar-chart)::before,
+.fsm-flyout-anchored.submenu > li > a:has(> i.fa-line-chart)::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+    background-color: currentColor;
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 3v18h18'/><path d='M18 17V9'/><path d='M13 17V5'/><path d='M8 17v-3'/></svg>") no-repeat center / contain;
+            mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 3v18h18'/><path d='M18 17V9'/><path d='M13 17V5'/><path d='M8 17v-3'/></svg>") no-repeat center / contain;
+}
 .fsm-flyout-anchored ul.treeview-menu .treeview-head {
     padding: 10px 16px 6px;
     font-size: 11px;

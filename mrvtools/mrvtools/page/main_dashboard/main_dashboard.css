@@ -141,9 +141,9 @@
 }
 .ed-dashboard .ed-activity-title {
 	font-family: var(--ed-font-body);
-	font-size: 11px;
+	font-size: 12px;
 	font-weight: 700;
-	letter-spacing: 0.3em;
+	letter-spacing: 0.24em;
 	text-transform: uppercase;
 	color: var(--ed-forest-60);
 	margin: 0 0 1.25rem;

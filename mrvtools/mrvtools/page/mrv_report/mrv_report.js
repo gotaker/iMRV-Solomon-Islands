@@ -248,10 +248,11 @@ class MRVReport {
 					axisOptions: {
 						xIsSeries: 0,
 						isNavigable :1 ,
-						shortenYAxisNumbers: 0,
+						shortenYAxisNumbers: 1,
 						xAxisMode: "tick",
 						numberFormatter: frappe.utils.format_chart_axis_number,
 					},
+					tooltipOptions: { formatTooltipY: (v) => (v == null ? "—" : Number(v).toLocaleString()) },
 					data: {
 						datasets: [{values: results.data}],
 						labels: results.labels
@@ -275,10 +276,11 @@ class MRVReport {
 					axisOptions: {
 						xIsSeries: 0,
 						isNavigable :1 ,
-						shortenYAxisNumbers: 0,
+						shortenYAxisNumbers: 1,
 						xAxisMode: "tick",
 						numberFormatter: frappe.utils.format_chart_axis_number,
 					},
+					tooltipOptions: { formatTooltipY: (v) => (v == null ? "—" : Number(v).toLocaleString()) },
 					data: {
 						datasets: [{values: results.data}],
 						labels: results.labels
