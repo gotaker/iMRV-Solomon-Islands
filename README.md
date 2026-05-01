@@ -12,6 +12,23 @@ Three layers in one repo:
 
 See [CLAUDE.md](CLAUDE.md) for a deeper architectural tour (routing handoff, seed data, permission query conditions, server-side entry points).
 
+## Design philosophy — Forest-and-Sage editorial system
+
+A single editorial design system spans all three layers: the public SPA at `/frontend/*`, the Frappe desk at `/app/*`, and the custom `/login` page. Designed to replace the Bootstrap/AOS/CDN-dependent legacy templates with a continuous, self-hosted, brand-coherent experience.
+
+**Typography.** [Anton](https://fonts.google.com/specimen/Anton) for display (h1/h2, modal titles, large stat numbers, program-card titles); [Inter](https://rsms.me/inter/) for everything else. Both self-hosted under [`mrvtools/public/fonts/`](mrvtools/public/fonts/) and [`frontend/src/assets/Anton/`](frontend/src/assets/Anton/) — **zero CDN calls** (hard requirement for offline / low-bandwidth deployment).
+
+**Palette.** Forest (`#01472e`) + cream (`#fefae0`) + sage tones, with derived alpha scrims (`--ed-forest-08/-12/-20/-60`). All tokens declared once at `:root` in [`frappe_side_menu/public/css/frappe_side_menu.css`](frappe_side_menu/public/css/frappe_side_menu.css) and consumed via `var(--ed-*)`. The SPA mirrors them in [`frontend/tailwind.config.js`](frontend/tailwind.config.js); palette changes update **both** files.
+
+**Surface language.**
+
+- **Persistent surfaces** (page bg, navbar, sidebar) — flat `var(--ed-cream)`, never frosted.
+- **Ephemeral surfaces** (modals, dropdowns, tooltips, popovers, the floating drawer) — frosted-glass: `backdrop-filter: blur(20px) saturate(140%)`, `var(--ed-frost-bg)`, hairline forest border. Backdrop dim uses `blur(4px)`.
+- **Cards** — white, hairline `var(--ed-forest-08)` border, `var(--ed-shadow-forest)`, `var(--ed-radius-card)`.
+- **Buttons + pills** — `var(--ed-radius-pill)`, uppercase, `letter-spacing: 0.3em`, 11px / 700 Inter.
+
+**Adherence rules.** Never hardcode hex literals — always `var(--ed-*)`. Never re-override the `:root` Frappe v16 variables that [`mrvtools/public/css/editorial/01-foundation.css`](mrvtools/public/css/editorial/01-foundation.css) owns. Add new desk styles to one of the existing `0X-*.css` layers (or a new `08-*.css` wired into [`mrvtools/hooks.py`](mrvtools/hooks.py) `app_include_css`). Diagnose selector/loading bugs before reaching for token swaps — "fix the font" usually means a CSS specificity issue, not a wrong token.
+
 ## Quick start (local dev)
 
 One-command bootstrap on a fresh macOS, Ubuntu, or WSL2 laptop:

@@ -1,46 +1,32 @@
-# Frappe UI Starter
+# frontend — Vue 3 SPA
 
-This template should help get you started developing custom frontend for Frappe
-apps with Vue 3 and the Frappe UI package.
+The public-facing Solomon Islands MRV portal. Vue 3 + Vite + TailwindCSS + [Frappe UI](https://github.com/frappe/frappe-ui), built into [`mrvtools/public/frontend/`](../mrvtools/public/frontend/) and served by Frappe at `/frontend/*`.
 
-![Auth](https://user-images.githubusercontent.com/34810212/236846289-ac31c292-81ea-4456-be65-95773a4049be.png)
+## Build and run
 
-![Home](https://user-images.githubusercontent.com/34810212/236846299-fd534e2b-1c06-4f01-a4f2-91a27547cd55.png)
-
-This boilerplate sets up Vue 3, Vue Router, TailwindCSS, and Frappe UI out of
-the box. It also has basic authentication frontend.
-
-## Usage
-
-This template is meant to be cloned inside an existing Frappe App. Assuming your
-apps name is `todo`. Clone this template in the root folder of your app using `degit`.
-
-```
-cd apps/todo
-npx degit NagariaHussain/doppio_frappeui_starter frontend
-cd frontend
-yarn
-yarn dev
+```bash
+yarn install        # first time
+yarn dev            # Vite dev server on :8080, proxies to bench on :8000
+yarn build          # production build → mrvtools/public/frontend/
+                    # also copies index.html → mrvtools/www/frontend.html
 ```
 
-In a development environment, you need to put the below key-value pair in your `site_config.json` file:
+Dev server proxies `/api`, `/method`, `/assets`, `/files`, `/private`, `/app`, `/login`, `/logout`, `/socket.io` to the adjacent Frappe bench. Host-aware: visit `http://mrv.localhost:8080` to proxy to `http://mrv.localhost:8000`.
 
+## Verifying a production build
+
+Don't use `vite preview` — it serves from `frontend/dist` with the dev base URL. Instead:
+
+```bash
+yarn build
+python3 -m http.server -d ../mrvtools/public/frontend 8090
+# load http://localhost:8090/
 ```
-"ignore_csrf": 1
-```
 
-This will prevent `CSRFToken` errors while using the vite dev server. In production environment, the `csrf_token` is attached to the `window` object in `index.html` for you.
+## Build pipeline
 
-The Vite dev server will start on the port `8080`. This can be changed from `vite.config.js`.
-The development server is configured to proxy your frappe app (usually running on port `8000`). If you have a site named `todo.test`, open `http://todo.test:8080` in your browser. If you see a button named "Click to send 'ping' request", congratulations!
+[`vite.config.mjs`](vite.config.mjs) drives the build via `frappe-ui/vite`'s plugin with `buildConfig: { outDir, baseUrl, indexHtmlPath }`. The `.mjs` extension is load-bearing (`frappe-ui/vite` is ESM-only). Output paths and the `website_route_rules` / `app_include_*` entries in [`mrvtools/hooks.py`](../mrvtools/hooks.py) must stay in sync.
 
-If you notice the browser URL is `/frontend`, this is the base URL where your frontend app will run in production.
-To change this, open `src/router.js` and change the base URL passed to `createWebHistory`.
+## More
 
-## Resources
-
-- [Vue 3](https://v3.vuejs.org/guide/introduction.html)
-- [Vue Router](https://next.router.vuejs.org/guide/)
-- [Frappe UI](https://github.com/frappe/frappe-ui)
-- [TailwindCSS](https://tailwindcss.com/docs/utility-first)
-- [Vite](https://vitejs.dev/guide/)
+See the root [`CLAUDE.md`](../CLAUDE.md) for architecture notes, the routing handoff (`/frontend/<path:app_path>` → Frappe → Vue router with `createWebHistory('/frontend')`), the `useReveal()` composable for scroll animations, and the `createResource(...).data` unwrap idiom.

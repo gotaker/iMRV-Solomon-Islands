@@ -40,3 +40,6 @@ screenshots/
 
 # /graphify skill output (regenerated; not source)
 graphify-out/
+
+# Stray top-level build path — real Vite output is mrvtools/public/frontend/
+iMRV-Solomon-Islands/
